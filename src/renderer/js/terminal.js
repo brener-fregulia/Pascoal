@@ -1,9 +1,19 @@
 function initTerminal() {
   const runBtn = document.getElementById('run-btn')
   const clearBtn = document.getElementById('clear-btn')
+  const input = document.getElementById('terminal-input')
 
   runBtn.addEventListener('click', runCode)
   clearBtn.addEventListener('click', clearTerminal)
+
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const val = input.value
+      printLine('> ' + val, 'dim')
+      input.value = ''
+      if (window.api) await window.api.sendInput(val)
+    }
+  })
 }
 
 function printLine(text, type = '') {
@@ -35,6 +45,9 @@ async function runCode() {
   printLine('Compilando...', 'info')
 
   if (window.api) {
+    // Remove listener anterior antes de adicionar novo
+    window.api.removeOutput()
+
     window.api.onOutput((data) => {
       printLine(data)
     })

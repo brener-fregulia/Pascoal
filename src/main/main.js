@@ -2,6 +2,13 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const { spawn } = require('child_process')
+const { isFpcInstalled, getFpcVersion, promptInstallFpc } = require('./fpc')
+let runningProcess = null
+
+// Verifica FPC ao iniciar
+app.whenReady().then(async () => {
+  createWindow()
+})
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -20,6 +27,19 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
 }
+
+// Retorna status do FPC para o renderer
+ipcMain.handle('check-fpc', async () => {
+  const installed = isFpcInstalled()
+  const version = installed ? getFpcVersion() : null
+  return { installed, version }
+})
+
+ipcMain.handle('send-input', (_, data) => {
+  if (runningProcess && runningProcess.stdin) {
+    runningProcess.stdin.write(data + '\n')
+  }
+})
 
 // Carrega a árvore de atividades
 ipcMain.handle('get-activities', () => {
@@ -75,34 +95,45 @@ ipcMain.handle('get-code', (_, disciplina, exercicio, aluno) => {
   return fs.readFileSync(filePath, 'utf-8')
 })
 
-// Compila e executa o código Pascal
 ipcMain.handle('run-code', async (event, code) => {
-  const tmpDir = path.join(app.getPath('temp'), 'bastos-pas')
+  const win = BrowserWindow.getFocusedWindow()
+
+  if (!isFpcInstalled()) {
+    await promptInstallFpc(win)
+    return { success: false, output: 'FPC nao encontrado. Instale o Free Pascal e tente novamente.' }
+  }
+
+  const tmpDir = path.join(app.getPath('userData'), 'bastos-tmp')
   if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
   const srcFile = path.join(tmpDir, 'programa.pas')
   const outFile = path.join(tmpDir, 'programa')
+  const exeFile = outFile + '.exe'
 
   fs.writeFileSync(srcFile, code, 'utf-8')
 
+  // Remove executavel anterior se existir
+  if (fs.existsSync(exeFile)) fs.unlinkSync(exeFile)
+  if (fs.existsSync(outFile)) fs.unlinkSync(outFile)
+
   return new Promise((resolve) => {
-    // Tenta encontrar o fpc no PATH
-    const fpc = process.platform === 'win32' ? 'fpc.exe' : 'fpc'
+    const compile = spawn('fpc.exe', [srcFile, '-FE' + tmpDir, '-o' + exeFile], {
+      cwd: tmpDir,
+      shell: true
+    })
 
-    const compile = spawn(fpc, ['-o' + outFile, srcFile])
     let compileOutput = ''
-
     compile.stdout.on('data', d => compileOutput += d.toString())
     compile.stderr.on('data', d => compileOutput += d.toString())
 
-    compile.on('close', (code) => {
-      if (code !== 0) {
+    compile.on('close', (exitCode) => {
+      if (exitCode !== 0 || !fs.existsSync(exeFile)) {
         resolve({ success: false, output: compileOutput })
         return
       }
 
-      const exe = process.platform === 'win32' ? outFile + '.exe' : outFile
-      const run = spawn(exe, [], { cwd: tmpDir })
+      runningProcess = spawn(exeFile, [], { cwd: tmpDir })
+      const run = runningProcess
       let runOutput = ''
 
       run.stdout.on('data', d => {
@@ -115,13 +146,12 @@ ipcMain.handle('run-code', async (event, code) => {
       })
 
       run.on('close', () => {
+        runningProcess = null
         resolve({ success: true, output: runOutput })
       })
     })
   })
 })
-
-app.whenReady().then(createWindow)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
