@@ -5,7 +5,6 @@ const { spawn } = require('child_process')
 const { isFpcInstalled, getFpcVersion, promptInstallFpc } = require('./fpc')
 let runningProcess = null
 
-// Verifica FPC ao iniciar
 app.whenReady().then(async () => {
   createWindow()
 })
@@ -28,7 +27,6 @@ function createWindow() {
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
 }
 
-// Retorna status do FPC para o renderer
 ipcMain.handle('check-fpc', async () => {
   const installed = isFpcInstalled()
   const version = installed ? getFpcVersion() : null
@@ -36,12 +34,11 @@ ipcMain.handle('check-fpc', async () => {
 })
 
 ipcMain.handle('send-input', (_, data) => {
-  if (runningProcess && runningProcess.stdin) {
-    runningProcess.stdin.write(data + '\n')
+  if (runningProcess) {
+    runningProcess.write(data + '\r')
   }
 })
 
-// Carrega a árvore de atividades
 ipcMain.handle('get-activities', () => {
   const baseDir = path.join(__dirname, '../../atividades')
   const result = []
@@ -84,7 +81,6 @@ ipcMain.handle('get-activities', () => {
   return result
 })
 
-// Carrega o código de um arquivo .pas
 ipcMain.handle('get-code', (_, disciplina, exercicio, aluno) => {
   const filePath = path.join(
     __dirname, '../../atividades',
@@ -108,19 +104,17 @@ ipcMain.handle('run-code', async (event, code) => {
 
   const srcFile = path.join(tmpDir, 'programa.pas')
   const outFile = path.join(tmpDir, 'programa')
-  const exeFile = outFile + '.exe'
+  const exeFile = process.platform === 'win32' ? outFile + '.exe' : outFile
 
   fs.writeFileSync(srcFile, code, 'utf-8')
 
-  // Remove executavel anterior se existir
   if (fs.existsSync(exeFile)) fs.unlinkSync(exeFile)
-  if (fs.existsSync(outFile)) fs.unlinkSync(outFile)
+  if (process.platform !== 'win32' && fs.existsSync(outFile + '.exe')) fs.unlinkSync(outFile + '.exe')
 
   return new Promise((resolve) => {
     const fpcBin = process.platform === 'win32' ? 'fpc.exe' : 'fpc'
     const compile = spawn(fpcBin, [srcFile, '-FE' + tmpDir, '-o' + exeFile], {
-      cwd: tmpDir,
-      shell: true
+      cwd: tmpDir
     })
 
     let compileOutput = ''
@@ -133,22 +127,31 @@ ipcMain.handle('run-code', async (event, code) => {
         return
       }
 
-      runningProcess = spawn(exeFile, [], { cwd: tmpDir })
-      const run = runningProcess
-      let runOutput = ''
+      if (process.platform !== 'win32') {
+        fs.chmodSync(exeFile, '755')
+      }
 
-      run.stdout.on('data', d => {
-        runOutput += d.toString()
-        event.sender.send('run-output', d.toString())
-      })
-      run.stderr.on('data', d => {
-        runOutput += d.toString()
-        event.sender.send('run-output', d.toString())
+      const pty = require('node-pty')
+
+      runningProcess = pty.spawn(exeFile, [], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 24,
+        cwd: tmpDir,
+        env: process.env
       })
 
-      run.on('close', () => {
+      if (process.platform !== 'win32') {
+        console.log('[bastos.pas] processo iniciado, PID:', runningProcess.pid)
+      }
+
+      runningProcess.onData((data) => {
+        event.sender.send('run-output', data)
+      })
+
+      runningProcess.onExit(({ exitCode }) => {
         runningProcess = null
-        resolve({ success: true, output: runOutput })
+        resolve({ success: true, output: '' })
       })
     })
   })
