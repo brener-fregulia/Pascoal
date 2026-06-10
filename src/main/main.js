@@ -117,7 +117,8 @@ ipcMain.handle('run-code', async (event, code) => {
   if (fs.existsSync(outFile)) fs.unlinkSync(outFile)
 
   return new Promise((resolve) => {
-    const compile = spawn('fpc.exe', [srcFile, '-FE' + tmpDir, '-o' + exeFile], {
+    const fpcBin = process.platform === 'win32' ? 'fpc.exe' : 'fpc'
+    const compile = spawn(fpcBin, [srcFile, '-FE' + tmpDir, '-o' + exeFile], {
       cwd: tmpDir,
       shell: true
     })

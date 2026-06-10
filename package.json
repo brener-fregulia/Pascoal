@@ -12,10 +12,18 @@
   },
   "author": "Brener Fregulia",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brener-fregulia/Bastos.pas/issues"
+  },
+  "homepage": "https://github.com/brener-fregulia/Bastos.pas#readme",
   "devDependencies": {
-    "electron": "^28.0.0"
+    "electron": "^42.4.0"
   },
   "dependencies": {
     "node-pty": "^1.0.0"
+  },
+  "allowScripts": {
+    "electron@42.4.0": true,
+    "node-pty@1.1.0": true
   }
 }
