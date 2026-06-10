@@ -1,0 +1,97 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:        #0D0D0D;
+  --sidebar:   #111118;
+  --panel:     #16161F;
+  --border:    #2A2A3A;
+  --accent:    #E94560;
+  --accent2:   #A8DADC;
+  --text:      #F0F0F0;
+  --text-dim:  #7A7A9A;
+  --success:   #4CAF82;
+  --error:     #E94560;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui:   'Inter', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+/* LAYOUT PRINCIPAL */
+#app {
+  display: grid;
+  grid-template-rows: 38px 1fr 28px;
+  height: 100vh;
+}
+
+/* TITLEBAR */
+#titlebar {
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+#titlebar .logo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+#titlebar .logo span {
+  color: var(--accent2);
+}
+
+#titlebar .subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* ÁREA CENTRAL */
+#main {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  overflow: hidden;
+}
+
+/* WORKSPACE */
+#workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+/* STATUSBAR */
+#statusbar-container {
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #fff;
+  user-select: none;
+}
+
+/* SCROLLBAR GLOBAL */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }

@@ -1,0 +1,89 @@
+#sidebar-container {
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 0;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-disciplina {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.sidebar-disciplina::before {
+  content: '▾';
+  font-size: 10px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.sidebar-disciplina.collapsed::before {
+  transform: rotate(-90deg);
+}
+
+.sidebar-disciplina:hover {
+  color: var(--accent2);
+}
+
+.sidebar-exercicios {
+  padding: 0;
+}
+
+.sidebar-exercicios.hidden {
+  display: none;
+}
+
+.sidebar-item {
+  padding: 7px 16px 7px 28px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.sidebar-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+
+.sidebar-item.active {
+  color: var(--accent2);
+  border-left-color: var(--accent);
+  background: rgba(232,69,96,0.07);
+}
+
+.sidebar-item.active::before {
+  background: var(--accent);
+}
