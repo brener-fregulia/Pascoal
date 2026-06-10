@@ -1,0 +1,21 @@
+{
+  "name": "bastos.pas",
+  "version": "0.1.0",
+  "description": "Pascal Playground — Bastos.pas",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brener-fregulia/Bastos.pas.git"
+  },
+  "author": "Brener Fregulia",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0"
+  }
+}
