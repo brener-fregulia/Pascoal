@@ -1,0 +1,8 @@
+{
+  "titulo": "Hello World",
+  "disciplina": "Algoritmos 1",
+  "semestre": "2025-1",
+  "enunciado": "Escreva um programa que exiba uma mensagem na tela. Este e o primeiro programa de qualquer programador.",
+  "dificuldade": "iniciante",
+  "tags": ["saida", "writeln", "primeiro programa"]
+}
