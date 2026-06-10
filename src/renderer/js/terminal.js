@@ -16,10 +16,25 @@ function initTerminal() {
   })
 }
 
+function stripAnsi(str) {
+  return str
+    .replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '')        // ESC[ sequencias CSI
+    .replace(/\x1b\][^\x07]*\x07/g, '')             // ESC] OSC sequences
+    .replace(/\x1b[()][A-Z0-9]/g, '')               // ESC( charset
+    .replace(/\x1b[@-Z\\-_]/g, '')                  // ESC de dois chars
+    .replace(/\[\?[0-9;]*[a-zA-Z]/g, '')            // [? sequencias sem ESC
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')  // outros controles
+    .replace(/\[2J/g, '')                            // clear screen
+    .replace(/\[m/g, '')                             // reset color
+    .replace(/\[H/g, '')                             // cursor home
+}
+
 function printLine(text, type = '') {
   const output = document.getElementById('terminal-output')
+  const clean = stripAnsi(text)
+  if (!clean) return
   const line = document.createElement('div')
-  line.textContent = text
+  line.textContent = clean
   if (type) line.classList.add(`line-${type}`)
   output.appendChild(line)
   output.scrollTop = output.scrollHeight
