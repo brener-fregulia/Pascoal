@@ -17,7 +17,7 @@ async function initApp() {
   document.getElementById('statusbar-container').innerHTML = `
     <span>FPC — Free Pascal</span>
     <span>|</span>
-    <span>Bastos.pas v0.1.0</span>
+    <span>Bascalzin v0.1.0</span>
   `
 
   const overlay = document.getElementById('modal-overlay')

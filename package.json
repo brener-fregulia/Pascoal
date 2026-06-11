@@ -1,21 +1,21 @@
 {
-  "name": "bastos.pas",
+  "name": "Bascalzin",
   "version": "0.1.0",
-  "description": "Pascal Playground — Bastos.pas",
+  "description": "Pascal Playground — Bascalzin",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brener-fregulia/Bastos.pas.git"
+    "url": "git+https://github.com/brener-fregulia/Bascalzin.git"
   },
   "author": "Brener Fregulia",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brener-fregulia/Bastos.pas/issues"
+    "url": "https://github.com/brener-fregulia/Bascalzin/issues"
   },
-  "homepage": "https://github.com/brener-fregulia/Bastos.pas#readme",
+  "homepage": "https://github.com/brener-fregulia/Bascalzin#readme",
   "devDependencies": {
     "electron": "^42.4.0"
   },

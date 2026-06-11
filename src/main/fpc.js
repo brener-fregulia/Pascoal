@@ -80,7 +80,7 @@ async function promptInstallFpc(win) {
       type: 'info',
       title: 'Instrucoes de instalacao',
       message: 'Apos instalar o FPC:',
-      detail: '1. Conclua a instalacao normalmente\n2. Reinicie o Bastos.pas\n3. Tente executar novamente',
+      detail: '1. Conclua a instalacao normalmente\n2. Reinicie o Bascalzin\n3. Tente executar novamente',
       buttons: ['OK']
     })
   }

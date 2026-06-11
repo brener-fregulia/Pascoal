@@ -117,7 +117,7 @@ ipcMain.handle('run-code', async (event, code) => {
     return { success: false, output: 'FPC nao encontrado. Instale o Free Pascal e tente novamente.' }
   }
 
-  const tmpDir = path.join(app.getPath('userData'), 'bastos-tmp')
+  const tmpDir = path.join(app.getPath('userData'), 'bascalzin-tmp')
   if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
   const srcFile = path.join(tmpDir, 'programa.pas')
@@ -160,7 +160,7 @@ ipcMain.handle('run-code', async (event, code) => {
       })
 
       if (process.platform !== 'win32') {
-        console.log('[bastos.pas] processo iniciado, PID:', runningProcess.pid)
+        console.log('[bascalzin] processo iniciado, PID:', runningProcess.pid)
       }
 
       runningProcess.onData((data) => {
