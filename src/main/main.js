@@ -9,10 +9,17 @@ app.whenReady().then(async () => {
   createWindow()
 })
 
+const { screen } = require('electron')
+
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  const isSmallScreen = width <= 1920 && height <= 1080
+
   const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: isSmallScreen ? width : 1280,
+    height: isSmallScreen ? height : 800,
+    x: isSmallScreen ? 0 : undefined,
+    y: isSmallScreen ? 0 : undefined,
     minWidth: 900,
     minHeight: 600,
     titleBarStyle: 'hidden',
