@@ -10,31 +10,31 @@ async function initApp() {
   await loadPartial('terminal-container', 'partials/terminal.html')
   await loadPartial('modal-container', 'partials/modal-welcome.html')
 
-  // Statusbar simples
+  console.log('partials carregados')
+  console.log('activities-tree:', document.getElementById('activities-tree'))
+  console.log('ace-editor:', document.getElementById('ace-editor'))
+
   document.getElementById('statusbar-container').innerHTML = `
     <span>FPC — Free Pascal</span>
     <span>|</span>
     <span>Bastos.pas v0.1.0</span>
   `
 
-  // Modal de boas-vindas
   const overlay = document.getElementById('modal-overlay')
   const closeBtn = document.getElementById('modal-close')
-
   closeBtn.addEventListener('click', () => {
     overlay.classList.add('hidden')
   })
 
-  // Carrega atividades (só funciona no Electron, não no browser)
+  // Inicializa editor DEPOIS dos partials estarem no DOM
+  initEditor()
+  initTerminal()
+
   if (window.api) {
     await loadActivities()
   } else {
     renderMockActivities()
   }
-
-  // Inicializa editor e terminal
-  initEditor()
-  initTerminal()
 }
 
 async function loadActivities() {
@@ -152,7 +152,7 @@ function selectExercicio(itemEl, ex) {
 async function loadCode(exPath, aluno) {
   if (window.api) {
     const code = await window.api.getCode(exPath, aluno)
-    document.getElementById('code-input').value = code
+    setEditorCode(code)
   }
 }
 

@@ -20,6 +20,7 @@
     "electron": "^42.4.0"
   },
   "dependencies": {
+    "ace-builds": "^1.44.0",
     "node-pty": "^1.0.0"
   },
   "allowScripts": {

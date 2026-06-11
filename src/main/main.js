@@ -25,6 +25,7 @@ function createWindow() {
   })
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
+  win.webContents.openDevTools()
 }
 
 ipcMain.handle('check-fpc', async () => {
