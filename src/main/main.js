@@ -162,9 +162,12 @@ ipcMain.handle('run-code', async (event, code) => {
         event.sender.send('run-output', data)
       })
 
-      runningProcess.onExit(({ exitCode }) => {
+      runningProcess.onExit(() => {
         runningProcess = null
-        resolve({ success: true, output: '' })
+        // Pequeno delay para garantir que todo o buffer foi enviado
+        setTimeout(() => {
+          resolve({ success: true, output: '' })
+        }, 100)
       })
     })
   })
