@@ -1,0 +1,8 @@
+{
+  "titulo": "Verifica Número Primo",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Lido um número inteiro positivo, determinar se ele é primo contando seus divisores — um número é primo se tiver exatamente 2 divisores (1 e ele mesmo).",
+  "dificuldade": "intermediario",
+  "tags": ["for", "if", "mod", "inteiro", "primo", "divisores"]
+}

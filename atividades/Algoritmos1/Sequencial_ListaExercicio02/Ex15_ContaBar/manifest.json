@@ -1,0 +1,9 @@
+{
+  "titulo": "Conta do Bar",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Três amigos (Carlos, André e Felipe) dividem uma conta de bar. Carlos e André pagam partes iguais inteiras (truncadas) e Felipe paga o restante. Dado o valor total, calcular quanto cada um deve pagar.",
+  "dificuldade": "iniciante",
+  "tags": ["trunc", "real", "inteiro", "financeiro", "divisao"]
+}

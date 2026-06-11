@@ -1,0 +1,8 @@
+{
+  "titulo": "Média do Vetor com Comparação",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Vetores",
+  "enunciado": "Lidos 5 valores inteiros em vetor, calcular a média e exibir para cada elemento se é maior, menor ou igual à média.",
+  "dificuldade": "iniciante",
+  "tags": ["array", "for", "if", "media", "comparacao", "real"]
+}

@@ -1,0 +1,8 @@
+{
+  "titulo": "Preenche Vetor com Fórmula",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Vetores",
+  "enunciado": "Preencher um vetor de 50 posições usando a fórmula arr[i] = (i + 5*i) mod (i+1) e exibir todos os elementos.",
+  "dificuldade": "iniciante",
+  "tags": ["array", "for", "mod", "const", "formula"]
+}

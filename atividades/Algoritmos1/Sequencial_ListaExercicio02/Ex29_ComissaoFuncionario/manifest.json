@@ -1,0 +1,9 @@
+{
+  "titulo": "Comissão do Funcionário",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Um funcionário recebe salário fixo mais 4% de comissão sobre suas vendas. Dados o salário fixo e o valor das vendas, calcular e exibir a comissão e o salário final.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "porcentagem", "comissao", "financeiro"]
+}

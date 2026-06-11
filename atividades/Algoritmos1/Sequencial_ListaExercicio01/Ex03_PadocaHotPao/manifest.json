@@ -1,0 +1,9 @@
+{
+  "titulo": "Padoca Hot Pão",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 01",
+  "enunciado": "Uma padaria vende pães a R$0,12 e broas a R$1,50. Dadas as quantidades vendidas no dia, calcular o faturamento com pães, com broas, o total e o valor a reservar para poupança (10% do total).",
+  "dificuldade": "iniciante",
+  "tags": ["const", "porcentagem", "real", "financeiro"]
+}

@@ -1,0 +1,9 @@
+{
+  "titulo": "Área do Losango",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dadas as diagonais maior e menor de um losango, calcular e exibir sua área usando a fórmula A = (diagonal maior * diagonal menor) / 2.",
+  "dificuldade": "iniciante",
+  "tags": ["geometria", "area", "real", "formula"]
+}

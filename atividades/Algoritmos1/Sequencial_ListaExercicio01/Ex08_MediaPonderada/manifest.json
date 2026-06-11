@@ -1,0 +1,9 @@
+{
+  "titulo": "Média Ponderada",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 01",
+  "enunciado": "Dadas três notas com pesos 1, 2 e 3 respectivamente, calcular e exibir a média ponderada do aluno.",
+  "dificuldade": "iniciante",
+  "tags": ["media", "ponderada", "const", "real", "notas"]
+}

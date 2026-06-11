@@ -1,0 +1,9 @@
+{
+  "titulo": "Quantidade de Salários Mínimos",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dados o valor do salário mínimo e o salário de um funcionário, calcular e exibir quantos salários mínimos o funcionário recebe.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "divisao", "financeiro", "operacao-basica"]
+}

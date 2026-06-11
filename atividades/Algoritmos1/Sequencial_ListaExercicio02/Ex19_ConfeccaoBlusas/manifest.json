@@ -1,0 +1,9 @@
+{
+  "titulo": "Confecção de Blusas",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dadas a quantidade de blusas a confeccionar e a quantidade de novelos de lã disponíveis, calcular quantos novelos serão gastos por blusa.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "inteiro", "divisao", "operacao-basica"]
+}

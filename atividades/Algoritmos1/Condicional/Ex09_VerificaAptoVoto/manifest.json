@@ -1,0 +1,8 @@
+{
+  "titulo": "Verifica Apto a Votar",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Lida a idade de uma pessoa, informar se ela está ou não apta a votar (mínimo 18 anos).",
+  "dificuldade": "iniciante",
+  "tags": ["if", "else", "inteiro", "comparacao"]
+}

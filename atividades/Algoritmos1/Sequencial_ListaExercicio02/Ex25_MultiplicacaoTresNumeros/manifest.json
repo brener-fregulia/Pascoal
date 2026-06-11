@@ -1,0 +1,9 @@
+{
+  "titulo": "Multiplicação de Três Números",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Lidos três números reais, calcular e exibir o resultado da multiplicação entre eles.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "multiplicacao", "operacao-basica"]
+}

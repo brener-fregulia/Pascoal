@@ -1,0 +1,8 @@
+{
+  "titulo": "Soma de 1 a 100",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Calcular e escrever a soma S = 1 + 2 + 3 + ... + 100. Solução utiliza a fórmula de Gauss: S = n*(n+1)/2.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "gauss", "formula", "soma", "serie"]
+}

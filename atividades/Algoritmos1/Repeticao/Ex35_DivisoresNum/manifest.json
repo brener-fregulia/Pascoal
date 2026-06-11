@@ -1,0 +1,8 @@
+{
+  "titulo": "Divisores de um Número",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Lido um número inteiro positivo, encontrar e exibir todos os seus divisores.",
+  "dificuldade": "iniciante",
+  "tags": ["for", "if", "mod", "inteiro", "divisores"]
+}

@@ -1,0 +1,9 @@
+{
+  "titulo": "Tabuada",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dado um número inteiro, calcular e exibir sua tabuada de 1 a 10.",
+  "dificuldade": "iniciante",
+  "tags": ["inteiro", "for", "multiplicacao", "tabuada"]
+}

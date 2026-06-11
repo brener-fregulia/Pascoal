@@ -1,0 +1,8 @@
+{
+  "titulo": "Comparação A+B com C",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Lidos três valores inteiros A, B e C, informar se a soma de A+B é maior, menor ou igual a C.",
+  "dificuldade": "iniciante",
+  "tags": ["if", "else", "inteiro", "comparacao", "soma"]
+}

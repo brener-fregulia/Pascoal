@@ -1,0 +1,9 @@
+{
+  "titulo": "Litragem de Refrigerante",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "A fábrica Meia-Cola vende refrigerante em latas de 350ml, garrafas de 600ml e garrafas de 2L. Dadas as quantidades compradas de cada formato, calcular o total de litros adquiridos.",
+  "dificuldade": "iniciante",
+  "tags": ["const", "real", "inteiro", "soma", "conversao"]
+}

@@ -1,0 +1,8 @@
+{
+  "titulo": "Peso Ideal",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Dados a altura e o sexo de uma pessoa (0=Masculino, 1=Feminino), calcular o peso ideal. Fórmula masculino: (72.7 * h) - 58. Fórmula feminino: (62.1 * h) - 44.7.",
+  "dificuldade": "iniciante",
+  "tags": ["if", "else", "real", "formula", "saude"]
+}

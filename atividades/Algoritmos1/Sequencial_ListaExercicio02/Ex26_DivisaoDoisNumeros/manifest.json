@@ -1,0 +1,9 @@
+{
+  "titulo": "Divisão de Dois Números",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Lidos dois números reais (sendo o segundo diferente de zero), calcular e exibir o resultado da divisão do primeiro pelo segundo.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "divisao", "operacao-basica"]
+}

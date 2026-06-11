@@ -1,0 +1,8 @@
+{
+  "titulo": "20 Sucessores",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Lido um número inteiro qualquer, escrever seus 20 sucessores.",
+  "dificuldade": "iniciante",
+  "tags": ["while", "inteiro", "sucessor", "sequencia"]
+}

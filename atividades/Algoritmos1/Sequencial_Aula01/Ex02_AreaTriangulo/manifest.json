@@ -1,0 +1,9 @@
+{
+  "titulo": "Área do Triângulo",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Aula 01",
+  "enunciado": "Dados a base e a altura de um triângulo, calcular e exibir sua área.",
+  "dificuldade": "iniciante",
+  "tags": ["geometria", "area", "real", "operacao-basica"]
+}

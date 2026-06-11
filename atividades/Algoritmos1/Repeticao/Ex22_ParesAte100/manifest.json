@@ -1,0 +1,8 @@
+{
+  "titulo": "Pares até 100",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Escrever todos os números pares positivos menores ou iguais a 100.",
+  "dificuldade": "iniciante",
+  "tags": ["while", "inteiro", "pares", "sequencia"]
+}

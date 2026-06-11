@@ -1,0 +1,9 @@
+{
+  "titulo": "Altura do Prédio",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Usando semelhança de triângulos, calcular a altura de um prédio a partir da altura de uma pessoa, do comprimento da sombra da pessoa e do comprimento da sombra do prédio.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "proporcao", "geometria", "formula"]
+}

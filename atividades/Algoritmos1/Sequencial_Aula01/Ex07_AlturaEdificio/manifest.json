@@ -1,0 +1,9 @@
+{
+  "titulo": "Altura do Edifício",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Aula 01",
+  "enunciado": "Dados a quantidade de lajes do tipo X e do tipo Y de um edifício, calcular sua altura total sabendo que cada laje X tem 3 metros e cada laje Y tem 12 metros.",
+  "dificuldade": "iniciante",
+  "tags": ["formula", "real", "operacao-basica", "engenharia"]
+}

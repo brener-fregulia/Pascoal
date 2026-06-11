@@ -1,0 +1,8 @@
+{
+  "titulo": "Resultado da Partida",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Lidos os nomes de dois times e os gols marcados por cada um, exibir o nome do vencedor ou 'EMPATE' caso os gols sejam iguais.",
+  "dificuldade": "iniciante",
+  "tags": ["if", "else", "string", "inteiro", "comparacao"]
+}

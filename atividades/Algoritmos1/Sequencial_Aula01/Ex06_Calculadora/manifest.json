@@ -1,0 +1,9 @@
+{
+  "titulo": "Calculadora de Soma",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Aula 01",
+  "enunciado": "Lidos quatro números inteiros, calcular e exibir a soma entre eles.",
+  "dificuldade": "iniciante",
+  "tags": ["soma", "inteiro", "operacao-basica"]
+}

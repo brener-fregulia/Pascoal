@@ -1,0 +1,9 @@
+{
+  "titulo": "Peso da Pessoa",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dado o peso de uma pessoa, calcular e exibir: a) o novo peso se ela engordar 15%; b) o novo peso se ela emagrecer 20%.",
+  "dificuldade": "iniciante",
+  "tags": ["real", "porcentagem", "operacao-basica"]
+}

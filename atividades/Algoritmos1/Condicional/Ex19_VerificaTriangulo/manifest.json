@@ -1,0 +1,8 @@
+{
+  "titulo": "Verifica Triângulo",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Lidos três valores inteiros positivos, verificar se formam um triângulo (a soma de dois lados deve ser maior que o terceiro). Se formarem, calcular e exibir a área pelo método de Heron; caso contrário, exibir os valores lidos.",
+  "dificuldade": "intermediario",
+  "tags": ["if", "else", "and", "sqrt", "heron", "geometria", "triangulo"]
+}

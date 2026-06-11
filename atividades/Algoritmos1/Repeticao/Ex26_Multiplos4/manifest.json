@@ -1,0 +1,8 @@
+{
+  "titulo": "Múltiplos de 4 até 500",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Escrever todos os múltiplos de 4 existentes entre 1 e 500.",
+  "dificuldade": "iniciante",
+  "tags": ["while", "inteiro", "multiplos", "sequencia"]
+}

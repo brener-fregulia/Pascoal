@@ -1,0 +1,9 @@
+{
+  "titulo": "Celsius para Fahrenheit",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Aula 01",
+  "enunciado": "Dada uma temperatura em Celsius, converter e exibir o valor equivalente em Fahrenheit.",
+  "dificuldade": "iniciante",
+  "tags": ["conversao", "temperatura", "real", "formula"]
+}

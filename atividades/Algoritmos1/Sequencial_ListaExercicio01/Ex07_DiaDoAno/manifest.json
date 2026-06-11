@@ -1,0 +1,9 @@
+{
+  "titulo": "Dia do Ano",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 01",
+  "enunciado": "Dado um mês e um dia, calcular quantos dias se passaram desde o início do ano, considerando todos os meses com 30 dias.",
+  "dificuldade": "iniciante",
+  "tags": ["inteiro", "formula", "data"]
+}

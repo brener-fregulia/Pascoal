@@ -1,0 +1,8 @@
+{
+  "titulo": "Maior Valor entre 10",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Lidos 10 valores inteiros, encontrar e exibir o maior valor digitado. O valor inicial do maior é o menor inteiro possível (-32768) para cobrir qualquer entrada.",
+  "dificuldade": "iniciante",
+  "tags": ["for", "if", "inteiro", "maximo", "comparacao"]
+}

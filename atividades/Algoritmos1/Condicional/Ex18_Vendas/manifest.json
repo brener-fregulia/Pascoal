@@ -1,0 +1,8 @@
+{
+  "titulo": "Vendas por Código",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Dado o código de um produto e a quantidade comprada, calcular o preço total. Tabela: ABCD=R$5,30; XYPK=R$6,00; KLMP=R$3,20; QRST=R$2,50. Exibir mensagem de erro para código inválido.",
+  "dificuldade": "iniciante",
+  "tags": ["if", "else", "string", "inteiro", "financeiro"]
+}

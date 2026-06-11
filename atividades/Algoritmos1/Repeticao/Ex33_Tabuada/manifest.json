@@ -1,0 +1,8 @@
+{
+  "titulo": "Tabuada",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Lido um número inteiro N, calcular e exibir sua tabuada de 1 a 10.",
+  "dificuldade": "iniciante",
+  "tags": ["for", "inteiro", "multiplicacao", "tabuada"]
+}

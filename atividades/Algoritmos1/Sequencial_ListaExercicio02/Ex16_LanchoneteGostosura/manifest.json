@@ -1,0 +1,9 @@
+{
+  "titulo": "Lanchonete Gostosura",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Uma lanchonete precisa calcular os ingredientes para seus sanduíches. Cada sanduíche leva 50g de queijo (dobrado), 50g de presunto e 100g de carne. Dada a quantidade de sanduíches, calcular quantos quilos de cada ingrediente serão necessários.",
+  "dificuldade": "iniciante",
+  "tags": ["const", "real", "multiplicacao", "financeiro"]
+}

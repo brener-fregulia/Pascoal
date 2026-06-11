@@ -1,0 +1,9 @@
+{
+  "titulo": "Ferraduras para Haras",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 01",
+  "enunciado": "Dado o número de cavalos de um haras, calcular quantas ferraduras serão necessárias, sabendo que cada cavalo usa 4 ferraduras.",
+  "dificuldade": "iniciante",
+  "tags": ["multiplicacao", "inteiro", "operacao-basica"]
+}

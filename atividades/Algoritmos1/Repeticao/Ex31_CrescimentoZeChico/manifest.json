@@ -1,0 +1,8 @@
+{
+  "titulo": "Crescimento de Zé e Chico",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Repetição",
+  "enunciado": "Chico tem 1,50m e cresce 2cm/ano. Zé tem 1,10m e cresce 3cm/ano. Calcular e exibir quantos anos serão necessários para que Zé seja mais alto que Chico.",
+  "dificuldade": "iniciante",
+  "tags": ["while", "real", "simulacao", "crescimento"]
+}

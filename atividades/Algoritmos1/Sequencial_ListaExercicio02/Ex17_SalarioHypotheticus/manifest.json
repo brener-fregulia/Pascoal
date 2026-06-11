@@ -1,0 +1,9 @@
+{
+  "titulo": "Salário Hypotheticus",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Lista Exercicio 02",
+  "enunciado": "Dado o número de horas normais e horas extras trabalhadas, calcular o salário bruto (R$10/h normal, R$15/h extra) e o salário líquido com desconto de 10%.",
+  "dificuldade": "iniciante",
+  "tags": ["const", "real", "financeiro", "porcentagem"]
+}

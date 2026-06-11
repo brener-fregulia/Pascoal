@@ -1,0 +1,9 @@
+{
+  "titulo": "Perímetro do Quadrado",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Sequencial",
+  "subcategoria": "Aula 01",
+  "enunciado": "Dado o valor do lado de um quadrado, calcular e exibir seu perímetro.",
+  "dificuldade": "iniciante",
+  "tags": ["geometria", "perimetro", "real", "operacao-basica"]
+}

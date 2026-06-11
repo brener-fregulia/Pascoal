@@ -1,0 +1,8 @@
+{
+  "titulo": "Média do Aluno com Conceito",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Condicional",
+  "enunciado": "Lidos o ID do aluno, três notas e a média dos exercícios, calcular a média de aproveitamento pela fórmula MA = (nota1 + nota2*2 + nota3*3 + ME)/7 e atribuir conceito: A(>=90), B(>=75), C(>=60), D(>=40), E(<40). Exibir todos os dados e informar se o aluno está aprovado (A, B ou C) ou reprovado.",
+  "dificuldade": "intermediario",
+  "tags": ["if", "else", "char", "real", "media-ponderada", "conceito", "aprovacao"]
+}

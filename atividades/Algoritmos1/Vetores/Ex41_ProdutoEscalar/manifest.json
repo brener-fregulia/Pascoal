@@ -1,0 +1,8 @@
+{
+  "titulo": "Produto Escalar",
+  "disciplina": "Algoritmos 1",
+  "categoria": "Vetores",
+  "enunciado": "Dados dois vetores x e y de 10 elementos inteiros, calcular e exibir o produto escalar (soma dos produtos elemento a elemento).",
+  "dificuldade": "intermediario",
+  "tags": ["array", "for", "const", "produto-escalar", "inteiro"]
+}
