@@ -50,43 +50,56 @@ ipcMain.handle('get-activities', () => {
 
   for (const disciplina of disciplinas) {
     const disciplinaPath = path.join(baseDir, disciplina.name)
-    const exercicios = fs.readdirSync(disciplinaPath, { withFileTypes: true })
-      .filter(d => d.isDirectory())
-
-    const exerciciosList = []
-
-    for (const ex of exercicios) {
-      const exPath = path.join(disciplinaPath, ex.name)
-      const manifestPath = path.join(exPath, 'manifest.json')
-      const solucoesPath = path.join(exPath, 'solucoes')
-
-      let manifest = { titulo: ex.name, enunciado: '' }
-      if (fs.existsSync(manifestPath)) {
-        manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
-      }
-
-      let solucoes = []
-      if (fs.existsSync(solucoesPath)) {
-        solucoes = fs.readdirSync(solucoesPath)
-          .filter(f => f.endsWith('.pas'))
-          .map(f => f.replace('.pas', ''))
-      }
-
-      exerciciosList.push({ id: ex.name, ...manifest, solucoes })
-    }
-
-    result.push({ disciplina: disciplina.name, exercicios: exerciciosList })
+    const exercicios = findExercicios(disciplinaPath, disciplinaPath)
+    result.push({ disciplina: disciplina.name, exercicios })
   }
 
   return result
 })
 
-ipcMain.handle('get-code', (_, disciplina, exercicio, aluno) => {
-  const filePath = path.join(
-    __dirname, '../../atividades',
-    disciplina, exercicio, 'solucoes',
-    `${aluno}.pas`
-  )
+function findExercicios(basePath, currentPath) {
+  const entries = fs.readdirSync(currentPath, { withFileTypes: true })
+  const hasManifest = entries.some(e => e.name === 'manifest.json')
+
+  // Esta pasta e um exercicio
+  if (hasManifest) {
+    const manifestPath = path.join(currentPath, 'manifest.json')
+    const solucoesPath = path.join(currentPath, 'solucoes')
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
+
+    let solucoes = []
+    if (fs.existsSync(solucoesPath)) {
+      solucoes = fs.readdirSync(solucoesPath)
+        .filter(f => f.endsWith('.pas'))
+        .map(f => f.replace('.pas', ''))
+    }
+
+    // Caminho relativo ao basePath para montar a categoria na sidebar
+    const rel = path.relative(basePath, currentPath)
+    const parts = rel.split(path.sep)
+    const categoria = parts.length > 1 ? parts.slice(0, -1).join(' / ') : ''
+
+    return [{
+      id: path.basename(currentPath),
+      path: currentPath,
+      categoria,
+      ...manifest,
+      solucoes
+    }]
+  }
+
+  // Nao e exercicio, desce recursivamente
+  const subDirs = entries.filter(e => e.isDirectory())
+  const exercicios = []
+  for (const sub of subDirs) {
+    const found = findExercicios(basePath, path.join(currentPath, sub.name))
+    exercicios.push(...found)
+  }
+  return exercicios
+}
+
+ipcMain.handle('get-code', (_, exPath, aluno) => {
+  const filePath = path.join(exPath, 'solucoes', `${aluno}.pas`)
   if (!fs.existsSync(filePath)) return ''
   return fs.readFileSync(filePath, 'utf-8')
 })

@@ -63,34 +63,63 @@ function renderActivities(activities) {
     section.className = 'sidebar-section'
 
     const header = document.createElement('div')
-    header.className = 'sidebar-disciplina'
+    header.className = 'sidebar-disciplina collapsed'
     header.textContent = disciplina.replace(/([0-9]+)/, ' $1')
 
     const list = document.createElement('div')
-    list.className = 'sidebar-exercicios'
+    list.className = 'sidebar-exercicios hidden'
 
     header.addEventListener('click', () => {
       header.classList.toggle('collapsed')
       list.classList.toggle('hidden')
     })
 
+    const categorias = {}
     for (const ex of exercicios) {
-      const item = document.createElement('div')
-      item.className = 'sidebar-item'
-      item.textContent = ex.titulo || ex.id
-      item.dataset.disciplina = disciplina
-      item.dataset.exercicio = ex.id
-      item.dataset.solucoes = JSON.stringify(ex.solucoes)
-      item.dataset.enunciado = ex.enunciado || ''
+      const cat = ex.categoria || ''
+      if (!categorias[cat]) categorias[cat] = []
+      categorias[cat].push(ex)
+    }
 
-      item.addEventListener('click', () => selectExercicio(item, ex))
-      list.appendChild(item)
+    for (const [cat, exList] of Object.entries(categorias)) {
+      if (cat) {
+        const catHeader = document.createElement('div')
+        catHeader.className = 'sidebar-categoria collapsed'
+        catHeader.textContent = cat.replace(/_/g, ' ')
+
+        const catList = document.createElement('div')
+        catList.className = 'sidebar-categoria-lista hidden'
+
+        catHeader.addEventListener('click', () => {
+          catHeader.classList.toggle('collapsed')
+          catList.classList.toggle('hidden')
+        })
+
+        for (const ex of exList) {
+          catList.appendChild(makeSidebarItem(ex))
+        }
+
+        list.appendChild(catHeader)
+        list.appendChild(catList)
+      } else {
+        for (const ex of exList) {
+          list.appendChild(makeSidebarItem(ex))
+        }
+      }
     }
 
     section.appendChild(header)
     section.appendChild(list)
     tree.appendChild(section)
   }
+}
+
+function makeSidebarItem(ex) {
+  const item = document.createElement('div')
+  item.className = 'sidebar-item'
+  item.textContent = ex.titulo || ex.id
+  item.addEventListener('click', () => selectExercicio(item, ex))
+  return item
 }
 
 function selectExercicio(itemEl, ex) {
@@ -110,23 +139,19 @@ function selectExercicio(itemEl, ex) {
     select.appendChild(opt)
   }
 
-  select.dataset.disciplina = itemEl.dataset.disciplina
-  select.dataset.exercicio = ex.id
-
   select.onchange = () => {
-    if (select.value) loadCode(select.dataset.disciplina, select.dataset.exercicio, select.value)
+    if (select.value) loadCode(ex.path, select.value)
   }
 
-  // Carrega o primeiro aluno automaticamente
   if (ex.solucoes.length > 0) {
     select.value = ex.solucoes[0]
-    loadCode(itemEl.dataset.disciplina, ex.id, ex.solucoes[0])
+    loadCode(ex.path, ex.solucoes[0])
   }
 }
 
-async function loadCode(disciplina, exercicio, aluno) {
+async function loadCode(exPath, aluno) {
   if (window.api) {
-    const code = await window.api.getCode(disciplina, exercicio, aluno)
+    const code = await window.api.getCode(exPath, aluno)
     document.getElementById('code-input').value = code
   }
 }
