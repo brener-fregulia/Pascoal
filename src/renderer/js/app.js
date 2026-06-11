@@ -40,6 +40,10 @@ async function initApp() {
 async function loadActivities() {
   const activities = await window.api.getActivities()
   renderActivities(activities)
+
+  // Seleciona o primeiro exercicio automaticamente
+  const firstItem = document.querySelector('.sidebar-item')
+  if (firstItem) firstItem.click()
 }
 
 function renderMockActivities() {

@@ -25,7 +25,6 @@ function createWindow() {
   })
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
-  win.webContents.openDevTools()
 }
 
 ipcMain.handle('check-fpc', async () => {
@@ -48,6 +47,11 @@ ipcMain.handle('get-activities', () => {
 
   const disciplinas = fs.readdirSync(baseDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
+    .sort((a, b) => {
+      if (a.name === 'HelloWorld') return -1
+      if (b.name === 'HelloWorld') return 1
+      return a.name.localeCompare(b.name)
+    })
 
   for (const disciplina of disciplinas) {
     const disciplinaPath = path.join(baseDir, disciplina.name)
