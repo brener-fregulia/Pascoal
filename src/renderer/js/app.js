@@ -35,6 +35,7 @@ async function initApp() {
   } else {
     renderMockActivities()
   }
+  initResize()
 }
 
 async function loadActivities() {

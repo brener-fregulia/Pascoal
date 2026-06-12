@@ -72,9 +72,33 @@ html, body {
 
 /* WORKSPACE */
 #workspace {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   overflow: hidden;
+}
+
+#editor-container {
+  flex: 1;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+#terminal-container {
+  flex: 1;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+#resize-handle {
+  width: 5px;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+#resize-handle:hover,
+#resize-handle.dragging {
+  background: var(--accent);
 }
 
 /* STATUSBAR */
