@@ -1,31 +1,32 @@
 async function loadPartial(containerId, partialPath) {
   const response = await fetch(partialPath)
-  const html = await response.text()
+  const template = await response.text()
+  const html     = Mustache.render(template, getAll())
   document.getElementById(containerId).innerHTML = html
 }
 
 async function initApp() {
-  await loadPartial('sidebar-container', 'partials/sidebar.html')
-  await loadPartial('editor-container', 'partials/editor.html')
+  await initI18n()
+
+  await loadPartial('sidebar-container',  'partials/sidebar.html')
+  await loadPartial('editor-container',   'partials/editor.html')
   await loadPartial('terminal-container', 'partials/terminal.html')
-  await loadPartial('modal-container', 'partials/modal-welcome.html')
+  await loadPartial('modal-container',    'partials/modal-welcome.html')
 
   initEditor()
   initTerminal()
   initResize()
 
-  // Modal de boas-vindas
-  const overlay = document.getElementById('modal-overlay')
+  const overlay  = document.getElementById('modal-overlay')
   const closeBtn = document.getElementById('modal-close')
   closeBtn.addEventListener('click', () => overlay.classList.add('hidden'))
 
-  // Info do app vinda do main process (versão, FPC, etc)
   if (window.api) {
     const info = await window.api.getAppInfo()
     renderStatusbar(info)
     await loadActivities()
   } else {
-    renderStatusbar({ name: 'Pascoal', version: '—', fpc: { installed: false, version: null } })
+    renderStatusbar({ name: t('app.name'), version: '-', fpc: { installed: false, version: null } })
     renderMockActivities()
   }
 }
@@ -33,11 +34,11 @@ async function initApp() {
 function renderStatusbar(info) {
   const fpcLabel = info.fpc.installed
     ? `FPC ${info.fpc.version}`
-    : 'FPC não encontrado'
+    : t('statusbar.fpc_not_found')
 
   document.getElementById('statusbar-container').innerHTML = `
     <span>${fpcLabel}</span>
-    <span>|</span>
+    <span>${t('statusbar.separator')}</span>
     <span>${info.name} v${info.version}</span>
   `
 }
@@ -53,9 +54,7 @@ async function loadActivities() {
 function renderMockActivities() {
   renderActivities([{
     disciplina: 'Exemplos',
-    exercicios: [
-      { id: 'HelloWorld', titulo: 'Hello World', solucoes: ['exemplo'] }
-    ]
+    exercicios: [{ id: 'HelloWorld', titulo: 'Hello World', solucoes: ['exemplo'] }]
   }])
 }
 
@@ -79,7 +78,6 @@ function renderActivities(activities) {
       list.classList.toggle('hidden')
     })
 
-    // Agrupa por categoria
     const categorias = {}
     for (const ex of exercicios) {
       const cat = ex.categoria || ''
@@ -128,15 +126,15 @@ function selectExercicio(itemEl, ex) {
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'))
   itemEl.classList.add('active')
 
-  document.getElementById('editor-title').textContent = ex.titulo || ex.id
-  document.getElementById('enunciado-text').textContent = ex.enunciado || 'Sem enunciado.'
+  document.getElementById('editor-title').textContent   = ex.titulo || ex.id
+  document.getElementById('enunciado-text').textContent = ex.enunciado || t('editor.no_enunciado')
 
   const select = document.getElementById('aluno-select')
-  select.innerHTML = '<option value="">— selecionar —</option>'
+  select.innerHTML = `<option value="">${t('sidebar.select_placeholder')}</option>`
 
   for (const aluno of ex.solucoes) {
     const opt = document.createElement('option')
-    opt.value = aluno
+    opt.value       = aluno
     opt.textContent = aluno
     select.appendChild(opt)
   }

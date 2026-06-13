@@ -1,22 +1,12 @@
 <div id="modal-overlay">
   <div id="modal-box">
     <div id="modal-header">
-      <div class="modal-logo">Pascoal</div>
-      <div class="modal-subtitle">Pascal Playground</div>
+      <div class="modal-logo">{{app.name}}</div>
+      <div class="modal-subtitle">{{modal.welcome.subtitle}}</div>
     </div>
-    <p>
-      Bem-vindo ao <strong>Pascoal</strong>, um playground interativo
-      para escrever, compilar e executar programas Pascal diretamente
-      na sua máquina.
-    </p>
-    <p>
-      Explore os exemplos na barra lateral, edite livremente no editor
-      e clique em <strong>Executar</strong> para ver o resultado.
-    </p>
-    <p class="modal-note">
-      Certifique-se de ter o <strong>Free Pascal (FPC)</strong> instalado.
-      Veja as instruções no <code>README.md</code>.
-    </p>
-    <button id="modal-close">Começar</button>
+    <p>{{{modal.welcome.p1}}}</p>
+    <p>{{{modal.welcome.p2}}}</p>
+    <p class="modal-note">{{{modal.welcome.note}}}</p>
+    <button id="modal-close">{{modal.welcome.btn_start}}</button>
   </div>
 </div>

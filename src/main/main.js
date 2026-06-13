@@ -46,6 +46,7 @@ function createWindow() {
   })
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
+  win.webContents.openDevTools();
 }
 
 app.on('window-all-closed', () => {

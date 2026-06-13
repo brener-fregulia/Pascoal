@@ -1,7 +1,7 @@
 function initTerminal() {
-  const runBtn = document.getElementById('run-btn')
+  const runBtn   = document.getElementById('run-btn')
   const clearBtn = document.getElementById('clear-btn')
-  const input = document.getElementById('terminal-input')
+  const input    = document.getElementById('terminal-input')
 
   runBtn.addEventListener('click', runCode)
   clearBtn.addEventListener('click', clearTerminal)
@@ -18,20 +18,20 @@ function initTerminal() {
 
 function stripAnsi(str) {
   return str
-    .replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '')        // ESC[ sequencias CSI
-    .replace(/\x1b\][^\x07]*\x07/g, '')             // ESC] OSC sequences
-    .replace(/\x1b[()][A-Z0-9]/g, '')               // ESC( charset
-    .replace(/\x1b[@-Z\\-_]/g, '')                  // ESC de dois chars
-    .replace(/\[\?[0-9;]*[a-zA-Z]/g, '')            // [? sequencias sem ESC
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')  // outros controles
-    .replace(/\[2J/g, '')                            // clear screen
-    .replace(/\[m/g, '')                             // reset color
-    .replace(/\[H/g, '')                             // cursor home
+    .replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '')
+    .replace(/\x1b\][^\x07]*\x07/g, '')
+    .replace(/\x1b[()][A-Z0-9]/g, '')
+    .replace(/\x1b[@-Z\\-_]/g, '')
+    .replace(/\x1b\[\?[0-9;]*[a-zA-Z]/g, '')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+    .replace(/\x1b\[2J/g, '')
+    .replace(/\x1b\[m/g, '')
+    .replace(/\x1b\[H/g, '')
 }
 
 function printLine(text, type = '') {
   const output = document.getElementById('terminal-output')
-  const clean = stripAnsi(text)
+  const clean  = stripAnsi(text)
   if (!clean) return
   const line = document.createElement('div')
   line.textContent = clean
@@ -48,38 +48,34 @@ async function runCode() {
   const code = getCurrentCode()
 
   if (!code.trim()) {
-    printLine('Nenhum codigo para executar.', 'error')
+    printLine(t('terminal.no_code'), 'error')
     return
   }
 
   const runBtn = document.getElementById('run-btn')
-  runBtn.disabled = true
-  runBtn.textContent = 'Compilando...'
+  runBtn.disabled  = true
+  runBtn.textContent = t('terminal.btn_running')
 
   clearTerminal()
-  printLine('Compilando...', 'info')
+  printLine(t('terminal.compiling'), 'info')
 
   if (window.api) {
-    // Remove listener anterior antes de adicionar novo
     window.api.removeOutput()
-
-    window.api.onOutput((data) => {
-      printLine(data)
-    })
+    window.api.onOutput((data) => printLine(data))
 
     const result = await window.api.runCode(code)
 
     if (!result.success) {
-      printLine('Erro de compilacao:', 'error')
+      printLine(t('terminal.compile_error'), 'error')
       printLine(result.output, 'error')
     } else {
-      printLine('Executado com sucesso.', 'success')
+      printLine(t('terminal.run_success'), 'success')
     }
   } else {
-    printLine('Execute dentro do Electron para compilar Pascal.', 'dim')
-    printLine('No navegador, apenas a interface esta disponivel.', 'dim')
+    printLine(t('terminal.no_electron'),  'dim')
+    printLine(t('terminal.no_electron2'), 'dim')
   }
 
-  runBtn.disabled = false
-  runBtn.textContent = 'Executar'
+  runBtn.disabled    = false
+  runBtn.textContent = `\u25B6 ${t('terminal.btn_run')}`
 }

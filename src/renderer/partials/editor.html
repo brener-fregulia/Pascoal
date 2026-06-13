@@ -1,11 +1,11 @@
 <div class="panel-header">
-  <span class="panel-title" id="editor-title">editor</span>
+  <span class="panel-title" id="editor-title">{{editor.panel_title}}</span>
   <select class="aluno-select" id="aluno-select">
-    <option value="">— selecionar aluno —</option>
+    <option value="">{{sidebar.select_placeholder}}</option>
   </select>
 </div>
 <div class="enunciado" id="enunciado">
-  <strong>Enunciado</strong>
-  <span id="enunciado-text">Selecione um exercicio na barra lateral.</span>
+  <strong>{{editor.enunciado_label}}</strong>
+  <span id="enunciado-text">{{editor.enunciado_placeholder}}</span>
 </div>
 <div id="ace-editor"></div>

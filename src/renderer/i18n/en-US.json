@@ -1,0 +1,46 @@
+{
+  "app.name": "Pascoal",
+  "app.subtitle": "Pascal Playground",
+
+  "statusbar.fpc_not_found": "FPC not found",
+  "statusbar.separator": "|",
+
+  "sidebar.loading": "Loading...",
+  "sidebar.select_placeholder": "- select -",
+
+  "editor.panel_title": "editor",
+  "editor.enunciado_label": "Description",
+  "editor.enunciado_placeholder": "Select an example from the sidebar.",
+  "editor.no_enunciado": "No description.",
+
+  "terminal.panel_title": "terminal",
+  "terminal.hint": "Pascoal - Pascal Playground",
+  "terminal.hint2": "Select an example and click Run.",
+  "terminal.input_placeholder": "program input...",
+  "terminal.btn_clear": "Clear",
+  "terminal.btn_run": "Run",
+  "terminal.btn_running": "Compiling...",
+  "terminal.no_code": "No code to run.",
+  "terminal.compiling": "Compiling...",
+  "terminal.compile_error": "Compilation error:",
+  "terminal.run_success": "Executed successfully.",
+  "terminal.no_electron": "Run inside Electron to compile Pascal.",
+  "terminal.no_electron2": "In the browser, only the interface is available.",
+
+  "modal.welcome.subtitle": "Pascal Playground",
+  "modal.welcome.p1": "Welcome to <strong>Pascoal</strong>, an interactive playground to write, compile and run Pascal programs directly on your machine.",
+  "modal.welcome.p2": "Explore the examples in the sidebar, edit freely in the editor and click <strong>Run</strong> to see the result.",
+  "modal.welcome.note": "Make sure you have <strong>Free Pascal (FPC)</strong> installed. See instructions in <code>README.md</code>.",
+  "modal.welcome.btn_start": "Get started",
+
+  "fpc.dialog.not_found.title": "Free Pascal not found",
+  "fpc.dialog.not_found.message": "The Free Pascal compiler (FPC) was not found on your machine.",
+  "fpc.dialog.not_found.detail": "FPC is required to compile and run Pascal programs. Would you like to open the download page?",
+  "fpc.dialog.not_found.btn_open": "Open download",
+  "fpc.dialog.not_found.btn_cancel": "Cancel",
+  "fpc.dialog.install.title": "Installation instructions",
+  "fpc.dialog.install.message": "After installing FPC:",
+  "fpc.dialog.install.detail": "1. Complete the installation normally\n2. Restart Pascoal\n3. Try running again",
+  "fpc.dialog.install.btn_ok": "OK",
+  "fpc.error.not_found": "FPC not found. Install Free Pascal and try again."
+}

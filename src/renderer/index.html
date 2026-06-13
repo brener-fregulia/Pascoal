@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; 
-                 script-src 'self' 'unsafe-inline'; 
-                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+  <meta charset="UTF-8
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+                 script-src 'self' 'unsafe-inline';
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
                  font-src https://fonts.gstatic.com">
   <title>Pascoal</title>
   <link rel="stylesheet"
@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="css/editor.css">
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/terminal.css">
-
 </head>
 
 <body>
@@ -38,14 +37,21 @@
     <div id="modal-container"></div>
   </div>
 
-  <script src="js/app.js"></script>
+  <!-- Dependências (ordem importa) -->
+  <script src="../../node_modules/ace-builds/src-min-noconflict/ace.js"></script>
+  <script src="../../node_modules/ace-builds/src-min-noconflict/mode-pascal.js"></script>
+  <script src="../../node_modules/ace-builds/src-min-noconflict/theme-tomorrow_night.js"></script>
+  <script src="../../node_modules/mustache/mustache.min.js"></script>
+
+  <!-- App (i18n deve vir antes dos outros) -->
+  <script src="js/i18n.js"></script>
   <script src="js/editor.js"></script>
   <script src="js/terminal.js"></script>
   <script src="js/resize.js"></script>
+  <script src="js/app.js"></script>
 </body>
 
-<script src="../../node_modules/ace-builds/src-min-noconflict/ace.js"></script>
-<script src="../../node_modules/ace-builds/src-min-noconflict/mode-pascal.js"></script>
-<script src="../../node_modules/ace-builds/src-min-noconflict/theme-tomorrow_night.js"></script>
+</html>
+lict/theme-tomorrow_night.js"></script>
 
 </html>
