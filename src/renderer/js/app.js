@@ -10,53 +10,53 @@ async function initApp() {
   await loadPartial('terminal-container', 'partials/terminal.html')
   await loadPartial('modal-container', 'partials/modal-welcome.html')
 
-  console.log('partials carregados')
-  console.log('activities-tree:', document.getElementById('activities-tree'))
-  console.log('ace-editor:', document.getElementById('ace-editor'))
-
-  document.getElementById('statusbar-container').innerHTML = `
-    <span>FPC — Free Pascal</span>
-    <span>|</span>
-    <span>Bascalzin v0.1.0</span>
-  `
-
-  const overlay = document.getElementById('modal-overlay')
-  const closeBtn = document.getElementById('modal-close')
-  closeBtn.addEventListener('click', () => {
-    overlay.classList.add('hidden')
-  })
-
-  // Inicializa editor DEPOIS dos partials estarem no DOM
   initEditor()
   initTerminal()
+  initResize()
 
+  // Modal de boas-vindas
+  const overlay = document.getElementById('modal-overlay')
+  const closeBtn = document.getElementById('modal-close')
+  closeBtn.addEventListener('click', () => overlay.classList.add('hidden'))
+
+  // Info do app vinda do main process (versão, FPC, etc)
   if (window.api) {
+    const info = await window.api.getAppInfo()
+    renderStatusbar(info)
     await loadActivities()
   } else {
+    renderStatusbar({ name: 'Bascalzin', version: '—', fpc: { installed: false, version: null } })
     renderMockActivities()
   }
-  initResize()
+}
+
+function renderStatusbar(info) {
+  const fpcLabel = info.fpc.installed
+    ? `FPC ${info.fpc.version}`
+    : 'FPC não encontrado'
+
+  document.getElementById('statusbar-container').innerHTML = `
+    <span>${fpcLabel}</span>
+    <span>|</span>
+    <span>${info.name} v${info.version}</span>
+  `
 }
 
 async function loadActivities() {
   const activities = await window.api.getActivities()
   renderActivities(activities)
 
-  // Seleciona o primeiro exercicio automaticamente
   const firstItem = document.querySelector('.sidebar-item')
   if (firstItem) firstItem.click()
 }
 
 function renderMockActivities() {
-  const mock = [
-    {
-      disciplina: 'Algoritmos1',
-      exercicios: [
-        { id: 'HelloWorld', titulo: 'Hello World', solucoes: ['exemplo'] }
-      ]
-    }
-  ]
-  renderActivities(mock)
+  renderActivities([{
+    disciplina: 'Exemplos',
+    exercicios: [
+      { id: 'HelloWorld', titulo: 'Hello World', solucoes: ['exemplo'] }
+    ]
+  }])
 }
 
 function renderActivities(activities) {
@@ -79,6 +79,7 @@ function renderActivities(activities) {
       list.classList.toggle('hidden')
     })
 
+    // Agrupa por categoria
     const categorias = {}
     for (const ex of exercicios) {
       const cat = ex.categoria || ''
@@ -100,16 +101,12 @@ function renderActivities(activities) {
           catList.classList.toggle('hidden')
         })
 
-        for (const ex of exList) {
-          catList.appendChild(makeSidebarItem(ex))
-        }
+        for (const ex of exList) catList.appendChild(makeSidebarItem(ex))
 
         list.appendChild(catHeader)
         list.appendChild(catList)
       } else {
-        for (const ex of exList) {
-          list.appendChild(makeSidebarItem(ex))
-        }
+        for (const ex of exList) list.appendChild(makeSidebarItem(ex))
       }
     }
 
@@ -135,7 +132,7 @@ function selectExercicio(itemEl, ex) {
   document.getElementById('enunciado-text').textContent = ex.enunciado || 'Sem enunciado.'
 
   const select = document.getElementById('aluno-select')
-  select.innerHTML = '<option value="">— selecionar aluno —</option>'
+  select.innerHTML = '<option value="">— selecionar —</option>'
 
   for (const aluno of ex.solucoes) {
     const opt = document.createElement('option')
@@ -155,10 +152,9 @@ function selectExercicio(itemEl, ex) {
 }
 
 async function loadCode(exPath, aluno) {
-  if (window.api) {
-    const code = await window.api.getCode(exPath, aluno)
-    setEditorCode(code)
-  }
+  if (!window.api) return
+  const code = await window.api.getCode(exPath, aluno)
+  setEditorCode(code)
 }
 
 document.addEventListener('DOMContentLoaded', initApp)
