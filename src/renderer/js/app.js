@@ -25,7 +25,7 @@ async function initApp() {
     renderStatusbar(info)
     await loadActivities()
   } else {
-    renderStatusbar({ name: 'Bascalzin', version: '—', fpc: { installed: false, version: null } })
+    renderStatusbar({ name: 'Pascoal', version: '—', fpc: { installed: false, version: null } })
     renderMockActivities()
   }
 }
