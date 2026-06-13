@@ -10,7 +10,7 @@ module.exports = {
   // Diretórios
   ACTIVITIES_DIR: 'atividades',
   SOLUTIONS_DIR: 'solucoes',
-  TMP_DIR_NAME: 'bascalzin-tmp',
+  TMP_DIR_NAME: 'pascoal-tmp',
   SRC_FILENAME: 'programa.pas',
   EXE_FILENAME: 'programa',
 

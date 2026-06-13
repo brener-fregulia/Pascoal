@@ -1,21 +1,22 @@
 {
-  "name": "Bascalzin",
+  "name": "pascoal",
+  "productName": "Pascoal",
   "version": "0.4.0",
-  "description": "Pascal Playground — Bascalzin",
+  "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brener-fregulia/Bascalzin.git"
+    "url": "git+https://github.com/brener-fregulia/Pascoal.git"
   },
   "author": "Brener Fregulia",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brener-fregulia/Bascalzin/issues"
+    "url": "https://github.com/brener-fregulia/Pascoal/issues"
   },
-  "homepage": "https://github.com/brener-fregulia/Bascalzin#readme",
+  "homepage": "https://github.com/brener-fregulia/Pascoal#readme",
   "devDependencies": {
     "electron": "^42.4.0"
   },
