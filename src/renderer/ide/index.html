@@ -1,13 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Pascoal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pascoal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/welcome.css">
 </head>
-
 <body>
-    <h1>Pascoal IDE</h1>
-</body>
+  <div id="app">
 
+    <div id="titlebar">
+      <div id="titlebar-inner">
+
+        <div class="mac-group">
+          <button class="mac-btn mac-close" id="wc-close" aria-label="Close">
+            <svg viewBox="0 0 8 8" fill="none" stroke="#7a1010" stroke-width="1.2" stroke-linecap="round">
+              <line x1="1.5" y1="1.5" x2="6.5" y2="6.5"/>
+              <line x1="6.5" y1="1.5" x2="1.5" y2="6.5"/>
+            </svg>
+          </button>
+          <button class="mac-btn mac-min" id="wc-minimize" aria-label="Minimize">
+            <svg viewBox="0 0 8 8" fill="none" stroke="#7a5500" stroke-width="1.2" stroke-linecap="round">
+              <line x1="1.5" y1="4" x2="6.5" y2="4"/>
+            </svg>
+          </button>
+          <button class="mac-btn mac-max" id="wc-maximize" aria-label="Maximize">
+            <svg viewBox="0 0 8 8" fill="none" stroke="#0a4a18" stroke-width="1.2" stroke-linecap="round">
+              <polyline points="1.5,4.5 1.5,1.5 4.5,1.5"/>
+              <polyline points="3.5,6.5 6.5,6.5 6.5,3.5"/>
+            </svg>
+          </button>
+        </div>
+
+        <span class="logo">Pascoal</span>
+
+        <div class="win-group">
+          <button class="wc-btn" id="wc-minimize-win" aria-label="Minimize">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="2" y1="7" x2="12" y2="7"/>
+            </svg>
+          </button>
+          <button class="wc-btn" id="wc-maximize-win" aria-label="Maximize">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="2.5" width="9" height="9" rx="1.5"/>
+            </svg>
+          </button>
+          <button class="wc-btn wc-close-btn" id="wc-close-win" aria-label="Close">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="3" y1="3" x2="11" y2="11"/>
+              <line x1="11" y1="3" x2="3" y2="11"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="main">
+
+      <div id="activity-bar">
+        <button class="ab-btn active" aria-label="Explorer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          </svg>
+        </button>
+        <button class="ab-btn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+          </svg>
+        </button>
+        <button class="ab-btn" aria-label="Git">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="6" r="2"/>
+            <circle cx="18" cy="6" r="2"/>
+            <circle cx="6" cy="18" r="2"/>
+            <path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </button>
+        <button class="ab-btn" aria-label="Playground">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </button>
+        <div class="ab-spacer"></div>
+        <button class="ab-btn" id="theme-toggle" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+        </button>
+        <button class="ab-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="editor-area">
+        <div id="tab-bar">
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+            Welcome
+          </div>
+        </div>
+
+        <div id="content">
+          <div id="welcome">
+
+            <div class="welcome-header">
+              <h1>Pascoal</h1>
+              <p>Pascal IDE &amp; Playground</p>
+            </div>
+
+            <div class="welcome-section">
+              <h2>Start</h2>
+              <button class="welcome-action" id="action-new-file">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                New File...
+              </button>
+              <button class="welcome-action" id="action-open-file">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Open File...
+              </button>
+              <button class="welcome-action" id="action-open-folder">
+                <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                Open Folder...
+              </button>
+              <button class="welcome-action" id="action-new-project">
+                <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2"/></svg>
+                New Project + Git...
+              </button>
+
+              <hr class="welcome-divider">
+              <h2>Walkthroughs</h2>
+              <button class="welcome-action" id="action-playground">
+                <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Open Playground
+              </button>
+              <button class="welcome-action" id="action-configure-git">
+                <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2"/></svg>
+                Configure Git
+              </button>
+            </div>
+
+            <div class="welcome-section">
+              <h2>Recent</h2>
+              <div id="recent-list"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="statusbar">
+      <span id="statusbar-fpc">FPC not found</span>
+      <span>|</span>
+      <span id="statusbar-version">Pascoal</span>
+      <div style="flex:1"></div>
+      <span id="statusbar-theme" style="cursor:pointer; opacity:0.7" onclick="cycleTheme()">Dark</span>
+    </div>
+
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/titlebar.js"></script>
+  <script src="js/welcome.js"></script>
+  <script src="js/app.js"></script>
+</body>
 </html>
