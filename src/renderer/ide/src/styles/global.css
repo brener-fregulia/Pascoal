@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Themes ────────────────────────────────────────────────── */
+
+:root {
+  --bg: #0D0D0D;
+  --sidebar: #111118;
+  --panel: #16161F;
+  --border: #2A2A3A;
+  --accent: #E94560;
+  --accent2: #A8DADC;
+  --text: #F0F0F0;
+  --text-dim: #7A7A9A;
+  --success: #4CAF82;
+  --error: #E94560;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui: 'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: #FFFFFF;
+  --sidebar: #F0F0F5;
+  --panel: #F7F7FA;
+  --border: #E0E0E8;
+  --accent: #C1392B;
+  --accent2: #2980B9;
+  --text: #1A1A2E;
+  --text-dim: #6B6B80;
+  --success: #27AE60;
+  --error: #C1392B;
+}
+
+[data-theme="charcoal"] {
+  --bg: #141414;
+  --sidebar: #1C1C1A;
+  --panel: #1F1F1C;
+  --border: #2C2820;
+  --accent: #CC3322;
+  --accent2: #C8901A;
+  --text: #E8D8C0;
+  --text-dim: #6A6055;
+  --success: #7A9A50;
+  --error: #CC3322;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+
+html,
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}

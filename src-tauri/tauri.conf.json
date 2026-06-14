@@ -1,10 +1,13 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Pascoal",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "identifier": "com.brener-fregulia.pascoal",
   "build": {
-    "frontendDist": "../src/renderer/ide"
+    "beforeDevCommand": "npm run dev:ide",
+    "beforeBuildCommand": "npm run build:ide",
+    "frontendDist": "../src/renderer/ide/dist",
+    "devUrl": "http://localhost:5173"
   },
   "app": {
     "withGlobalTauri": true,
