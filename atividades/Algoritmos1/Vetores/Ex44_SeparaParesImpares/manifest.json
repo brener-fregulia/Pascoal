@@ -1,8 +1,0 @@
-{
-  "titulo": "Separa Pares e Ímpares",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Lidos 20 valores inteiros, armazenar os pares em um vetor e os ímpares em outro, exibindo ambos ao final.",
-  "dificuldade": "intermediario",
-  "tags": ["array", "for", "if", "mod", "pares", "impares", "separacao"]
-}

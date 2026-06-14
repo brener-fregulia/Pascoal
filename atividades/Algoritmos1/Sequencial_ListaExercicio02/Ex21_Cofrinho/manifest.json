@@ -1,9 +1,0 @@
-{
-  "titulo": "Cofrinho",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Pedrinho tem um cofrinho com moedas de 1, 5, 10, 25 e 50 centavos e de 1 real. Dadas as quantidades de cada tipo, calcular e exibir o total economizado em reais.",
-  "dificuldade": "iniciante",
-  "tags": ["real", "inteiro", "soma", "financeiro", "moedas"]
-}

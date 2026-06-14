@@ -1,9 +1,0 @@
-{
-  "titulo": "Cálculo de Salário",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Dado o salário de um funcionário, aplicar aumento de 15% e depois descontar 8% de impostos. Exibir o salário inicial, com aumento e o valor final.",
-  "dificuldade": "iniciante",
-  "tags": ["porcentagem", "const", "real", "financeiro"]
-}

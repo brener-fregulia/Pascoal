@@ -1,8 +1,0 @@
-{
-  "titulo": "Número Maior",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lidos dois valores inteiros distintos, informar qual deles é maior, ou se são iguais.",
-  "dificuldade": "iniciante",
-  "tags": ["if", "else", "inteiro", "comparacao"]
-}

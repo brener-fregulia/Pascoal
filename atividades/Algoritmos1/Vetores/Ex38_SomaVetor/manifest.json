@@ -1,8 +1,0 @@
-{
-  "titulo": "Soma de Vetor",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Lidos 5 valores inteiros armazenados em um vetor, calcular e exibir a soma de todos os elementos.",
-  "dificuldade": "iniciante",
-  "tags": ["array", "for", "soma", "inteiro"]
-}

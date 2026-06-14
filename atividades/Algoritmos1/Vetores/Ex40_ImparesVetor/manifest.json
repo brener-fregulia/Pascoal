@@ -1,8 +1,0 @@
-{
-  "titulo": "Vetor de Ímpares até 50",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Armazenar em um vetor os números ímpares entre 1 e 50 e exibir os elementos.",
-  "dificuldade": "iniciante",
-  "tags": ["array", "for", "if", "mod", "impares", "inc"]
-}

@@ -1,8 +1,0 @@
-{
-  "titulo": "Par ou Ímpar",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lido um número inteiro, informar se ele é par ou ímpar.",
-  "dificuldade": "iniciante",
-  "tags": ["if", "else", "mod", "inteiro"]
-}

@@ -1,9 +1,0 @@
-{
-  "titulo": "Desconto em Produto",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Dado o preço de um produto, calcular e exibir o novo preço após aplicar um desconto de 10%.",
-  "dificuldade": "iniciante",
-  "tags": ["real", "porcentagem", "desconto", "financeiro"]
-}

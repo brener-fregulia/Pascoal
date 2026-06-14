@@ -1,9 +1,0 @@
-{
-  "titulo": "Granja FrangoTech",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Uma granja precisa marcar seus frangos com chip de identificação (R$4,00) e dois chips de alimentação (R$3,50 cada). Dado o número de frangos, calcular o custo total para marcar todos.",
-  "dificuldade": "iniciante",
-  "tags": ["const", "real", "inteiro", "financeiro", "multiplicacao"]
-}

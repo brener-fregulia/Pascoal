@@ -1,8 +1,0 @@
-{
-  "titulo": "Sequência A",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Dado A(0)=1 e um valor N, calcular e exibir os 20 termos da sequência definida por A(i) = (A(i-1) + N/A(i-1)) / 2. Esta é a aproximação de Newton para raiz quadrada.",
-  "dificuldade": "avancado",
-  "tags": ["array", "for", "real", "const", "recursao", "newton", "raiz-quadrada"]
-}

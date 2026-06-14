@@ -1,9 +1,0 @@
-{
-  "titulo": "Cálculo de Refresco",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Um refresco é feito com 8 partes de água mineral e 2 partes de suco de maracujá. Dada a quantidade de litros desejada, calcular quantos litros de cada ingrediente são necessários.",
-  "dificuldade": "iniciante",
-  "tags": ["real", "proporcao", "formula", "divisao"]
-}

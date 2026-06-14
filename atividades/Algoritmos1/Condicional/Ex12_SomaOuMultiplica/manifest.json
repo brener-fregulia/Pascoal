@@ -1,8 +1,0 @@
-{
-  "titulo": "Soma ou Multiplica",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lidos dois inteiros A e B: se forem iguais, somar os dois; caso contrário, multiplicar A por B. Atribuir o resultado a C e exibi-lo.",
-  "dificuldade": "iniciante",
-  "tags": ["if", "else", "inteiro", "soma", "multiplicacao"]
-}

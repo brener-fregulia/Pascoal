@@ -1,9 +1,0 @@
-{
-  "titulo": "Área do Trapézio",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Dados a base maior, a base menor e a altura de um trapézio, calcular e exibir sua área usando a fórmula A = (base maior + base menor) * altura / 2.",
-  "dificuldade": "iniciante",
-  "tags": ["geometria", "area", "real", "formula"]
-}

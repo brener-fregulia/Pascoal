@@ -1,8 +1,0 @@
-{
-  "titulo": "IMC",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Dados o peso (kg) e a altura (m) de uma pessoa, calcular o IMC (peso / altura²) e classificar: abaixo de 18.5 = abaixo do peso; entre 18.5 e 25 = peso normal; entre 25 e 30 = acima do peso; acima de 30 = obeso.",
-  "dificuldade": "iniciante",
-  "tags": ["if", "else", "real", "formula", "saude", "imc"]
-}

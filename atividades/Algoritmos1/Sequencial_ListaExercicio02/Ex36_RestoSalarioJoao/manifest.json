@@ -1,9 +1,0 @@
-{
-  "titulo": "Resto do Salário do João",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "João recebe R$1200,00 e deve pagar duas contas atrasadas: C1=R$200,00 e C2=R$120,00, ambas com multa de 2%. Calcular e exibir o total das contas com multas e o valor que restará do salário.",
-  "dificuldade": "iniciante",
-  "tags": ["real", "porcentagem", "financeiro", "multa"]
-}

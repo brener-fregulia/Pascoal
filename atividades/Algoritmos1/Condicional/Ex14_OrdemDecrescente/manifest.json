@@ -1,8 +1,0 @@
-{
-  "titulo": "Ordem Decrescente",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lidos três valores inteiros distintos, exibi-los em ordem decrescente usando trocas com variável temporária.",
-  "dificuldade": "intermediario",
-  "tags": ["if", "inteiro", "ordenacao", "swap", "variavel-temp"]
-}

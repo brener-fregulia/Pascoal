@@ -1,9 +1,0 @@
-{
-  "titulo": "Volume da Caixa d'Água",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Dados o raio da base e a altura de uma caixa d'água cilíndrica, calcular e exibir seu volume usando a constante PI.",
-  "dificuldade": "iniciante",
-  "tags": ["geometria", "volume", "PI", "cilindro", "real"]
-}

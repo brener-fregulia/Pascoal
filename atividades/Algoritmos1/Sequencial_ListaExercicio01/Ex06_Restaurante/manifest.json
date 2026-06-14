@@ -1,9 +1,0 @@
-{
-  "titulo": "Conta do Restaurante",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 01",
-  "enunciado": "Um restaurante por quilo cobra R$12,00 o quilo e desconta o peso do prato vazio (150g). Dado o peso total do prato em quilos, calcular e exibir o valor a pagar.",
-  "dificuldade": "iniciante",
-  "tags": ["real", "formula", "financeiro"]
-}

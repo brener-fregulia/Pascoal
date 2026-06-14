@@ -1,9 +1,0 @@
-{
-  "titulo": "Sistema de Ponto",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "subcategoria": "Desafio 01",
-  "enunciado": "Lidas a hora e os minutos de entrada e saída de um funcionário (no mesmo dia), calcular e exibir quanto tempo ele ficou na empresa em horas e minutos.",
-  "dificuldade": "intermediario",
-  "tags": ["inteiro", "div", "mod", "tempo", "conversao"]
-}

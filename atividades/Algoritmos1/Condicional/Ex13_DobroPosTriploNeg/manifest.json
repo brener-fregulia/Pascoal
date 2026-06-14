@@ -1,8 +1,0 @@
-{
-  "titulo": "Dobro se Positivo, Triplo se Negativo",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lido um número inteiro, calcular e exibir seu dobro se for positivo, ou seu triplo se for negativo.",
-  "dificuldade": "iniciante",
-  "tags": ["if", "else", "inteiro", "comparacao", "multiplicacao"]
-}

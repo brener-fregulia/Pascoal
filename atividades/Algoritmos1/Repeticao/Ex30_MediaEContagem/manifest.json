@@ -1,8 +1,0 @@
-{
-  "titulo": "Média e Contagem",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Repetição",
-  "enunciado": "Lidos 10 números inteiros, calcular e exibir: a) a média aritmética dos números; b) a quantidade de números maiores que 10 e menores que 50.",
-  "dificuldade": "iniciante",
-  "tags": ["for", "if", "and", "media", "contagem", "inteiro"]
-}

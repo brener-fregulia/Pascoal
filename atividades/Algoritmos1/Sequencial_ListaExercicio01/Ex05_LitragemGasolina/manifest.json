@@ -1,9 +1,0 @@
-{
-  "titulo": "Litragem de Gasolina",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 01",
-  "enunciado": "Dado o preço por litro da gasolina e o valor em reais gasto no abastecimento, calcular e exibir quantos litros foram colocados.",
-  "dificuldade": "iniciante",
-  "tags": ["divisao", "real", "operacao-basica"]
-}

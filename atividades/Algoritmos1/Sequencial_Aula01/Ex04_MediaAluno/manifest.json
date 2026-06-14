@@ -1,9 +1,0 @@
-{
-  "titulo": "Média do Aluno",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Aula 01",
-  "enunciado": "Dadas três notas de um aluno, calcular e exibir a média aritmética simples.",
-  "dificuldade": "iniciante",
-  "tags": ["media", "notas", "real", "operacao-basica"]
-}

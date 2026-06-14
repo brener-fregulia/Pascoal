@@ -1,8 +1,0 @@
-{
-  "titulo": "10 Antecessores",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Repetição",
-  "enunciado": "Lido um número inteiro qualquer, escrever seus 10 antecessores.",
-  "dificuldade": "iniciante",
-  "tags": ["while", "inteiro", "antecessor", "sequencia"]
-}

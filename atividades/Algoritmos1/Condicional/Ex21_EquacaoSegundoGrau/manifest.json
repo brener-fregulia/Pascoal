@@ -1,8 +1,0 @@
-{
-  "titulo": "Equação do Segundo Grau",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Condicional",
-  "enunciado": "Lidos os coeficientes a, b e c de uma equação do segundo grau, calcular o delta e exibir as raízes reais se existirem, ou informar que não há raízes reais ou que não é equação do segundo grau (a=0).",
-  "dificuldade": "intermediario",
-  "tags": ["if", "else", "real", "sqrt", "bhaskara", "delta"]
-}

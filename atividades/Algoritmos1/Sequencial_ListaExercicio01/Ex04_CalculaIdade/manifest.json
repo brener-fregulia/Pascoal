@@ -1,9 +1,0 @@
-{
-  "titulo": "Calcula Idade em Dias",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 01",
-  "enunciado": "Dado o nome e a idade em anos de uma pessoa, calcular e exibir quantos dias de vida ela possui (considerando 365 dias por ano).",
-  "dificuldade": "iniciante",
-  "tags": ["string", "inteiro", "conversao", "operacao-basica"]
-}

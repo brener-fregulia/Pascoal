@@ -1,8 +1,0 @@
-{
-  "titulo": "Conta Pares no Vetor",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Lidos 10 valores inteiros em vetor, contar e exibir quantos são pares.",
-  "dificuldade": "iniciante",
-  "tags": ["array", "for", "if", "mod", "pares", "contagem", "inc"]
-}

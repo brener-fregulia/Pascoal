@@ -1,8 +1,0 @@
-{
-  "titulo": "Soma Harmônica",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Repetição",
-  "enunciado": "Lido um inteiro positivo N, calcular e exibir a soma harmônica S = 1 + 1/2 + 1/3 + ... + 1/N.",
-  "dificuldade": "intermediario",
-  "tags": ["for", "if", "real", "serie", "harmonica"]
-}

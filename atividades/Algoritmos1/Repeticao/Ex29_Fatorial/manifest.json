@@ -1,8 +1,0 @@
-{
-  "titulo": "Fatorial",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Repetição",
-  "enunciado": "Lido um número inteiro positivo N, calcular e exibir seu fatorial. Por definição, o fatorial de 0 é 1. Solução utiliza função recursiva.",
-  "dificuldade": "intermediario",
-  "tags": ["function", "recursao", "inteiro", "fatorial"]
-}

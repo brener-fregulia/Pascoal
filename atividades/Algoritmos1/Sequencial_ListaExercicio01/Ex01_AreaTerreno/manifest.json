@@ -1,9 +1,0 @@
-{
-  "titulo": "Área do Terreno",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 01",
-  "enunciado": "Dadas a largura e o comprimento de um terreno retangular em metros, calcular e exibir sua área em metros quadrados.",
-  "dificuldade": "iniciante",
-  "tags": ["geometria", "area", "real", "operacao-basica"]
-}

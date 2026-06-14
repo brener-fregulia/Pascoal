@@ -1,8 +1,0 @@
-{
-  "titulo": "Soma de Sequência Fracional",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Repetição",
-  "enunciado": "Calcular e escrever a soma da série S = 1/20 + 2/19 + 3/18 + ... + 20/1, onde o numerador cresce de 1 a 20 e o denominador decresce de 20 a 1.",
-  "dificuldade": "intermediario",
-  "tags": ["while", "real", "serie", "fracao", "inc", "dec"]
-}

@@ -1,9 +1,0 @@
-{
-  "titulo": "Dias Sem Acidente",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Sequencial",
-  "subcategoria": "Lista Exercicio 02",
-  "enunciado": "Dado um número de dias sem acidente, converter e exibir esse valor em anos, meses e dias (considerando 365 dias/ano e 30 dias/mês).",
-  "dificuldade": "iniciante",
-  "tags": ["div", "mod", "conversao", "inteiro"]
-}

@@ -1,8 +1,0 @@
-{
-  "titulo": "Média dos Alunos",
-  "disciplina": "Algoritmos 1",
-  "categoria": "Vetores",
-  "enunciado": "Lidas as notas de 20 alunos armazenadas em vetor, calcular a média da turma e contar quantos alunos obtiveram nota superior à média.",
-  "dificuldade": "iniciante",
-  "tags": ["array", "for", "media", "contagem", "real"]
-}
