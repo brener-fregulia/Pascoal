@@ -53,7 +53,7 @@ async function runCode() {
   }
 
   const runBtn = document.getElementById('run-btn')
-  runBtn.disabled  = true
+  runBtn.disabled    = true
   runBtn.textContent = t('terminal.btn_running')
 
   clearTerminal()

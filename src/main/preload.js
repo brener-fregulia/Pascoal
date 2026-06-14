@@ -3,8 +3,8 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('api', {
   platform:       process.platform,
   getAppInfo:     () => ipcRenderer.invoke('get-app-info'),
-  getActivities:  () => ipcRenderer.invoke('get-activities'),
-  getCode:        (exPath, aluno) => ipcRenderer.invoke('get-code', exPath, aluno),
+  getExamples:    () => ipcRenderer.invoke('get-examples'),
+  getCode:        (exPath, solution) => ipcRenderer.invoke('get-code', exPath, solution),
   checkFpc:       () => ipcRenderer.invoke('check-fpc'),
   runCode:        (code) => ipcRenderer.invoke('run-code', code),
   sendInput:      (data) => ipcRenderer.invoke('send-input', data),

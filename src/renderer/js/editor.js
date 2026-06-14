@@ -5,12 +5,12 @@ function initEditor() {
   aceEditor.setTheme('ace/theme/tomorrow_night')
   aceEditor.session.setMode('ace/mode/pascal')
   aceEditor.setOptions({
-    fontSize: '13px',
-    showPrintMargin: false,
+    fontSize:          '13px',
+    showPrintMargin:   false,
     highlightActiveLine: true,
-    tabSize: 2,
-    useSoftTabs: true,
-    wrap: false
+    tabSize:           2,
+    useSoftTabs:       true,
+    wrap:              false
   })
   aceEditor.renderer.setScrollMargin(16, 16, 0, 20)
 }
@@ -21,7 +21,5 @@ function getCurrentCode() {
 }
 
 function setEditorCode(code) {
-  if (aceEditor) {
-    aceEditor.setValue(code, -1)
-  }
+  if (aceEditor) aceEditor.setValue(code, -1)
 }

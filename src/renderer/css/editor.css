@@ -24,7 +24,7 @@
   letter-spacing: 0.8px;
 }
 
-.aluno-select {
+.solution-select {
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--text);
@@ -37,7 +37,7 @@
   transition: border-color 0.15s;
 }
 
-.aluno-select:focus {
+.solution-select:focus {
   border-color: var(--accent2);
 }
 
@@ -48,7 +48,7 @@
   line-height: 1.7;
 }
 
-.enunciado {
+.description {
   padding: 12px 16px;
   font-size: 12px;
   color: var(--text-dim);
@@ -58,7 +58,7 @@
   flex-shrink: 0;
 }
 
-.enunciado strong {
+.description strong {
   color: var(--accent2);
   font-size: 11px;
   text-transform: uppercase;

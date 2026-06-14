@@ -10,7 +10,7 @@
   margin-bottom: 4px;
 }
 
-.sidebar-disciplina {
+.sidebar-category-header {
   padding: 8px 16px;
   font-size: 11px;
   font-weight: 600;
@@ -25,26 +25,26 @@
   transition: color 0.15s;
 }
 
-.sidebar-disciplina::before {
+.sidebar-category-header::before {
   content: '\25BE';
   font-size: 10px;
   transition: transform 0.2s;
   display: inline-block;
 }
 
-.sidebar-disciplina.collapsed::before {
+.sidebar-category-header.collapsed::before {
   transform: rotate(-90deg);
 }
 
-.sidebar-disciplina:hover {
+.sidebar-category-header:hover {
   color: var(--accent2);
 }
 
-.sidebar-exercicios {
+.sidebar-examples {
   padding: 0;
 }
 
-.sidebar-exercicios.hidden {
+.sidebar-examples.hidden {
   display: none;
 }
 
@@ -88,7 +88,7 @@
   background: var(--accent);
 }
 
-.sidebar-categoria {
+.sidebar-group {
   padding: 6px 16px 6px 20px;
   font-size: 11px;
   font-weight: 600;
@@ -103,29 +103,29 @@
   transition: color 0.15s;
 }
 
-.sidebar-categoria::before {
-  content: '▾';
+.sidebar-group::before {
+  content: '\25BE';
   font-size: 10px;
   transition: transform 0.2s;
   display: inline-block;
 }
 
-.sidebar-categoria.collapsed::before {
+.sidebar-group.collapsed::before {
   transform: rotate(-90deg);
 }
 
-.sidebar-categoria:hover {
+.sidebar-group:hover {
   color: var(--text);
 }
 
-.sidebar-categoria-lista {
+.sidebar-group-list {
   padding: 0;
 }
 
-.sidebar-categoria-lista.hidden {
+.sidebar-group-list.hidden {
   display: none;
 }
 
-.sidebar-categoria-lista .sidebar-item {
+.sidebar-group-list .sidebar-item {
   padding-left: 36px;
 }

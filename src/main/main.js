@@ -10,10 +10,10 @@ const {
 } = require('./constants')
 
 // Handlers
-const appHandler = require('./handlers/app')
-const activitiesHandler = require('./handlers/activities')
+const appHandler      = require('./handlers/app')
+const examplesHandler = require('./handlers/examples')
 const compilerHandler = require('./handlers/compiler')
-const windowHandler = require('./handlers/window')
+const windowHandler   = require('./handlers/window')
 
 app.whenReady().then(() => {
   registerHandlers()
@@ -23,7 +23,7 @@ app.whenReady().then(() => {
 function registerHandlers() {
   const { ipcMain } = require('electron')
   appHandler.register(ipcMain)
-  activitiesHandler.register(ipcMain)
+  examplesHandler.register(ipcMain)
   compilerHandler.register(ipcMain)
   windowHandler.register(ipcMain)
 }
@@ -33,22 +33,23 @@ function createWindow() {
   const isSmallScreen = width <= 1920 && height <= 1080
 
   const win = new BrowserWindow({
-    width: isSmallScreen ? width : WIN_DEFAULT_W,
+    width:  isSmallScreen ? width  : WIN_DEFAULT_W,
     height: isSmallScreen ? height : WIN_DEFAULT_H,
-    x: isSmallScreen ? x : undefined,
-    y: isSmallScreen ? y : undefined,
-    minWidth: WIN_MIN_WIDTH,
-    minHeight: WIN_MIN_HEIGHT,
-    titleBarStyle: 'hidden',
+    x:      isSmallScreen ? x      : undefined,
+    y:      isSmallScreen ? y      : undefined,
+    minWidth:        WIN_MIN_WIDTH,
+    minHeight:       WIN_MIN_HEIGHT,
+    titleBarStyle:   'hidden',
     backgroundColor: WIN_BG_COLOR,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload:          path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration:  false
     }
   })
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
+
   if (IS_DEV) {
     win.webContents.on('did-finish-load', () => {
       win.webContents.openDevTools()

@@ -3,14 +3,14 @@ const { isFpcInstalled, getFpcVersion } = require('../fpc')
 
 function register(ipcMain) {
   ipcMain.handle('get-app-info', () => {
-    const fpcInstalled = isFpcInstalled()
+    const installed = isFpcInstalled()
     return {
-      name: APP_NAME,
-      version: APP_VERSION,
+      name:        APP_NAME,
+      version:     APP_VERSION,
       description: APP_DESCRIPTION,
       fpc: {
-        installed: fpcInstalled,
-        version: fpcInstalled ? getFpcVersion() : null,
+        installed,
+        version: installed ? getFpcVersion() : null,
       }
     }
   })

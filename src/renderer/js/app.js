@@ -8,11 +8,11 @@ async function loadPartial(containerId, partialPath) {
 async function initApp() {
   await initI18n()
 
-  await loadPartial('sidebar-container',  'partials/sidebar.html')
-  await loadPartial('editor-container',   'partials/editor.html')
-  await loadPartial('terminal-container', 'partials/terminal.html')
-  await loadPartial('modal-container',    'partials/modal-welcome.html')
-  await loadPartial('titlebar',           'partials/titlebar.html')
+  await loadPartial('titlebar',          'partials/titlebar.html')
+  await loadPartial('sidebar-container', 'partials/sidebar.html')
+  await loadPartial('editor-container',  'partials/editor.html')
+  await loadPartial('terminal-container','partials/terminal.html')
+  await loadPartial('modal-container',   'partials/modal-welcome.html')
 
   initTitlebar()
   initEditor()
@@ -26,10 +26,10 @@ async function initApp() {
   if (window.api) {
     const info = await window.api.getAppInfo()
     renderStatusbar(info)
-    await loadActivities()
+    await loadExamples()
   } else {
     renderStatusbar({ name: t('app.name'), version: '-', fpc: { installed: false, version: null } })
-    renderMockActivities()
+    renderMockExamples()
   }
 }
 
@@ -45,66 +45,67 @@ function renderStatusbar(info) {
   `
 }
 
-async function loadActivities() {
-  const activities = await window.api.getActivities()
-  renderActivities(activities)
+async function loadExamples() {
+  const examples = await window.api.getExamples()
+  renderExamples(examples)
 
   const firstItem = document.querySelector('.sidebar-item')
   if (firstItem) firstItem.click()
 }
 
-function renderMockActivities() {
-  renderActivities([{
-    disciplina: 'Exemplos',
-    exercicios: [{ id: 'HelloWorld', titulo: 'Hello World', solucoes: ['exemplo'] }]
+function renderMockExamples() {
+  renderExamples([{
+    category: 'Examples',
+    examples: [{ id: 'HelloWorld', title: 'Hello World', solutions: ['example'] }]
   }])
 }
 
-function renderActivities(activities) {
-  const tree = document.getElementById('activities-tree')
+function renderExamples(data) {
+  const tree = document.getElementById('examples-tree')
   tree.innerHTML = ''
 
-  for (const { disciplina, exercicios } of activities) {
+  for (const { category, examples } of data) {
     const section = document.createElement('div')
     section.className = 'sidebar-section'
 
     const header = document.createElement('div')
-    header.className = 'sidebar-disciplina collapsed'
-    header.textContent = disciplina.replace(/([0-9]+)/, ' $1')
+    header.className = 'sidebar-category-header collapsed'
+    header.textContent = category.replace(/([0-9]+)/, ' $1')
 
     const list = document.createElement('div')
-    list.className = 'sidebar-exercicios hidden'
+    list.className = 'sidebar-examples hidden'
 
     header.addEventListener('click', () => {
       header.classList.toggle('collapsed')
       list.classList.toggle('hidden')
     })
 
-    const categorias = {}
-    for (const ex of exercicios) {
-      const cat = ex.categoria || ''
-      if (!categorias[cat]) categorias[cat] = []
-      categorias[cat].push(ex)
+    // Group by group field
+    const groups = {}
+    for (const ex of examples) {
+      const g = ex.group || ''
+      if (!groups[g]) groups[g] = []
+      groups[g].push(ex)
     }
 
-    for (const [cat, exList] of Object.entries(categorias)) {
-      if (cat) {
-        const catHeader = document.createElement('div')
-        catHeader.className = 'sidebar-categoria collapsed'
-        catHeader.textContent = cat.replace(/_/g, ' ')
+    for (const [group, exList] of Object.entries(groups)) {
+      if (group) {
+        const groupHeader = document.createElement('div')
+        groupHeader.className = 'sidebar-group collapsed'
+        groupHeader.textContent = group.replace(/_/g, ' ')
 
-        const catList = document.createElement('div')
-        catList.className = 'sidebar-categoria-lista hidden'
+        const groupList = document.createElement('div')
+        groupList.className = 'sidebar-group-list hidden'
 
-        catHeader.addEventListener('click', () => {
-          catHeader.classList.toggle('collapsed')
-          catList.classList.toggle('hidden')
+        groupHeader.addEventListener('click', () => {
+          groupHeader.classList.toggle('collapsed')
+          groupList.classList.toggle('hidden')
         })
 
-        for (const ex of exList) catList.appendChild(makeSidebarItem(ex))
+        for (const ex of exList) groupList.appendChild(makeSidebarItem(ex))
 
-        list.appendChild(catHeader)
-        list.appendChild(catList)
+        list.appendChild(groupHeader)
+        list.appendChild(groupList)
       } else {
         for (const ex of exList) list.appendChild(makeSidebarItem(ex))
       }
@@ -119,25 +120,25 @@ function renderActivities(activities) {
 function makeSidebarItem(ex) {
   const item = document.createElement('div')
   item.className = 'sidebar-item'
-  item.textContent = ex.titulo || ex.id
-  item.addEventListener('click', () => selectExercicio(item, ex))
+  item.textContent = ex.title || ex.id
+  item.addEventListener('click', () => selectExample(item, ex))
   return item
 }
 
-function selectExercicio(itemEl, ex) {
+function selectExample(itemEl, ex) {
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'))
   itemEl.classList.add('active')
 
-  document.getElementById('editor-title').textContent   = ex.titulo || ex.id
-  document.getElementById('enunciado-text').textContent = ex.enunciado || t('editor.no_enunciado')
+  document.getElementById('editor-title').textContent    = ex.title || ex.id
+  document.getElementById('description-text').textContent = ex.description || t('editor.no_enunciado')
 
-  const select = document.getElementById('aluno-select')
+  const select = document.getElementById('solution-select')
   select.innerHTML = `<option value="">${t('sidebar.select_placeholder')}</option>`
 
-  for (const aluno of ex.solucoes) {
+  for (const solution of ex.solutions) {
     const opt = document.createElement('option')
-    opt.value       = aluno
-    opt.textContent = aluno
+    opt.value       = solution
+    opt.textContent = solution
     select.appendChild(opt)
   }
 
@@ -145,15 +146,15 @@ function selectExercicio(itemEl, ex) {
     if (select.value) loadCode(ex.path, select.value)
   }
 
-  if (ex.solucoes.length > 0) {
-    select.value = ex.solucoes[0]
-    loadCode(ex.path, ex.solucoes[0])
+  if (ex.solutions.length > 0) {
+    select.value = ex.solutions[0]
+    loadCode(ex.path, ex.solutions[0])
   }
 }
 
-async function loadCode(exPath, aluno) {
+async function loadCode(exPath, solution) {
   if (!window.api) return
-  const code = await window.api.getCode(exPath, aluno)
+  const code = await window.api.getCode(exPath, solution)
   setEditorCode(code)
 }
 
