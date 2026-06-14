@@ -1,12 +1,13 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "cross-env NODE_ENV=development electron ."
+    "dev": "cross-env NODE_ENV=development electron .",
+    "set-version": "node scripts/set-version.js"
   },
   "repository": {
     "type": "git",

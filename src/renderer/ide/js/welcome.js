@@ -2,28 +2,40 @@ function initWelcome() {
   renderRecents([])
 
   document.getElementById('action-new-file')?.addEventListener('click', () => {
-    console.log('new file')
+    console.log('new file — coming soon')
   })
 
-  document.getElementById('action-open-file')?.addEventListener('click', () => {
-    console.log('open file')
-  })
+  document.getElementById('action-open-file')?.addEventListener('click', handleOpenFile)
 
   document.getElementById('action-open-folder')?.addEventListener('click', () => {
-    console.log('open folder')
+    console.log('open folder — coming soon')
   })
 
   document.getElementById('action-new-project')?.addEventListener('click', () => {
-    console.log('new project + git')
+    console.log('new project + git — coming soon')
   })
 
   document.getElementById('action-playground')?.addEventListener('click', () => {
-    console.log('open playground')
+    console.log('open playground — coming soon')
   })
 
   document.getElementById('action-configure-git')?.addEventListener('click', () => {
-    console.log('configure git')
+    console.log('configure git — coming soon')
   })
+}
+
+async function handleOpenFile() {
+  if (!window.__TAURI__) return
+
+  try {
+    const result = await window.__TAURI__.core.invoke('open_file')
+    if (result) {
+      const [filePath, content] = result
+      openInEditor(filePath, content)
+    }
+  } catch (e) {
+    console.error('open_file failed:', e)
+  }
 }
 
 function renderRecents(recents) {
