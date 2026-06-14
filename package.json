@@ -24,13 +24,17 @@
   "homepage": "https://github.com/brener-fregulia/Pascoal#readme",
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/svelte": "^5.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "cross-env": "^7.0.3",
     "electron": "^42.4.0",
+    "jsdom": "^29.1.1",
     "svelte": "^5.56.3",
     "svelte-check": "^4.6.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "ace-builds": "^1.44.0",
