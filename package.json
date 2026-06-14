@@ -1,7 +1,7 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
@@ -9,6 +9,10 @@
     "dev": "cross-env NODE_ENV=development electron .",
     "dev:ide": "cd src/renderer/ide && npx vite",
     "build:ide": "cd src/renderer/ide && npx vite build",
+    "test:frontend": "cd src/renderer/ide && npx vitest run",
+    "test:frontend:watch": "cd src/renderer/ide && npx vitest",
+    "test:rust": "cd src-tauri && cargo test",
+    "test": "npm run test:frontend && npm run test:rust",
     "set-version": "node scripts/set-version.cjs"
   },
   "repository": {

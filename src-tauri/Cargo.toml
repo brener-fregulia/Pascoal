@@ -1,6 +1,6 @@
 [package]
 name = "pascoal"
-version = "0.12.0"
+version = "0.12.1"
 description = "A modern Pascal playground and IDE"
 authors = ["Brener Fregulia"]
 license = "MIT"
@@ -22,3 +22,6 @@ log = "0.4"
 tauri = { version = "2.11.2", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }

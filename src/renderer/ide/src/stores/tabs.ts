@@ -1,5 +1,7 @@
 import { writable, get } from 'svelte/store'
 
+let tabCounter = 0
+
 export interface Tab {
   id: string
   filePath: string | null
@@ -35,15 +37,15 @@ function createTabStore() {
     while (
       existingNames.includes(candidate) ||
       (window.__TAURI__ && window.__documentsDir &&
-        await window.__TAURI__.core.invoke<boolean>('file_exists', {
+        await (window.__TAURI__.core.invoke('file_exists', {
           path: `${window.__documentsDir}/${candidate}`
-        }))
+        }) as Promise<boolean>))
     ) {
       n++
       candidate = `untitled-${n}.pas`
     }
 
-    const id = `tab-${Date.now()}`
+    const id = `tab-${++tabCounter}`
     const session = (window as any).ace.createEditSession(content, 'ace/mode/pascal')
     session.setTabSize(2)
     session.setUseSoftTabs(true)
@@ -152,6 +154,11 @@ function createTabStore() {
     return state.tabs.find(t => t.id === state.activeTabId) ?? null
   }
 
+  function reset() {
+    tabCounter = 0
+    set({ tabs: [], activeTabId: null, activeView: 'welcome' })
+  }
+
   return {
     subscribe,
     newTab,
@@ -163,6 +170,7 @@ function createTabStore() {
     close,
     updateFilePath,
     getActive,
+    reset,
   }
 }
 
