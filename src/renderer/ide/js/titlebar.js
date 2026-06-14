@@ -1,11 +1,6 @@
-async function initTitlebar() {
-  let os = 'linux'
-  try {
-    const platform = await window.__TAURI__.os.platform()
-    os = platform
-  } catch (e) {
-    console.error('os detection failed:', e)
-  }
+function initTitlebar(platform) {
+  const osMap = { windows: 'win32', macos: 'darwin', linux: 'linux' }
+  const os = osMap[platform] || 'linux'
 
   document.body.classList.add(`platform-${os}`)
 

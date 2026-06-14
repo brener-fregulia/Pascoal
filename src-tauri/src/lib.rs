@@ -4,12 +4,11 @@ pub struct AppInfo {
     version: String,
     fpc_installed: bool,
     fpc_version: Option<String>,
+    platform: String,
 }
 
 fn detect_fpc() -> (bool, Option<String>) {
-    let output = std::process::Command::new("fpc")
-        .arg("-iV")
-        .output();
+    let output = std::process::Command::new("fpc").arg("-iV").output();
 
     match output {
         Ok(o) if o.status.success() => {
@@ -18,7 +17,7 @@ fn detect_fpc() -> (bool, Option<String>) {
                 .map(|s| s.trim().to_string());
             (true, version)
         }
-        _ => (false, None)
+        _ => (false, None),
     }
 }
 
@@ -30,7 +29,24 @@ fn get_app_info(app: tauri::AppHandle) -> AppInfo {
         version: app.package_info().version.to_string(),
         fpc_installed,
         fpc_version,
+        platform: std::env::consts::OS.to_string(),
     }
+}
+
+#[tauri::command]
+async fn open_file(app: tauri::AppHandle) -> Option<(String, String)> {
+    use tauri_plugin_dialog::DialogExt;
+
+    let path = app
+        .dialog()
+        .file()
+        .add_filter("Pascal", &["pas"])
+        .blocking_pick_file()?;
+
+    let path_str = path.to_string();
+    let content = std::fs::read_to_string(&path_str).ok()?;
+
+    Some((path_str, content))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -44,10 +60,10 @@ pub fn run() {
                         .build(),
                 )?;
             }
-            app.handle().plugin(tauri_plugin_os::init())?;
+            app.handle().plugin(tauri_plugin_dialog::init())?;
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_app_info])
+        .invoke_handler(tauri::generate_handler![get_app_info, open_file])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")
 }

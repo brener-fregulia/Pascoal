@@ -1,6 +1,7 @@
 {
+  "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default permissions",
+  "description": "Default permissions for Pascoal",
   "windows": [
     "main"
   ],
@@ -11,6 +12,6 @@
     "core:window:allow-maximize",
     "core:window:allow-unmaximize",
     "core:window:allow-is-maximized",
-    "os:allow-platform"
+    "dialog:allow-open"
   ]
 }

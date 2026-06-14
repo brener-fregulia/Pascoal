@@ -1,7 +1,7 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
