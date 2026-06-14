@@ -1,2 +1,14 @@
 * text=auto
-*.pas text eol=lf
+
+# Código
+*.js    text eol=lf
+*.json  text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.pas   text eol=lf
+*.md    text eol=lf
+
+# Binários (nunca converter)
+*.exe   binary
+*.png   binary
+*.ico   binary
