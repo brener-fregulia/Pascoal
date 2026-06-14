@@ -6,6 +6,7 @@ const {
   WIN_DEFAULT_W,
   WIN_DEFAULT_H,
   WIN_BG_COLOR,
+  IS_DEV,
 } = require('./constants')
 
 // Handlers
@@ -47,8 +48,10 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, '../renderer/index.html'))
   if (IS_DEV) {
-  win.webContents.openDevTools()
-}
+    win.webContents.on('did-finish-load', () => {
+      win.webContents.openDevTools()
+    })
+  }
 }
 
 app.on('window-all-closed', () => {
