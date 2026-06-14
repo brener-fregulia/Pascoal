@@ -1,0 +1,43 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import Titlebar from "./components/Titlebar.svelte";
+  import ActivityBar from "./components/ActivityBar.svelte";
+  import EditorArea from "./components/EditorArea.svelte";
+  import Statusbar from "./components/Statusbar.svelte";
+  import { appStore } from "./stores/app";
+  import { themeStore } from "./stores/theme";
+
+  onMount(async () => {
+    themeStore.init();
+    await appStore.init();
+  });
+
+  $effect(() => {
+    document.documentElement.setAttribute("data-theme", $themeStore.current);
+  });
+</script>
+
+<div id="layout">
+  <Titlebar />
+  <div id="main">
+    <ActivityBar />
+    <EditorArea />
+  </div>
+  <Statusbar />
+</div>
+
+<style>
+  #layout {
+    display: grid;
+    grid-template-rows: 36px 1fr 24px;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  #main {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    overflow: hidden;
+  }
+</style>

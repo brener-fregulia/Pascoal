@@ -1,12 +1,17 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "0.6.0",
+  "version": "0.14.0",
   "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "cross-env NODE_ENV=development electron ."
+    "dev:ide": "cd src/renderer/ide && npx vite",
+    "build:ide": "cd src/renderer/ide && npx vite build",
+    "set-version": "node scripts/set-version.cjs",
+    "test:frontend": "cd src/renderer/ide && npx vitest run",
+    "test:frontend:watch": "cd src/renderer/ide && npx vitest",
+    "test:rust": "cd src-tauri && cargo test",
+    "test": "npm run test:frontend && npm run test:rust"
   },
   "repository": {
     "type": "git",
@@ -14,17 +19,28 @@
   },
   "author": "Brener Fregulia",
   "license": "MIT",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/brener-fregulia/Pascoal/issues"
   },
   "homepage": "https://github.com/brener-fregulia/Pascoal#readme",
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "electron": "^42.4.0"
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/svelte": "^5.3.1",
+    "@tsconfig/svelte": "^5.0.8",
+    "jsdom": "^29.1.1",
+    "svelte": "^5.56.3",
+    "svelte-check": "^4.6.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
-    "ace-builds": "^1.44.0",
-    "mustache": "^4.2.0",
+    "@tauri-apps/api": "^2.11.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0",
     "node-pty": "^1.0.0"
   },
   "allowScripts": {
