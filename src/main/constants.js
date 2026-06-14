@@ -6,6 +6,7 @@ module.exports = {
   APP_VERSION: pkg.version,
   APP_DESCRIPTION: pkg.description,
   APP_AUTHOR: pkg.author,
+  IS_DEV: process.env.NODE_ENV === 'development',
 
   // Diretórios
   ACTIVITIES_DIR: 'atividades',
@@ -31,8 +32,8 @@ module.exports = {
   // UI
   WIN_MIN_WIDTH: 900,
   WIN_MIN_HEIGHT: 600,
-  WIN_DEFAULT_W: 1280,
-  WIN_DEFAULT_H: 800,
+  WIN_DEFAULT_W: 1920,
+  WIN_DEFAULT_H: 1080,
   WIN_BG_COLOR: '#0D0D0D',
 
   // Misc
