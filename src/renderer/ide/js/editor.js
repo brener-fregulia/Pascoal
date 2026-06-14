@@ -1,5 +1,6 @@
 let aceEditor = null
 let currentFilePath = null
+let isDirty = false
 
 function initEditor() {
   aceEditor = ace.edit('ace-editor')
@@ -14,12 +15,28 @@ function initEditor() {
     wrap: false
   })
   aceEditor.renderer.setScrollMargin(16, 16, 0, 20)
+
+  aceEditor.session.on('change', () => {
+    if (!isDirty) {
+      isDirty = true
+      markTabDirty()
+    }
+  })
+
+  // Ctrl+S / Cmd+S
+  document.addEventListener('keydown', async (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault()
+      await handleSave()
+    }
+  })
 }
 
 function openInEditor(filePath, content) {
   if (!aceEditor) initEditor()
 
   currentFilePath = filePath
+  isDirty = false
   aceEditor.setValue(content, -1)
   aceEditor.resize()
 
@@ -44,7 +61,7 @@ function updateEditorTab(fileName) {
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14 2 14 8 20 8"/>
     </svg>
-    ${fileName}
+    <span class="tab-name">${fileName}</span>
   `
 
   tab.addEventListener('click', () => {
@@ -66,6 +83,59 @@ function updateEditorTab(fileName) {
   }
 
   tabBar.appendChild(tab)
+}
+
+function markTabDirty() {
+  const tab = document.querySelector('.tab.file-tab .tab-name')
+  if (tab && !tab.textContent.startsWith('●')) {
+    tab.textContent = '● ' + tab.textContent
+  }
+}
+
+function markTabClean() {
+  const tab = document.querySelector('.tab.file-tab .tab-name')
+  if (tab) {
+    tab.textContent = tab.textContent.replace('● ', '')
+  }
+}
+
+async function handleSave() {
+  if (!aceEditor || !window.__TAURI__) return
+
+  const content = aceEditor.getValue()
+
+  if (currentFilePath) {
+    try {
+      await window.__TAURI__.core.invoke('save_file', {
+        content,
+        filePath: currentFilePath
+      })
+      isDirty = false
+      markTabClean()
+    } catch (e) {
+      console.error('save_file failed:', e)
+    }
+  } else {
+    await handleSaveAs()
+  }
+}
+
+async function handleSaveAs() {
+  if (!aceEditor || !window.__TAURI__) return
+
+  const content = aceEditor.getValue()
+
+  try {
+    const result = await window.__TAURI__.core.invoke('save_file_as', { content })
+    if (result) {
+      currentFilePath = result.path
+      isDirty = false
+      const fileName = result.path.split(/[\\/]/).pop()
+      updateEditorTab(fileName)
+    }
+  } catch (e) {
+    console.error('save_file_as failed:', e)
+  }
 }
 
 function getCurrentCode() {
