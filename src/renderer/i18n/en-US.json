@@ -42,5 +42,9 @@
   "fpc.dialog.install.message": "After installing FPC:",
   "fpc.dialog.install.detail": "1. Complete the installation normally\n2. Restart Pascoal\n3. Try running again",
   "fpc.dialog.install.btn_ok": "OK",
-  "fpc.error.not_found": "FPC not found. Install Free Pascal and try again."
+  "fpc.error.not_found": "FPC not found. Install Free Pascal and try again.",
+
+  "titlebar.close": "Close",
+  "titlebar.minimize": "Minimize",
+  "titlebar.maximize": "Maximize"
 }

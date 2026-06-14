@@ -12,7 +12,9 @@ async function initApp() {
   await loadPartial('editor-container',   'partials/editor.html')
   await loadPartial('terminal-container', 'partials/terminal.html')
   await loadPartial('modal-container',    'partials/modal-welcome.html')
+  await loadPartial('titlebar',           'partials/titlebar.html')
 
+  initTitlebar()
   initEditor()
   initTerminal()
   initResize()

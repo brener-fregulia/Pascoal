@@ -13,6 +13,7 @@ const {
 const appHandler = require('./handlers/app')
 const activitiesHandler = require('./handlers/activities')
 const compilerHandler = require('./handlers/compiler')
+const windowHandler = require('./handlers/window')
 
 app.whenReady().then(() => {
   registerHandlers()
@@ -24,6 +25,7 @@ function registerHandlers() {
   appHandler.register(ipcMain)
   activitiesHandler.register(ipcMain)
   compilerHandler.register(ipcMain)
+  windowHandler.register(ipcMain)
 }
 
 function createWindow() {

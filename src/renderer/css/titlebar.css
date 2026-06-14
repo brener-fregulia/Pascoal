@@ -1,0 +1,118 @@
+#titlebar {
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+  user-select: none;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+#titlebar-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+#titlebar .logo {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+#titlebar .subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.wc-spacer {
+  flex: 1;
+}
+
+/* Oculta ambos por padrão, JS ativa o correto */
+.mac-group { display: none; }
+.win-group { display: none; }
+
+/* Windows / Linux */
+body.platform-win32 .win-group,
+body.platform-linux .win-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* macOS */
+body.platform-darwin .mac-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body.platform-darwin #titlebar-inner {
+  padding-left: 12px;
+}
+
+/* Botões Windows */
+.wc-btn {
+  width: 32px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  color: var(--text-dim);
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.wc-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.wc-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+.wc-btn.wc-close-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Botões macOS */
+.mac-btn {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.mac-btn svg {
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  position: absolute;
+}
+
+.mac-group:hover .mac-btn svg { opacity: 1; }
+
+.mac-close { background: #FF5F57; }
+.mac-min   { background: #FFBD2E; }
+.mac-max   { background: #28C840; }
