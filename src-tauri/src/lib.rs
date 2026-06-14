@@ -7,6 +7,7 @@ pub struct AppInfo {
     fpc_installed: bool,
     fpc_version: Option<String>,
     platform: String,
+    documents_dir: String,
 }
 
 #[derive(serde::Serialize)]
@@ -49,6 +50,7 @@ fn get_app_info(app: tauri::AppHandle) -> AppInfo {
         fpc_installed,
         fpc_version,
         platform: std::env::consts::OS.to_string(),
+        documents_dir: get_documents_dir(&app).to_string_lossy().to_string(),
     }
 }
 
@@ -78,7 +80,11 @@ async fn save_file(content: String, file_path: String) -> Result<SaveResult, Str
 }
 
 #[tauri::command]
-async fn save_file_as(app: tauri::AppHandle, content: String) -> Option<SaveResult> {
+async fn save_file_as(
+    app: tauri::AppHandle,
+    content: String,
+    suggested_name: String,
+) -> Option<SaveResult> {
     use tauri_plugin_dialog::DialogExt;
 
     let default_dir = get_documents_dir(&app);
@@ -87,7 +93,7 @@ async fn save_file_as(app: tauri::AppHandle, content: String) -> Option<SaveResu
         .dialog()
         .file()
         .set_directory(default_dir)
-        .set_file_name("untitled.pas")
+        .set_file_name(&suggested_name)
         .add_filter("Pascal", &["pas"])
         .blocking_save_file()?;
 
@@ -115,8 +121,14 @@ pub fn run() {
             get_app_info,
             open_file,
             save_file,
-            save_file_as
+            save_file_as,
+            file_exists
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")
+}
+
+#[tauri::command]
+fn file_exists(path: String) -> bool {
+    std::path::Path::new(&path).exists()
 }

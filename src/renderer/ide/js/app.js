@@ -9,6 +9,7 @@ async function initApp() {
       const info = await window.__TAURI__.core.invoke('get_app_info')
 
       initTitlebar(info.platform)
+      window.__documentsDir = info.documents_dir
 
       const fpcLabel = info.fpc_installed
         ? `FPC ${info.fpc_version}`

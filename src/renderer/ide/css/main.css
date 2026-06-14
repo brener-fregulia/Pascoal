@@ -1,10 +1,13 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
@@ -85,14 +88,16 @@ html, body {
 
 .ab-btn:hover {
   color: var(--text);
-  background: rgba(128,128,128,0.1);
+  background: rgba(128, 128, 128, 0.1);
 }
 
 .ab-btn.active {
   color: var(--accent2);
 }
 
-.ab-spacer { flex: 1; }
+.ab-spacer {
+  flex: 1;
+}
 
 /* EDITOR AREA */
 #editor-area {
@@ -113,7 +118,9 @@ html, body {
   overflow-x: auto;
 }
 
-#tab-bar::-webkit-scrollbar { height: 0; }
+#tab-bar::-webkit-scrollbar {
+  height: 0;
+}
 
 .tab {
   padding: 0 16px;
@@ -166,14 +173,32 @@ html, body {
 }
 
 /* SCROLLBAR */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
 
 /* WINDOW CONTROLS */
-.mac-group { display: none; }
-.win-group { display: none; }
+.mac-group {
+  display: none;
+}
+
+.win-group {
+  display: none;
+}
 
 body.platform-win32 .win-group,
 body.platform-linux .win-group {
@@ -209,9 +234,20 @@ body.platform-darwin #titlebar-inner {
   flex-shrink: 0;
 }
 
-.wc-btn svg { width: 14px; height: 14px; }
-.wc-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
-.wc-btn.wc-close-btn:hover { background: var(--accent); color: #fff; }
+.wc-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.wc-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.wc-btn.wc-close-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
 
 .mac-btn {
   width: 13px;
@@ -235,7 +271,55 @@ body.platform-darwin #titlebar-inner {
   position: absolute;
 }
 
-.mac-group:hover .mac-btn svg { opacity: 1; }
-.mac-close { background: #FF5F57; }
-.mac-min   { background: #FFBD2E; }
-.mac-max   { background: #28C840; }
+.mac-group:hover .mac-btn svg {
+  opacity: 1;
+}
+
+.mac-close {
+  background: #FF5F57;
+}
+
+.mac-min {
+  background: #FFBD2E;
+}
+
+.mac-max {
+  background: #28C840;
+}
+
+/* Tab close button */
+.tab-close {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  color: var(--text-dim);
+  padding: 0;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.tab-close svg {
+  width: 10px;
+  height: 10px;
+}
+
+.tab:hover .tab-close {
+  opacity: 1;
+}
+
+.tab-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+.tab.active .tab-close {
+  opacity: 1;
+}

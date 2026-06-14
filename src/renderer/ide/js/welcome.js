@@ -1,10 +1,14 @@
+const PASCAL_TEMPLATE = `program Untitled;
+
+begin
+
+end.
+`
+
 function initWelcome() {
   renderRecents([])
 
-  document.getElementById('action-new-file')?.addEventListener('click', () => {
-    console.log('new file — coming soon')
-  })
-
+  document.getElementById('action-new-file')?.addEventListener('click', handleNewFile)
   document.getElementById('action-open-file')?.addEventListener('click', handleOpenFile)
 
   document.getElementById('action-open-folder')?.addEventListener('click', () => {
@@ -22,6 +26,10 @@ function initWelcome() {
   document.getElementById('action-configure-git')?.addEventListener('click', () => {
     console.log('configure git — coming soon')
   })
+}
+
+async function handleNewFile() {
+  await openInEditor(null, PASCAL_TEMPLATE)
 }
 
 async function handleOpenFile() {
