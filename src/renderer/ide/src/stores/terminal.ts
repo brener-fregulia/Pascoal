@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store'
+import { writable } from 'svelte/store'
 
 export type TerminalPosition = 'bottom' | 'right'
 
@@ -19,7 +19,7 @@ interface TerminalState {
 let lineId = 0
 
 function createTerminalStore() {
-  const { subscribe, update, set } = writable<TerminalState>({
+  const { subscribe, update } = writable<TerminalState>({
     lines: [],
     running: false,
     visible: false,
@@ -76,3 +76,6 @@ function createTerminalStore() {
 }
 
 export const terminalStore = createTerminalStore()
+
+// Separate writable to trigger xterm clear — increment to fire
+export const clearTerminalSignal = writable(0)

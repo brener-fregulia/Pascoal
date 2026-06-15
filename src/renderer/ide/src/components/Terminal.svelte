@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { terminalStore } from "../stores/terminal";
+  import { terminalStore, clearTerminalSignal } from "../stores/terminal";
   import X from "../icons/X.svelte";
 
   let terminalEl: HTMLDivElement;
@@ -8,6 +8,11 @@
   let fitAddon: any = null;
   let unlistenOutput: (() => void) | null = null;
   let unlistenExit: (() => void) | null = null;
+
+  // Clear xterm when signal fires
+  $effect(() => {
+    if ($clearTerminalSignal > 0) term?.clear();
+  });
 
   onMount(() => {
     let resizeObserver: ResizeObserver;
@@ -99,21 +104,15 @@
       brightWhite: get("--text") || "#F0F0F0",
     };
   }
-
-  export function clear() {
-    term?.clear();
-  }
-
-  export function focus() {
-    term?.focus();
-  }
 </script>
 
 <div id="terminal-panel">
   <div class="terminal-header">
     <span class="terminal-title">Terminal</span>
     <div class="terminal-actions">
-      <button class="t-btn" on:click={clear} title="Clear">Clear</button>
+      <button class="t-btn" on:click={() => term?.clear()} title="Clear">
+        Clear
+      </button>
       <button
         class="t-btn icon"
         on:click={() => terminalStore.hide()}
@@ -127,8 +126,6 @@
 </div>
 
 <style>
-  @import "@xterm/xterm/css/xterm.css";
-
   #terminal-panel {
     display: flex;
     flex-direction: column;
