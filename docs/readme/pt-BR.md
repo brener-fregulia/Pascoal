@@ -1,6 +1,6 @@
 # Pascoal
 
-> Um playground Pascal moderno para desktop - escreva, compile e execute programas Pascal com estilo.
+> Uma IDE Pascal moderna para desktop - escreva, compile e execute programas Pascal.
 
 🌐 [English](../../README.md)
 
@@ -8,24 +8,27 @@
 
 ## O que é o Pascoal?
 
-Pascoal é uma IDE Pascal desktop construída com Electron, projetada para trazer a programação Pascal a um público moderno. Interface limpa, compilação real via Free Pascal (FPC) e terminal interativo — tudo em um só lugar.
+O Pascoal é uma IDE Pascal para desktop construída com Tauri e Rust, desenvolvida para trazer a programação Pascal a um público moderno. Interface limpa, compilação real via Free Pascal (FPC) e terminal interativo - tudo em um pacote leve.
 
-Nasceu como uma rebeldia contra ferramentas ultrapassadas como o Pascalzim, com o objetivo de tornar o Pascal acessível e divertido novamente.
+Nasceu como uma rebelião contra ferramentas ultrapassadas como o Pascalzim, com o objetivo de tornar Pascal acessível e divertido novamente - sem o peso do Electron ou a bagunça de interfaces legadas.
 
 ## Funcionalidades
 
-- **Editor moderno** com Ace Editor e highlight de sintaxe Pascal
+- **Editor moderno** com Ace Editor e realce de sintaxe Pascal
 - **Compilação real** via Free Pascal Compiler (FPC)
-- **Terminal interativo** com suporte a TTY via node-pty
-- **Multiplataforma** — Windows e Linux (macOS planejado)
-- **Controles de janela nativos** adaptados por plataforma (semáforos no macOS, estilo Windows/Linux)
-- **Suporte a i18n** — Português (BR) e Inglês incluídos
-- **Tema escuro** com estética limpa e minimalista
+- **Terminal interativo** com suporte a stdin/stdout - `readln` funciona
+- **Edição em múltiplas abas** - abra vários arquivos simultaneamente
+- **Três temas** - Dark, Light e Charcoal, com detecção automática do sistema
+- **Controles de janela nativos** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
+- **Salvar automaticamente antes de executar** - configurável
+- **Leve** - ~25MB de RAM, ~5MB de instalador
 
 ## Requisitos
 
-- [Node.js](https://nodejs.org/) >= 22.12.0
+- [Rust](https://rustup.rs/) (stable)
+- [Node.js](https://nodejs.org/) >= 22
 - [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) instalado e disponível no PATH
+- [Pré-requisitos do Tauri](https://tauri.app/start/prerequisites/) para sua plataforma
 
 ## Como começar
 
@@ -37,48 +40,79 @@ cd Pascoal
 # Instale as dependências
 npm install
 
-# Execute em modo de desenvolvimento (abre DevTools automaticamente)
-npm run dev
+# Execute em modo de desenvolvimento
+cargo tauri dev
 
-# Execute normalmente
-npm start
+# Build para produção
+cargo tauri build
+```
+
+### Somente frontend (desenvolvimento de UI sem Tauri)
+
+```bash
+npm run dev:ide
+```
+
+### Executando testes
+
+```bash
+npm test              # frontend + Rust
+npm run test:frontend # somente Vitest
+npm run test:rust     # somente cargo test
 ```
 
 ## Estrutura do projeto
 
 ```
 src/
-  main/
-    constants.js        # Fonte única da verdade para constantes do app
-    fpc.js              # Deteccao do FPC e prompts de instalacao
-    preload.js          # Context bridge do Electron
-    main.js             # Ponto de entrada do app
-    handlers/           # Handlers IPC (app, atividades, compilador, janela)
-    i18n/               # Traducoes do main process (dialogos nativos)
   renderer/
-    index.html
-    css/                # Estilos por componente
-    js/                 # Scripts do renderer
-    partials/           # Templates HTML renderizados via Mustache
-    i18n/               # Traducoes do renderer (pt-BR, en-US)
+    ide/                    # Frontend Svelte + Vite
+      src/
+        components/         # Componentes Svelte (Titlebar, TabBar, Editor, Terminal...)
+        icons/              # Componentes de ícones SVG
+        stores/             # Stores Svelte (tabs, theme, terminal, runner, settings)
+        styles/             # CSS global
+        tests/              # Testes Vitest
+      public/
+        vendor/             # Ace Editor (ace.js, mode-pascal.js, tema)
+src-tauri/
+  src/
+    lib.rs                  # Comandos Tauri e lógica principal
+    tests/                  # Testes unitários Rust
+  tauri.conf.json
+  Cargo.toml
 docs/
-  readme/               # Traducoes deste README
+  readme/                   # Traduções do README
+scripts/
+  set-version.cjs           # Script de bump de versão
 ```
 
-## Stack
+## Stack tecnológica
 
 | | |
 |---|---|
-| Runtime | Electron 42 |
+| Runtime | Tauri 2 |
+| Backend | Rust |
+| Frontend | Svelte 5 + Vite + TypeScript |
 | Compilador | Free Pascal (FPC) |
-| Terminal | node-pty |
+| Terminal | xterm.js |
 | Editor | Ace Editor |
-| Templates | Mustache |
+| Testes | Vitest + cargo test |
+
+## Roadmap
+
+- [ ] Abrir Pasta / Projeto
+- [ ] Integração com Git
+- [ ] Terminal PTY (PowerShell, bash, fish)
+- [ ] Persistência de configurações
+- [ ] Modo Playground
+- [ ] Modo Desafio com casos de teste
+- [ ] CI/CD com GitHub Actions
 
 ## Contribuindo
 
-Contribuições são bem-vindas. Fique à vontade para abrir issues ou pull requests.
+Contribuições são bem-vindas. Sinta-se à vontade para abrir issues ou pull requests.
 
 ## Licença
 
-[MIT](../../LICENSE) — Brener Fregulia, 2026
+[MIT](../../LICENSE) - Brener Fregulia, 2026
