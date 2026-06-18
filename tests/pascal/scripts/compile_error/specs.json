@@ -1,0 +1,8 @@
+{
+  "program": "compile_error.pas",
+  "description": "Program with a type error — FPC must fail to compile",
+  "stdin": [],
+  "expect_stdout": [],
+  "expect_exit_code": 1,
+  "expect_compile_failure": true
+}

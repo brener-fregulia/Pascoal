@@ -1,0 +1,11 @@
+{
+  "program": "readln_integer.pas",
+  "description": "Basic integer input and output",
+  "stdin": ["42"],
+  "expect_stdout": [
+    "Type a number:",
+    "Number: 42",
+    "Text: 42"
+  ],
+  "expect_exit_code": 0
+}

@@ -1,6 +1,6 @@
 [package]
 name = "pascoal"
-version = "0.14.0"
+version = "0.15.0"
 description = "A modern Pascal playground and IDE"
 authors = ["Brener Fregulia"]
 license = "MIT"
@@ -25,4 +25,10 @@ tauri-plugin-dialog = "2"
 portable-pty = "0.9.0"
 
 [dev-dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["rt", "macros"] }
+
+[[test]]
+name = "pascal_runner"
+path = "tests/pascal_runner.rs"

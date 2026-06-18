@@ -1,0 +1,12 @@
+{
+  "program": "format_real.pas",
+  "description": "Real number formatting with width and decimal specifiers",
+  "stdin": ["3.14"],
+  "expect_stdout": [
+    "Type a real number:",
+    "Raw:  3.1400000000000001E+000",
+    "Formatted:     3.14",
+    "Compact: 3.14"
+  ],
+  "expect_exit_code": 0
+}

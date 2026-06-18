@@ -1,0 +1,14 @@
+{
+  "program": "multiple_inputs.pas",
+  "description": "Multiple readln calls with different types",
+  "stdin": ["Alice", "30", "1.75"],
+  "expect_stdout": [
+    "Name:",
+    "Age:",
+    "Height:",
+    "Hello, Alice!",
+    "Age: 30",
+    "Height: 1.75"
+  ],
+  "expect_exit_code": 0
+}

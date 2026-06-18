@@ -1,7 +1,7 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Pascal Playground - Pascoal",
   "main": "src/main/main.js",
   "scripts": {
@@ -10,8 +10,9 @@
     "set-version": "node scripts/set-version.cjs",
     "test:frontend": "cd src/renderer/ide && npx vitest run",
     "test:frontend:watch": "cd src/renderer/ide && npx vitest",
-    "test:rust": "cd src-tauri && cargo test",
-    "test": "npm run test:frontend && npm run test:rust"
+    "test:rust": "cd src-tauri && cargo test --lib",
+    "test:pascal": "cd src-tauri && cargo test --test pascal_runner -- --nocapture",
+    "test": "npm run test:frontend && npm run test:rust && npm run test:pascal"
   },
   "repository": {
     "type": "git",
