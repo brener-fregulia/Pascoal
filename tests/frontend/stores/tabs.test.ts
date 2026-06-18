@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { tabStore } from '../../stores/tabs'
+import { tabStore } from "@stores/tabs";
 
 describe('tabStore', () => {
   beforeEach(() => {
