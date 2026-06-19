@@ -131,12 +131,14 @@ pub fn compile(src_file: &std::path::Path, out_dir: &std::path::Path) -> Compile
 
 struct ProcessState {
     writer: std::sync::Mutex<Option<Box<dyn std::io::Write + Send>>>,
+    generation: std::sync::atomic::AtomicU64,
 }
 
 impl ProcessState {
     fn new() -> Self {
         Self {
             writer: std::sync::Mutex::new(None),
+            generation: std::sync::atomic::AtomicU64::new(0),
         }
     }
 }
@@ -229,12 +231,21 @@ async fn compile_and_run(app: tauri::AppHandle, code: String) -> CompileResult {
         };
     }
 
-    // Kill any running process before compiling
+    // Kill any running process and bump generation before compiling
+    let current_gen = {
+        let binding = app.state::<ProcessState>();
+        binding
+            .generation
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
+            + 1
+    };
     {
         let binding = app.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
     }
+    // Give the OS time to flush and close the old stdin pipe
+    std::thread::sleep(std::time::Duration::from_millis(100));
 
     let result = compile(&src_file, &tmp_dir);
 
@@ -250,9 +261,9 @@ async fn compile_and_run(app: tauri::AppHandle, code: String) -> CompileResult {
     app.emit("console-started", ()).ok();
 
     if cfg!(target_os = "windows") {
-        run_with_pipes(&app, &exe_file, &tmp_dir).await
+        run_with_pipes(&app, &exe_file, &tmp_dir, current_gen).await
     } else {
-        run_with_pty(&app, &exe_file, &tmp_dir).await
+        run_with_pty(&app, &exe_file, &tmp_dir, current_gen).await
     }
 }
 
@@ -260,6 +271,7 @@ async fn run_with_pipes(
     app: &tauri::AppHandle,
     exe_file: &std::path::Path,
     tmp_dir: &std::path::Path,
+    gen: u64,
 ) -> CompileResult {
     use std::process::Stdio;
 
@@ -302,6 +314,13 @@ async fn run_with_pipes(
             match stdout.read(&mut buf) {
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
+                    let current = app_clone
+                        .state::<ProcessState>()
+                        .generation
+                        .load(std::sync::atomic::Ordering::SeqCst);
+                    if current != gen {
+                        break;
+                    }
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
                     app_clone.emit("console-program-output", data).ok();
                 }
@@ -319,6 +338,13 @@ async fn run_with_pipes(
             match stderr.read(&mut buf) {
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
+                    let current = app_clone2
+                        .state::<ProcessState>()
+                        .generation
+                        .load(std::sync::atomic::Ordering::SeqCst);
+                    if current != gen {
+                        break;
+                    }
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
                     app_clone2.emit("console-program-error", data).ok();
                 }
@@ -333,7 +359,14 @@ async fn run_with_pipes(
             .wait()
             .map(|s| if s.success() { 0i32 } else { 1i32 })
             .unwrap_or(1);
-        app_clone3.emit("console-exit", exit_code).ok();
+
+        let current = app_clone3
+            .state::<ProcessState>()
+            .generation
+            .load(std::sync::atomic::Ordering::SeqCst);
+        if current == gen {
+            app_clone3.emit("console-exit", exit_code).ok();
+        }
 
         let binding = app_clone3.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
@@ -350,6 +383,7 @@ async fn run_with_pty(
     app: &tauri::AppHandle,
     exe_file: &std::path::Path,
     tmp_dir: &std::path::Path,
+    gen: u64,
 ) -> CompileResult {
     use portable_pty::{native_pty_system, CommandBuilder, PtySize};
 
@@ -404,6 +438,13 @@ async fn run_with_pty(
             match std::io::Read::read(&mut reader, &mut buf) {
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
+                    let current = app_clone
+                        .state::<ProcessState>()
+                        .generation
+                        .load(std::sync::atomic::Ordering::SeqCst);
+                    if current != gen {
+                        break;
+                    }
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
                     app_clone.emit("console-program-output", data).ok();
                 }
@@ -414,7 +455,14 @@ async fn run_with_pty(
             .wait()
             .map(|s| if s.success() { 0i32 } else { 1i32 })
             .unwrap_or(1);
-        app_clone.emit("console-exit", exit_code).ok();
+
+        let current = app_clone
+            .state::<ProcessState>()
+            .generation
+            .load(std::sync::atomic::Ordering::SeqCst);
+        if current == gen {
+            app_clone.emit("console-exit", exit_code).ok();
+        }
 
         let binding = app_clone.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();

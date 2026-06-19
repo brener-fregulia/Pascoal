@@ -35,20 +35,8 @@ export async function runActiveFile() {
   }
 
   consoleStore.show()
-  consoleStore.setRunning(true)
+  consoleStore.setRunning(false)
   consoleStore.resetBuild()
-
-  // Wait for console to be ready
-  await new Promise<void>(resolve => {
-    const handler = () => {
-      window.removeEventListener('console-ready', handler)
-      resolve()
-    }
-    window.addEventListener('console-ready', handler)
-    setTimeout(resolve, 500)
-  })
-
-  // Clear after console is confirmed ready
   clearConsoleSignal.update(n => n + 1)
 
   // Small delay to ensure clear renders before output arrives

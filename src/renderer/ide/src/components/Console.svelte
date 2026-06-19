@@ -8,6 +8,7 @@
   let programEl: HTMLDivElement;
   let term: any = null;
   let fitAddon: any = null;
+  let isRunning = false;
   let unlistenBuild: (() => void) | null = null;
   let unlistenStarted: (() => void) | null = null;
   let unlistenProgramOut: (() => void) | null = null;
@@ -19,7 +20,7 @@
 
   // Clear xterm when signal fires
   $effect(() => {
-    if ($clearConsoleSignal > 0) term?.clear();
+    if ($clearConsoleSignal > 0) term?.reset();
   });
 
   onMount(() => {
@@ -44,7 +45,7 @@
       fitAddon.fit();
 
       term.onData((data: string) => {
-        if (window.__TAURI__ && $consoleStore.running) {
+        if (window.__TAURI__ && isRunning) {
           // Manual echo — pipes don't echo input automatically
           if (data === "\r") {
             term.write("\r\n");
@@ -71,6 +72,8 @@
 
         unlistenStarted = await listen("console-started", () => {
           consoleStore.setBuildStatus("success");
+          consoleStore.setRunning(true);
+          isRunning = true;
         });
 
         unlistenProgramOut = await listen<string>(
@@ -96,6 +99,7 @@
             term?.write(msg);
           }
           consoleStore.setRunning(false);
+          isRunning = false;
         });
       }
 
