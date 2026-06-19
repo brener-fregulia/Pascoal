@@ -8,10 +8,9 @@
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "baseUrl": ".",
     "paths": {
       "@stores/*": [
-        "src/stores/*"
+        "./src/stores/*"
       ]
     }
   },
