@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
 import { tabStore } from './tabs'
-import { terminalStore, clearTerminalSignal } from './terminal'
+import { consoleStore, clearConsoleSignal } from './console'
 import { settingsStore } from './settings'
 
 export async function runActiveFile() {
@@ -8,7 +8,7 @@ export async function runActiveFile() {
 
   const tab = tabStore.getActive()
   if (!tab) {
-    terminalStore.show()
+    consoleStore.show()
     return
   }
 
@@ -29,26 +29,27 @@ export async function runActiveFile() {
         return
       }
     } else {
-      terminalStore.show()
+      consoleStore.show()
       return
     }
   }
 
-  terminalStore.show()
-  terminalStore.setRunning(true)
+  consoleStore.show()
+  consoleStore.setRunning(true)
+  consoleStore.resetBuild()
 
-  // Wait for terminal to be ready
+  // Wait for console to be ready
   await new Promise<void>(resolve => {
     const handler = () => {
-      window.removeEventListener('terminal-ready', handler)
+      window.removeEventListener('console-ready', handler)
       resolve()
     }
-    window.addEventListener('terminal-ready', handler)
+    window.addEventListener('console-ready', handler)
     setTimeout(resolve, 500)
   })
 
-  // Clear after terminal is confirmed ready
-  clearTerminalSignal.update(n => n + 1)
+  // Clear after console is confirmed ready
+  clearConsoleSignal.update(n => n + 1)
 
   // Small delay to ensure clear renders before output arrives
   await new Promise(resolve => setTimeout(resolve, 50))
@@ -57,6 +58,7 @@ export async function runActiveFile() {
     await window.__TAURI__.core.invoke('compile_and_run', { code: content })
   } catch (e) {
     console.error('compile_and_run failed:', e)
-    terminalStore.setRunning(false)
+    consoleStore.setRunning(false)
+    consoleStore.setBuildStatus('error')
   }
 }

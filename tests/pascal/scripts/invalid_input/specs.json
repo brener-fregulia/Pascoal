@@ -1,0 +1,10 @@
+{
+  "program": "invalid_input.pas",
+  "description": "String fed where integer is expected — FPC runtime error on Windows (exit 106)",
+  "stdin": ["not_a_number"],
+  "expect_stdout": [
+    "Type a number:"
+  ],
+  "expect_exit_code": 106,
+  "expect_compile_failure": false
+}

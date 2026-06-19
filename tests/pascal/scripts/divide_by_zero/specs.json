@@ -1,0 +1,8 @@
+{
+  "program": "divide_by_zero.pas",
+  "description": "Program that compiles but crashes at runtime with division by zero",
+  "stdin": [],
+  "expect_stdout": [],
+  "expect_exit_code": 200,
+  "expect_compile_failure": false
+}

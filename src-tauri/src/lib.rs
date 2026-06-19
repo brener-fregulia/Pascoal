@@ -127,13 +127,13 @@ pub fn compile(src_file: &std::path::Path, out_dir: &std::path::Path) -> Compile
     }
 }
 
-// ── PTY state ─────────────────────────────────────────────────────────────────
+// ── Process state ─────────────────────────────────────────────────────────────
 
-struct PtyState {
+struct ProcessState {
     writer: std::sync::Mutex<Option<Box<dyn std::io::Write + Send>>>,
 }
 
-impl PtyState {
+impl ProcessState {
     fn new() -> Self {
         Self {
             writer: std::sync::Mutex::new(None),
@@ -221,6 +221,8 @@ async fn compile_and_run(app: tauri::AppHandle, code: String) -> CompileResult {
     });
 
     if let Err(e) = write_file(src_file.to_str().unwrap_or(""), &code) {
+        app.emit("console-build-output", format!("{}\n", e)).ok();
+        app.emit("console-exit", 1i32).ok();
         return CompileResult {
             success: false,
             output: e,
@@ -229,22 +231,23 @@ async fn compile_and_run(app: tauri::AppHandle, code: String) -> CompileResult {
 
     // Kill any running process before compiling
     {
-        let binding = app.state::<PtyState>();
+        let binding = app.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
     }
 
     let result = compile(&src_file, &tmp_dir);
-    app.emit("terminal-output", format!("{}\r\n", result.output))
-        .ok();
+
+    // Build messages go to the dedicated build channel
+    app.emit("console-build-output", result.output.clone()).ok();
 
     if !result.success {
-        app.emit("terminal-exit", 1i32).ok();
+        app.emit("console-exit", 1i32).ok();
         return result;
     }
 
-    app.emit("terminal-output", "Compilation successful. Running...\r\n")
-        .ok();
+    // Build succeeded — program is about to start
+    app.emit("console-started", ()).ok();
 
     if cfg!(target_os = "windows") {
         run_with_pipes(&app, &exe_file, &tmp_dir).await
@@ -269,9 +272,9 @@ async fn run_with_pipes(
     {
         Ok(c) => c,
         Err(e) => {
-            app.emit("terminal-output", format!("Spawn error: {}\r\n", e))
+            app.emit("console-program-error", format!("Spawn error: {}\n", e))
                 .ok();
-            app.emit("terminal-exit", 1i32).ok();
+            app.emit("console-exit", 1i32).ok();
             return CompileResult {
                 success: false,
                 output: e.to_string(),
@@ -281,7 +284,7 @@ async fn run_with_pipes(
 
     // Store stdin for input
     if let Some(stdin) = child.stdin.take() {
-        let binding = app.state::<PtyState>();
+        let binding = app.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = Some(Box::new(stdin));
     }
@@ -300,7 +303,7 @@ async fn run_with_pipes(
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
-                    app_clone.emit("terminal-output", data).ok();
+                    app_clone.emit("console-program-output", data).ok();
                 }
             }
         }
@@ -317,7 +320,7 @@ async fn run_with_pipes(
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
-                    app_clone2.emit("terminal-output", data).ok();
+                    app_clone2.emit("console-program-error", data).ok();
                 }
             }
         }
@@ -330,9 +333,9 @@ async fn run_with_pipes(
             .wait()
             .map(|s| if s.success() { 0i32 } else { 1i32 })
             .unwrap_or(1);
-        app_clone3.emit("terminal-exit", exit_code).ok();
+        app_clone3.emit("console-exit", exit_code).ok();
 
-        let binding = app_clone3.state::<PtyState>();
+        let binding = app_clone3.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
     });
@@ -359,9 +362,9 @@ async fn run_with_pty(
     }) {
         Ok(p) => p,
         Err(e) => {
-            app.emit("terminal-output", format!("PTY error: {}\r\n", e))
+            app.emit("console-program-error", format!("PTY error: {}\n", e))
                 .ok();
-            app.emit("terminal-exit", 1i32).ok();
+            app.emit("console-exit", 1i32).ok();
             return CompileResult {
                 success: false,
                 output: e.to_string(),
@@ -375,9 +378,9 @@ async fn run_with_pty(
     let mut child = match pair.slave.spawn_command(cmd) {
         Ok(c) => c,
         Err(e) => {
-            app.emit("terminal-output", format!("Spawn error: {}\r\n", e))
+            app.emit("console-program-error", format!("Spawn error: {}\n", e))
                 .ok();
-            app.emit("terminal-exit", 1i32).ok();
+            app.emit("console-exit", 1i32).ok();
             return CompileResult {
                 success: false,
                 output: e.to_string(),
@@ -387,7 +390,7 @@ async fn run_with_pty(
 
     let writer = pair.master.take_writer().unwrap();
     {
-        let binding = app.state::<PtyState>();
+        let binding = app.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = Some(writer);
     }
@@ -402,7 +405,7 @@ async fn run_with_pty(
                 Ok(0) | Err(_) => break,
                 Ok(n) => {
                     let data = String::from_utf8_lossy(&buf[..n]).to_string();
-                    app_clone.emit("terminal-output", data).ok();
+                    app_clone.emit("console-program-output", data).ok();
                 }
             }
         }
@@ -411,9 +414,9 @@ async fn run_with_pty(
             .wait()
             .map(|s| if s.success() { 0i32 } else { 1i32 })
             .unwrap_or(1);
-        app_clone.emit("terminal-exit", exit_code).ok();
+        app_clone.emit("console-exit", exit_code).ok();
 
-        let binding = app_clone.state::<PtyState>();
+        let binding = app_clone.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
     });
@@ -427,7 +430,7 @@ async fn run_with_pty(
 #[tauri::command]
 fn send_input(app: tauri::AppHandle, data: String) {
     use std::io::Write;
-    let binding = app.state::<PtyState>();
+    let binding = app.state::<ProcessState>();
     let mut guard = binding.writer.lock().unwrap();
     if let Some(writer) = guard.as_mut() {
         let _ = writer.write_all(data.as_bytes());
@@ -439,7 +442,7 @@ fn send_input(app: tauri::AppHandle, data: String) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .manage(PtyState::new())
+        .manage(ProcessState::new())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

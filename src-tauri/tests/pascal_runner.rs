@@ -12,7 +12,6 @@
 ///
 /// Requirements:
 ///   - FPC (Free Pascal Compiler) must be installed and in PATH.
-
 use std::{
     fs,
     io::Write,
@@ -48,7 +47,10 @@ fn workspace_root() -> PathBuf {
 }
 
 fn scripts_dir() -> PathBuf {
-    workspace_root().join("tests").join("pascal").join("scripts")
+    workspace_root()
+        .join("tests")
+        .join("pascal")
+        .join("scripts")
 }
 
 fn build_dir() -> PathBuf {
@@ -85,9 +87,7 @@ fn exe_name_for(pas_filename: &str) -> String {
 /// Uses -FE<dir> to put the output in build/<case>/.
 /// Returns (success, combined_output).
 fn compile(src: &Path, out_dir: &Path) -> (bool, String) {
-    let exe = out_dir.join(exe_name_for(
-        src.file_name().unwrap().to_str().unwrap(),
-    ));
+    let exe = out_dir.join(exe_name_for(src.file_name().unwrap().to_str().unwrap()));
 
     // Remove stale executable
     if exe.exists() {
@@ -131,7 +131,9 @@ fn run(exe: &Path, stdin_lines: &[String]) -> (i32, Vec<String>) {
         }
     }
 
-    let output = child.wait_with_output().expect("failed to wait for program");
+    let output = child
+        .wait_with_output()
+        .expect("failed to wait for program");
 
     let exit_code = output.status.code().unwrap_or(1);
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -194,8 +196,7 @@ fn run_test_case(case_name: &str) {
     assert!(
         compile_ok,
         "Compilation failed for '{}'\n--- FPC output ---\n{}",
-        case_name,
-        compile_output
+        case_name, compile_output
     );
 
     println!("   ✓ Compilation succeeded");
@@ -208,12 +209,9 @@ fn run_test_case(case_name: &str) {
 
     // ── Assert exit code ─────────────────────────────────────────────────────
     assert_eq!(
-        exit_code,
-        spec.expect_exit_code,
+        exit_code, spec.expect_exit_code,
         "Exit code mismatch for '{}': got {}, expected {}",
-        case_name,
-        exit_code,
-        spec.expect_exit_code
+        case_name, exit_code, spec.expect_exit_code
     );
 
     // ── Assert stdout (exact match per line) ─────────────────────────────────
@@ -267,4 +265,14 @@ fn test_multiple_inputs() {
 #[test]
 fn test_compile_error() {
     run_test_case("compile_error");
+}
+
+#[test]
+fn test_divide_by_zero() {
+    run_test_case("divide_by_zero");
+}
+
+#[test]
+fn test_invalid_input() {
+    run_test_case("invalid_input");
 }
