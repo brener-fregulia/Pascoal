@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tabStore } from "../stores/tabs";
+  import { i18n } from "../i18n";
   import Tab from "./Tab.svelte";
   import Home from "../icons/Home.svelte";
   import File from "../icons/File.svelte";
@@ -11,7 +12,7 @@
 
 <div id="tab-bar">
   <Tab
-    label="Welcome"
+    label={$i18n('tabs.welcome')}
     active={activeView === "welcome"}
     on:click={() => tabStore.showWelcome()}
     on:keydown={(e) => e.key === "Enter" && tabStore.showWelcome()}

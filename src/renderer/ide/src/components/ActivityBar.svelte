@@ -1,5 +1,6 @@
 <script lang="ts">
   import { themeStore } from "../stores/theme";
+  import { i18n } from "../i18n";
   import IconButton from "./IconButton.svelte";
   import Folder from "../icons/Folder.svelte";
   import Search from "../icons/Search.svelte";
@@ -10,11 +11,11 @@
 
   let active = "explorer";
 
-  const items = [
-    { id: "explorer", label: "Explorer", icon: Folder },
-    { id: "search", label: "Search", icon: Search },
-    { id: "git", label: "Git", icon: Git },
-    { id: "playground", label: "Playground", icon: Play },
+  $: items = [
+    { id: "explorer", label: $i18n('activity.explorer'), icon: Folder },
+    { id: "search",   label: $i18n('activity.search'),   icon: Search },
+    { id: "git",      label: $i18n('activity.git'),       icon: Git },
+    { id: "playground", label: $i18n('activity.playground'), icon: Play },
   ];
 </script>
 
@@ -31,11 +32,11 @@
 
   <div class="spacer"></div>
 
-  <IconButton label="Toggle theme" on:click={() => themeStore.cycle()}>
+  <IconButton label={$i18n('activity.toggle_theme')} on:click={() => themeStore.cycle()}>
     <Sun size={20} />
   </IconButton>
 
-  <IconButton label="Settings">
+  <IconButton label={$i18n('activity.settings')}>
     <Settings size={20} />
   </IconButton>
 </nav>

@@ -1,137 +1,115 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import { EditorView } from "@codemirror/view";
-  import { tabStore } from "../stores/tabs";
-  import { themeStore } from "../stores/theme";
-  import { runActiveFile } from "../stores/runner";
-  import { themeCompartment } from "../stores/editor-extensions";
-  import { buildPascoalTheme } from "../stores/editor-theme";
-  import IconButton from "./IconButton.svelte";
-  import Play from "../icons/Play.svelte";
+  import { onMount, onDestroy } from 'svelte'
+  import { EditorView } from '@codemirror/view'
+  import { tabStore } from '../stores/tabs'
+  import { themeStore } from '../stores/theme'
+  import { runActiveFile } from '../stores/runner'
+  import { themeCompartment } from '../stores/editor-extensions'
+  import { buildPascoalTheme } from '../stores/editor-theme'
+  import { i18n } from '../i18n'
+  import IconButton from './IconButton.svelte'
+  import Play from '../icons/Play.svelte'
 
-  let editorEl: HTMLDivElement;
-  let view: EditorView | null = null;
-  let currentTabId: string | null = null;
+  let editorEl: HTMLDivElement
+  let view: EditorView | null = null
+  let currentTabId: string | null = null
 
-  // Swap CodeMirror state when active tab changes
   $effect(() => {
-    const activeTab =
-      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null;
-    if (!view || !activeTab) return;
-    if (activeTab.id === currentTabId) return;
+    const activeTab = $tabStore.tabs.find(t => t.id === $tabStore.activeTabId) ?? null
+    if (!view || !activeTab) return
+    if (activeTab.id === currentTabId) return
+    view.setState(activeTab.state)
+    currentTabId = activeTab.id
+    view.focus()
+  })
 
-    view.setState(activeTab.state);
-    currentTabId = activeTab.id;
-    view.focus();
-  });
-
-  // Rebuild theme when Pascoal theme changes
   $effect(() => {
-    const _theme = $themeStore.current; // tracked dependency
-    if (!view) return;
-    // Wait one microtask so data-theme attribute is applied to documentElement first
+    const _theme = $themeStore.current
+    if (!view) return
     Promise.resolve().then(() => {
       view?.dispatch({
         effects: themeCompartment.reconfigure(buildPascoalTheme()),
-      });
-    });
-  });
+      })
+    })
+  })
 
   onMount(() => {
-    const activeTab =
-      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null;
+    const activeTab = $tabStore.tabs.find(t => t.id === $tabStore.activeTabId) ?? null
 
     view = new EditorView({
       state: activeTab?.state,
       parent: editorEl,
       dispatch(tr) {
-        if (!view) return;
-        view.update([tr]);
-
-        // Persist updated state back to the store
-        const tabId = currentTabId;
+        if (!view) return
+        view.update([tr])
+        const tabId = currentTabId
         if (tabId && tr.docChanged) {
-          tabStore.updateEditorState(tabId, view.state);
+          tabStore.updateEditorState(tabId, view.state)
         }
       },
-    });
+    })
 
-    currentTabId = activeTab?.id ?? null;
+    currentTabId = activeTab?.id ?? null
+    document.addEventListener('keydown', handleKeydown)
+    return () => document.removeEventListener('keydown', handleKeydown)
+  })
 
-    document.addEventListener("keydown", handleKeydown);
-    return () => document.removeEventListener("keydown", handleKeydown);
-  });
-
-  onDestroy(() => {
-    view?.destroy();
-  });
+  onDestroy(() => { view?.destroy() })
 
   async function handleKeydown(e: KeyboardEvent) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-      e.preventDefault();
-      await save();
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault()
+      await save()
     }
-    if (e.key === "F5") {
-      e.preventDefault();
-      await runActiveFile();
+    if (e.key === 'F5') {
+      e.preventDefault()
+      await runActiveFile()
     }
   }
 
   function getContent(): string {
-    return view?.state.doc.toString() ?? "";
+    return view?.state.doc.toString() ?? ''
   }
 
   async function save() {
-    const tab = tabStore.getActive();
-    if (!tab || !window.__TAURI__) return;
-
-    const content = getContent();
-
+    const tab = tabStore.getActive()
+    if (!tab || !window.__TAURI__) return
+    const content = getContent()
     if (tab.filePath) {
       try {
-        await window.__TAURI__.core.invoke("save_file", {
-          content,
-          filePath: tab.filePath,
-        });
-        tabStore.markClean(tab.id);
+        await window.__TAURI__.core.invoke('save_file', { content, filePath: tab.filePath })
+        tabStore.markClean(tab.id)
       } catch (e) {
-        console.error("save_file failed:", e);
+        console.error('save_file failed:', e)
       }
     } else {
-      await saveAs();
+      await saveAs()
     }
   }
 
   async function saveAs() {
-    const tab = tabStore.getActive();
-    if (!tab || !window.__TAURI__) return;
-
-    const content = getContent();
+    const tab = tabStore.getActive()
+    if (!tab || !window.__TAURI__) return
+    const content = getContent()
     try {
-      const result = (await window.__TAURI__.core.invoke("save_file_as", {
+      const result = await window.__TAURI__.core.invoke('save_file_as', {
         content,
         suggestedName: tab.fileName,
-      })) as { path: string } | null;
-
+      }) as { path: string } | null
       if (result) {
-        tabStore.updateFilePath(tab.id, result.path);
-        tabStore.markClean(tab.id);
+        tabStore.updateFilePath(tab.id, result.path)
+        tabStore.markClean(tab.id)
       }
     } catch (e) {
-      console.error("save_file_as failed:", e);
+      console.error('save_file_as failed:', e)
     }
   }
 </script>
 
 <div id="editor-toolbar">
-  <IconButton
-    variant="toolbar"
-    label="Run"
-    title="Run (F5)"
-    on:click={runActiveFile}
-  >
+  <IconButton variant="toolbar" label={$i18n('editor.run')} title="Run (F5)" on:click={runActiveFile}>
     <Play size={14} stroke="#fff" />
-    <span class="run-label">Run</span>
+    <span class="run-label">{$i18n('editor.run')}</span>
   </IconButton>
 </div>
 <div id="codemirror-editor" bind:this={editorEl}></div>
@@ -147,9 +125,7 @@
     flex-shrink: 0;
   }
 
-  .run-label {
-    margin-left: 6px;
-  }
+  .run-label { margin-left: 6px; }
 
   #codemirror-editor {
     flex: 1;

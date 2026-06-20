@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tabStore } from "../stores/tabs";
+  import { i18n } from "../i18n";
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`;
 
@@ -11,9 +12,7 @@
   async function handleOpenFile() {
     if (!window.__TAURI__) return;
     try {
-      const result = await window.__TAURI__.core.invoke<
-        [string, string] | null
-      >("open_file");
+      const result = await window.__TAURI__.core.invoke('open_file') as [string, string] | null;
       if (result) {
         const [filePath, content] = result;
         const tab = await tabStore.openFile(filePath, content);
@@ -28,109 +27,65 @@
 <div id="welcome">
   <div class="welcome-header">
     <h1>Pascoal</h1>
-    <p>Pascal IDE &amp; Playground</p>
+    <p>{$i18n('welcome.subtitle')}</p>
   </div>
 
   <div class="welcome-section">
-    <h2>Start</h2>
+    <h2>{$i18n('welcome.section_start')}</h2>
     <button class="welcome-action" on:click={handleNewFile}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
         <line x1="12" y1="18" x2="12" y2="12" />
         <line x1="9" y1="15" x2="15" y2="15" />
       </svg>
-      New File...
+      {$i18n('welcome.new_file')}
     </button>
     <button class="welcome-action" on:click={handleOpenFile}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
       </svg>
-      Open File...
+      {$i18n('welcome.open_file')}
     </button>
     <button class="welcome-action" on:click={() => console.log("coming soon")}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-        />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       </svg>
-      Open Folder...
+      {$i18n('welcome.open_folder')}
     </button>
     <button class="welcome-action" on:click={() => console.log("coming soon")}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="6" cy="6" r="2" />
         <circle cx="18" cy="6" r="2" />
         <circle cx="6" cy="18" r="2" />
         <path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2" />
       </svg>
-      New Project + Git...
+      {$i18n('welcome.new_project_git')}
     </button>
 
     <hr class="divider" />
-    <h2>Walkthroughs</h2>
+    <h2>{$i18n('welcome.section_walkthroughs')}</h2>
     <button class="welcome-action" on:click={() => console.log("coming soon")}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="5 3 19 12 5 21 5 3" />
       </svg>
-      Open Playground
+      {$i18n('welcome.open_playground')}
     </button>
     <button class="welcome-action" on:click={() => console.log("coming soon")}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="6" cy="6" r="2" />
         <circle cx="18" cy="6" r="2" />
         <circle cx="6" cy="18" r="2" />
         <path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2" />
       </svg>
-      Configure Git
+      {$i18n('welcome.configure_git')}
     </button>
   </div>
 
   <div class="welcome-section">
-    <h2>Recent</h2>
-    <p class="empty">No recent projects.</p>
+    <h2>{$i18n('welcome.section_recent')}</h2>
+    <p class="empty">{$i18n('welcome.no_recent')}</p>
   </div>
 </div>
 
@@ -195,9 +150,7 @@
     transition: color 0.15s;
   }
 
-  .welcome-action:hover {
-    color: var(--text);
-  }
+  .welcome-action:hover { color: var(--text); }
 
   .welcome-action svg {
     width: 16px;

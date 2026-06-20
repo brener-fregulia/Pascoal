@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store'
 import { EditorState } from '@codemirror/state'
 import { pascalExtensions } from './editor-extensions'
+import { t } from '../i18n'
 
 let tabCounter = 0
 
@@ -125,7 +126,7 @@ function createTabStore() {
     if (!tab) return false
 
     if (tab.isDirty) {
-      const confirmed = window.confirm(`"${tab.fileName}" has unsaved changes. Close anyway?`)
+      const confirmed = window.confirm(t('tabs.unsaved_confirm', { name: tab.fileName }))
       if (!confirmed) return false
     }
 

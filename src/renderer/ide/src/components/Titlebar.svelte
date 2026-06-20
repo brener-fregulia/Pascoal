@@ -1,5 +1,6 @@
 <script lang="ts">
   import { appStore } from "../stores/app";
+  import { i18n } from "../i18n";
 
   $: platform = $appStore.info?.platform ?? "linux";
   $: isMac = platform === "macos";
@@ -23,37 +24,19 @@
 <header id="titlebar" class:mac={isMac}>
   {#if isMac}
     <div class="mac-group">
-      <button class="mac-btn mac-close" aria-label="Close" on:click={close}>
-        <svg
-          viewBox="0 0 8 8"
-          fill="none"
-          stroke="#7a1010"
-          stroke-width="1.2"
-          stroke-linecap="round"
-        >
+      <button class="mac-btn mac-close" aria-label={$i18n('titlebar.close')} on:click={close}>
+        <svg viewBox="0 0 8 8" fill="none" stroke="#7a1010" stroke-width="1.2" stroke-linecap="round">
           <line x1="1.5" y1="1.5" x2="6.5" y2="6.5" />
           <line x1="6.5" y1="1.5" x2="1.5" y2="6.5" />
         </svg>
       </button>
-      <button class="mac-btn mac-min" aria-label="Minimize" on:click={minimize}>
-        <svg
-          viewBox="0 0 8 8"
-          fill="none"
-          stroke="#7a5500"
-          stroke-width="1.2"
-          stroke-linecap="round"
-        >
+      <button class="mac-btn mac-min" aria-label={$i18n('titlebar.minimize')} on:click={minimize}>
+        <svg viewBox="0 0 8 8" fill="none" stroke="#7a5500" stroke-width="1.2" stroke-linecap="round">
           <line x1="1.5" y1="4" x2="6.5" y2="4" />
         </svg>
       </button>
-      <button class="mac-btn mac-max" aria-label="Maximize" on:click={maximize}>
-        <svg
-          viewBox="0 0 8 8"
-          fill="none"
-          stroke="#0a4a18"
-          stroke-width="1.2"
-          stroke-linecap="round"
-        >
+      <button class="mac-btn mac-max" aria-label={$i18n('titlebar.maximize')} on:click={maximize}>
+        <svg viewBox="0 0 8 8" fill="none" stroke="#0a4a18" stroke-width="1.2" stroke-linecap="round">
           <polyline points="1.5,4.5 1.5,1.5 4.5,1.5" />
           <polyline points="3.5,6.5 6.5,6.5 6.5,3.5" />
         </svg>
@@ -65,37 +48,18 @@
 
   {#if !isMac}
     <div class="win-group">
-      <button class="wc-btn" aria-label="Minimize" on:click={minimize}>
-        <svg
-          viewBox="0 0 14 14"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-        >
+      <button class="wc-btn" aria-label={$i18n('titlebar.minimize')} on:click={minimize}>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="2" y1="7" x2="12" y2="7" />
         </svg>
       </button>
-      <button class="wc-btn" aria-label="Maximize" on:click={maximize}>
-        <svg
-          viewBox="0 0 14 14"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+      <button class="wc-btn" aria-label={$i18n('titlebar.maximize')} on:click={maximize}>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2.5" y="2.5" width="9" height="9" rx="1.5" />
         </svg>
       </button>
-      <button class="wc-btn wc-close" aria-label="Close" on:click={close}>
-        <svg
-          viewBox="0 0 14 14"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-        >
+      <button class="wc-btn wc-close" aria-label={$i18n('titlebar.close')} on:click={close}>
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <line x1="3" y1="3" x2="11" y2="11" />
           <line x1="11" y1="3" x2="3" y2="11" />
         </svg>
@@ -117,9 +81,7 @@
     height: 36px;
   }
 
-  #titlebar.mac {
-    padding-left: 12px;
-  }
+  #titlebar.mac { padding-left: 12px; }
 
   .logo {
     font-family: var(--font-mono);
@@ -153,24 +115,13 @@
     justify-content: center;
     border-radius: 4px;
     color: var(--text-dim);
-    transition:
-      background 0.15s,
-      color 0.15s;
+    transition: background 0.15s, color 0.15s;
     -webkit-app-region: no-drag;
   }
 
-  .wc-btn svg {
-    width: 14px;
-    height: 14px;
-  }
-  .wc-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
-  }
-  .wc-btn.wc-close:hover {
-    background: var(--accent);
-    color: #fff;
-  }
+  .wc-btn svg { width: 14px; height: 14px; }
+  .wc-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
+  .wc-btn.wc-close:hover { background: var(--accent); color: #fff; }
 
   .mac-btn {
     width: 13px;
@@ -193,16 +144,8 @@
     position: absolute;
   }
 
-  .mac-group:hover .mac-btn svg {
-    opacity: 1;
-  }
-  .mac-close {
-    background: #ff5f57;
-  }
-  .mac-min {
-    background: #ffbd2e;
-  }
-  .mac-max {
-    background: #28c840;
-  }
+  .mac-group:hover .mac-btn svg { opacity: 1; }
+  .mac-close { background: #ff5f57; }
+  .mac-min   { background: #ffbd2e; }
+  .mac-max   { background: #28c840; }
 </style>

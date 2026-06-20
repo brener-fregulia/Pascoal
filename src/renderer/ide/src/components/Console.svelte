@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { consoleStore, clearConsoleSignal } from "../stores/console";
+  import { i18n } from "../i18n";
   import PanelHeader from "./PanelHeader.svelte";
   import IconButton from "./IconButton.svelte";
   import X from "../icons/X.svelte";
@@ -17,8 +18,8 @@
 
   let buildStatus = $derived($consoleStore.buildStatus);
   let buildOutput = $derived($consoleStore.buildOutput);
+  let copied = $state(false);
 
-  // Clear xterm when signal fires
   $effect(() => {
     if ($clearConsoleSignal > 0) term?.reset();
   });
@@ -46,7 +47,6 @@
 
       term.onData((data: string) => {
         if (window.__TAURI__ && isRunning) {
-          // Manual echo — pipes don't echo input automatically
           if (data === "\r") {
             term.write("\r\n");
           } else if (data === "\x7f") {
@@ -88,14 +88,13 @@
 
         unlistenExit = await listen<number>("console-exit", (event) => {
           const code = event.payload;
-          // Exit while still compiling means the build itself failed
           if ($consoleStore.buildStatus === "compiling") {
             consoleStore.setBuildStatus("error");
           } else {
             const msg =
               code === 0
-                ? "\r\n\x1b[32mProcess finished with exit code 0\x1b[0m\r\n"
-                : `\r\n\x1b[31mProcess finished with exit code ${code}\x1b[0m\r\n`;
+                ? `\r\n\x1b[32m${$i18n("console.exit_success")}\x1b[0m\r\n`
+                : `\r\n\x1b[31m${$i18n("console.exit_failure", { code })}\x1b[0m\r\n`;
             term?.write(msg);
           }
           consoleStore.setRunning(false);
@@ -142,15 +141,6 @@
     };
   }
 
-  const STATUS_LABEL: Record<string, string> = {
-    idle: "No build yet",
-    compiling: "Compiling...",
-    success: "Build succeeded",
-    error: "Build failed",
-  };
-
-  let copied = $state(false);
-
   async function copyProgramOutput() {
     const text = term?.getSelection();
     if (text) {
@@ -167,21 +157,28 @@
     copied = true;
     setTimeout(() => (copied = false), 2000);
   }
+
+  const statusLabels = $derived({
+    idle: $i18n("console.status_idle"),
+    compiling: $i18n("console.status_compiling"),
+    success: $i18n("console.status_success"),
+    error: $i18n("console.status_error"),
+  });
 </script>
 
 <div id="console-panel">
-  <PanelHeader title="Console">
+  <PanelHeader title={$i18n("console.title")}>
     <IconButton
       variant="inline"
-      label="Clear program output"
-      title="Clear"
-      on:click={() => term?.clear()}
+      label={$i18n("console.clear")}
+      title={$i18n("console.clear")}
+      on:click={() => term?.reset()}
     >
-      Clear
+      {$i18n("console.clear")}
     </IconButton>
     <IconButton
       variant="inline"
-      label="Close console"
+      label={$i18n("console.title")}
       title="Close"
       on:click={() => consoleStore.hide()}
     >
@@ -191,9 +188,9 @@
 
   <section class="console-build" class:error={buildStatus === "error"}>
     <div class="zone-label">
-      <span>Build</span>
+      <span>{$i18n("console.build")}</span>
       <span class="status status-{buildStatus}"
-        >{STATUS_LABEL[buildStatus]}</span
+        >{statusLabels[buildStatus]}</span
       >
     </div>
     {#if buildOutput}
@@ -203,14 +200,14 @@
 
   <section class="console-program">
     <div class="zone-label">
-      <span>Program</span>
+      <span>{$i18n("console.program")}</span>
       <IconButton
         variant="inline"
-        label="Copy output"
-        title="Copy"
+        label={$i18n("console.copy")}
+        title={$i18n("console.copy")}
         on:click={copyProgramOutput}
       >
-        {copied ? "Copied!" : "Copy"}
+        {copied ? $i18n("console.copied") : $i18n("console.copy")}
       </IconButton>
     </div>
     <div id="program-output" bind:this={programEl}></div>
@@ -302,7 +299,6 @@
   #program-output :global(.xterm) {
     height: 100%;
   }
-
   #program-output :global(.xterm-viewport) {
     border-radius: 0;
   }

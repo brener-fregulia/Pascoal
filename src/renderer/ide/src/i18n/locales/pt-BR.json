@@ -1,0 +1,52 @@
+{
+  "welcome": {
+    "subtitle": "IDE e Playground Pascal",
+    "section_start": "Começar",
+    "section_walkthroughs": "Tutoriais",
+    "section_recent": "Recentes",
+    "new_file": "Novo Arquivo...",
+    "open_file": "Abrir Arquivo...",
+    "open_folder": "Abrir Pasta...",
+    "new_project_git": "Novo Projeto + Git...",
+    "open_playground": "Abrir Playground",
+    "configure_git": "Configurar Git",
+    "no_recent": "Nenhum projeto recente."
+  },
+  "console": {
+    "title": "Console",
+    "clear": "Limpar",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "build": "Build",
+    "program": "Programa",
+    "status_idle": "Nenhum build ainda",
+    "status_compiling": "Compilando...",
+    "status_success": "Build concluído",
+    "status_error": "Build falhou",
+    "exit_success": "Processo finalizado com código 0",
+    "exit_failure": "Processo finalizado com código {code}"
+  },
+  "editor": {
+    "run": "Executar"
+  },
+  "activity": {
+    "explorer": "Explorador",
+    "search": "Buscar",
+    "git": "Git",
+    "playground": "Playground",
+    "toggle_theme": "Alternar tema",
+    "settings": "Configurações"
+  },
+  "titlebar": {
+    "close": "Fechar",
+    "minimize": "Minimizar",
+    "maximize": "Maximizar"
+  },
+  "statusbar": {
+    "fpc_not_found": "FPC não encontrado"
+  },
+  "tabs": {
+    "welcome": "Início",
+    "unsaved_confirm": "\"{name}\" tem alterações não salvas. Fechar mesmo assim?"
+  }
+}

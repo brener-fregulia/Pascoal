@@ -1,9 +1,10 @@
 <script lang="ts">
   import { appStore } from "../stores/app";
   import { themeStore } from "../stores/theme";
+  import { i18n } from "../i18n";
 
   $: info = $appStore.info;
-  $: fpcLabel = info?.fpcInstalled ? `FPC ${info.fpcVersion}` : "FPC not found";
+  $: fpcLabel = info?.fpcInstalled ? `FPC ${info.fpcVersion}` : $i18n('statusbar.fpc_not_found');
   $: versionLabel = info ? `${info.name} v${info.version}` : "Pascoal";
   $: themeLabel =
     $themeStore.current.charAt(0).toUpperCase() + $themeStore.current.slice(1);

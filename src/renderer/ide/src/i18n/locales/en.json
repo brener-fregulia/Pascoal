@@ -1,0 +1,52 @@
+{
+  "welcome": {
+    "subtitle": "Pascal IDE & Playground",
+    "section_start": "Start",
+    "section_walkthroughs": "Walkthroughs",
+    "section_recent": "Recent",
+    "new_file": "New File...",
+    "open_file": "Open File...",
+    "open_folder": "Open Folder...",
+    "new_project_git": "New Project + Git...",
+    "open_playground": "Open Playground",
+    "configure_git": "Configure Git",
+    "no_recent": "No recent projects."
+  },
+  "console": {
+    "title": "Console",
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "build": "Build",
+    "program": "Program",
+    "status_idle": "No build yet",
+    "status_compiling": "Compiling...",
+    "status_success": "Build succeeded",
+    "status_error": "Build failed",
+    "exit_success": "Process finished with exit code 0",
+    "exit_failure": "Process finished with exit code {code}"
+  },
+  "editor": {
+    "run": "Run"
+  },
+  "activity": {
+    "explorer": "Explorer",
+    "search": "Search",
+    "git": "Git",
+    "playground": "Playground",
+    "toggle_theme": "Toggle theme",
+    "settings": "Settings"
+  },
+  "titlebar": {
+    "close": "Close",
+    "minimize": "Minimize",
+    "maximize": "Maximize"
+  },
+  "statusbar": {
+    "fpc_not_found": "FPC not found"
+  },
+  "tabs": {
+    "welcome": "Welcome",
+    "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?"
+  }
+}
