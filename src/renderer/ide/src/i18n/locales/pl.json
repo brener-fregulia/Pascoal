@@ -1,0 +1,52 @@
+{
+    "welcome": {
+        "subtitle": "IDE i Playground dla Pascala",
+        "section_start": "Start",
+        "section_walkthroughs": "Samouczki",
+        "section_recent": "Ostatnie",
+        "new_file": "Nowy plik...",
+        "open_file": "Otwórz plik...",
+        "open_folder": "Otwórz folder...",
+        "new_project_git": "Nowy projekt + Git...",
+        "open_playground": "Otwórz Playground",
+        "configure_git": "Skonfiguruj Git",
+        "no_recent": "Brak ostatnich projektów."
+    },
+    "console": {
+        "title": "Konsola",
+        "clear": "Wyczyść",
+        "copy": "Kopiuj",
+        "copied": "Skopiowano!",
+        "build": "Kompiluj",
+        "program": "Program",
+        "status_idle": "Jeszcze nie kompilowano",
+        "status_compiling": "Kompilowanie...",
+        "status_success": "Kompilacja zakończona powodzeniem",
+        "status_error": "Błąd kompilacji",
+        "exit_success": "Proces zakończony kodem 0",
+        "exit_failure": "Proces zakończony kodem {code}"
+    },
+    "editor": {
+        "run": "Uruchom"
+    },
+    "activity": {
+        "explorer": "Eksplorator",
+        "search": "Szukaj",
+        "git": "Git",
+        "playground": "Playground",
+        "toggle_theme": "Zmień motyw",
+        "settings": "Ustawienia"
+    },
+    "titlebar": {
+        "close": "Zamknij",
+        "minimize": "Minimalizuj",
+        "maximize": "Maksymalizuj"
+    },
+    "statusbar": {
+        "fpc_not_found": "Nie znaleziono FPC"
+    },
+    "tabs": {
+        "welcome": "Start",
+        "unsaved_confirm": "\"{name}\" ma niezapisane zmiany.\nCzy mimo to zamknąć?"
+    }
+}

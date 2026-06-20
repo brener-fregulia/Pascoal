@@ -3,8 +3,9 @@ import { writable, derived, get } from 'svelte/store'
 import en from './locales/en.json'
 import ptBR from './locales/pt-BR.json'
 import es419 from './locales/es-419.json'
+import pl from './locales/pl.json'
 
-export type Locale = 'en' | 'pt-BR' | 'es-419'
+export type Locale = 'en' | 'pt-BR' | 'es-419' | 'pl'
 
 type LocaleData = typeof en
 
@@ -12,12 +13,14 @@ const locales: Record<Locale, LocaleData> = {
   'en': en,
   'pt-BR': ptBR,
   'es-419': es419,
+  'pl': pl,
 }
 
 export const LOCALE_OPTIONS: Array<{ value: Locale; label: string }> = [
   { value: 'en', label: 'English' },
   { value: 'pt-BR', label: 'Português (Brasil)' },
   { value: 'es-419', label: 'Español (Latinoamérica)' },
+  { value: 'pl', label: 'Polski' },
 ]
 
 const SUPPORTED: Locale[] = LOCALE_OPTIONS.map(option => option.value)

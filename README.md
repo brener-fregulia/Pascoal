@@ -2,7 +2,7 @@
 
 > A modern Pascal IDE for desktop - write, compile, and run Pascal programs.
 
-[Português (BR)](docs/readme/pt-BR.md) · [Español (Latinoamérica)](docs/readme/es-419.md)
+[Português (BR)](docs/readme/pt-BR.md) · [Español (Latinoamérica)](docs/readme/es-419.md) · [Polski](docs/readme/pl.md)
 
 ---
 
