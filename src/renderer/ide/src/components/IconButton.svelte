@@ -86,12 +86,14 @@
   .inline {
     font-size: 11px;
     font-family: var(--font-ui);
-    padding: 2px 6px;
+    padding: 2px 8px;
     border-radius: 3px;
+    background: var(--panel);
+    border: 1px solid var(--border);
   }
 
   .inline:hover {
     color: var(--text);
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--border);
   }
 </style>

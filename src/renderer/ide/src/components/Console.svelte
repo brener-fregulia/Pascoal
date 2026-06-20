@@ -148,6 +148,25 @@
     success: "Build succeeded",
     error: "Build failed",
   };
+
+  let copied = $state(false);
+
+  async function copyProgramOutput() {
+    const text = term?.getSelection();
+    if (text) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const all = term?.buffer.active;
+      if (!all) return;
+      const lines: string[] = [];
+      for (let i = 0; i < all.length; i++) {
+        lines.push(all.getLine(i)?.translateToString(true) ?? "");
+      }
+      await navigator.clipboard.writeText(lines.join("\n").trimEnd());
+    }
+    copied = true;
+    setTimeout(() => (copied = false), 2000);
+  }
 </script>
 
 <div id="console-panel">
@@ -183,7 +202,17 @@
   </section>
 
   <section class="console-program">
-    <div class="zone-label"><span>Program</span></div>
+    <div class="zone-label">
+      <span>Program</span>
+      <IconButton
+        variant="inline"
+        label="Copy output"
+        title="Copy"
+        on:click={copyProgramOutput}
+      >
+        {copied ? "Copied!" : "Copy"}
+      </IconButton>
+    </div>
     <div id="program-output" bind:this={programEl}></div>
   </section>
 </div>
