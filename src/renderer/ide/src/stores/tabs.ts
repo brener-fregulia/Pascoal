@@ -1,4 +1,6 @@
 import { writable, get } from 'svelte/store'
+import { EditorState } from '@codemirror/state'
+import { pascalExtensions } from './editor-extensions'
 
 let tabCounter = 0
 
@@ -7,7 +9,7 @@ export interface Tab {
   filePath: string | null
   fileName: string
   isDirty: boolean
-  session: any // Ace EditSession
+  state: EditorState
 }
 
 interface TabState {
@@ -25,6 +27,13 @@ function createTabStore() {
 
   function getState() {
     return get({ subscribe })
+  }
+
+  function makeEditorState(content: string, tabId: string): EditorState {
+    return EditorState.create({
+      doc: content,
+      extensions: pascalExtensions(() => markDirty(tabId)),
+    })
   }
 
   async function newTab(content: string): Promise<Tab> {
@@ -46,17 +55,13 @@ function createTabStore() {
     }
 
     const id = `tab-${++tabCounter}`
-    const session = (window as any).ace.createEditSession(content, 'ace/mode/pascal')
-    session.setTabSize(2)
-    session.setUseSoftTabs(true)
-
-    let initialized = false
-    session.on('change', () => {
-      if (!initialized) { initialized = true; return }
-      markDirty(id)
-    })
-
-    const tab: Tab = { id, filePath: null, fileName: candidate, isDirty: false, session }
+    const tab: Tab = {
+      id,
+      filePath: null,
+      fileName: candidate,
+      isDirty: false,
+      state: makeEditorState(content, id),
+    }
 
     update(s => ({ ...s, tabs: [...s.tabs, tab] }))
     return tab
@@ -70,21 +75,26 @@ function createTabStore() {
       return existing
     }
 
-    const id = `tab-${Date.now()}`
+    const id = `tab-${++tabCounter}`
     const fileName = filePath.split(/[\\/]/).pop() ?? filePath
-    const session = (window as any).ace.createEditSession(content, 'ace/mode/pascal')
-    session.setTabSize(2)
-    session.setUseSoftTabs(true)
+    const tab: Tab = {
+      id,
+      filePath,
+      fileName,
+      isDirty: false,
+      state: makeEditorState(content, id),
+    }
 
-    let initialized = false
-    session.on('change', () => {
-      if (!initialized) { initialized = true; return }
-      markDirty(id)
-    })
-
-    const tab: Tab = { id, filePath, fileName, isDirty: false, session }
     update(s => ({ ...s, tabs: [...s.tabs, tab] }))
     return tab
+  }
+
+  // Called by Editor.svelte whenever CodeMirror dispatches a transaction
+  function updateEditorState(id: string, state: EditorState) {
+    update(s => ({
+      ...s,
+      tabs: s.tabs.map(t => t.id === id ? { ...t, state } : t),
+    }))
   }
 
   function activate(id: string) {
@@ -98,14 +108,14 @@ function createTabStore() {
   function markDirty(id: string) {
     update(s => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: true } : t)
+      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: true } : t),
     }))
   }
 
   function markClean(id: string) {
     update(s => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: false } : t)
+      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: false } : t),
     }))
   }
 
@@ -145,7 +155,7 @@ function createTabStore() {
     const fileName = filePath.split(/[\\/]/).pop() ?? filePath
     update(s => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, filePath, fileName } : t)
+      tabs: s.tabs.map(t => t.id === id ? { ...t, filePath, fileName } : t),
     }))
   }
 
@@ -163,6 +173,7 @@ function createTabStore() {
     subscribe,
     newTab,
     openFile,
+    updateEditorState,
     activate,
     showWelcome,
     markDirty,

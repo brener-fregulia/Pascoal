@@ -13,7 +13,7 @@ export async function runActiveFile() {
   }
 
   const settings = get(settingsStore)
-  const content = tab.session.getValue()
+  const content = tab.state.doc.toString()
 
   // Auto-save before run if enabled
   if (settings.autoSaveBeforeRun) {
@@ -35,8 +35,20 @@ export async function runActiveFile() {
   }
 
   consoleStore.show()
-  consoleStore.setRunning(false)
+  consoleStore.setRunning(false) // input blocked until console-started fires
   consoleStore.resetBuild()
+
+  // Wait for console to be ready
+  await new Promise<void>(resolve => {
+    const handler = () => {
+      window.removeEventListener('console-ready', handler)
+      resolve()
+    }
+    window.addEventListener('console-ready', handler)
+    setTimeout(resolve, 500)
+  })
+
+  // Clear after console is confirmed ready
   clearConsoleSignal.update(n => n + 1)
 
   // Small delay to ensure clear renders before output arrives

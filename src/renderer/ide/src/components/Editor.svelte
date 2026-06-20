@@ -1,39 +1,69 @@
 <script lang="ts">
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount, onDestroy } from "svelte";
+  import { EditorView } from "@codemirror/view";
   import { tabStore } from "../stores/tabs";
+  import { themeStore } from "../stores/theme";
   import { runActiveFile } from "../stores/runner";
+  import { themeCompartment } from "../stores/editor-extensions";
+  import { buildPascoalTheme } from "../stores/editor-theme";
   import IconButton from "./IconButton.svelte";
   import Play from "../icons/Play.svelte";
 
   let editorEl: HTMLDivElement;
-  let aceEditor: any = null;
+  let view: EditorView | null = null;
+  let currentTabId: string | null = null;
 
-  $: activeTab =
-    $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null;
+  // Swap CodeMirror state when active tab changes
+  $effect(() => {
+    const activeTab =
+      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null;
+    if (!view || !activeTab) return;
+    if (activeTab.id === currentTabId) return;
+
+    view.setState(activeTab.state);
+    currentTabId = activeTab.id;
+    view.focus();
+  });
+
+  // Rebuild theme when Pascoal theme changes
+  $effect(() => {
+    const _theme = $themeStore.current; // tracked dependency
+    if (!view) return;
+    // Wait one microtask so data-theme attribute is applied to documentElement first
+    Promise.resolve().then(() => {
+      view?.dispatch({
+        effects: themeCompartment.reconfigure(buildPascoalTheme()),
+      });
+    });
+  });
 
   onMount(() => {
-    aceEditor = (window as any).ace.edit(editorEl);
-    aceEditor.setTheme("ace/theme/tomorrow_night");
-    aceEditor.setOptions({
-      fontSize: "13px",
-      showPrintMargin: false,
-      highlightActiveLine: true,
-      wrap: false,
+    const activeTab =
+      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null;
+
+    view = new EditorView({
+      state: activeTab?.state,
+      parent: editorEl,
+      dispatch(tr) {
+        if (!view) return;
+        view.update([tr]);
+
+        // Persist updated state back to the store
+        const tabId = currentTabId;
+        if (tabId && tr.docChanged) {
+          tabStore.updateEditorState(tabId, view.state);
+        }
+      },
     });
-    aceEditor.renderer.setScrollMargin(16, 16, 0, 20);
+
+    currentTabId = activeTab?.id ?? null;
 
     document.addEventListener("keydown", handleKeydown);
     return () => document.removeEventListener("keydown", handleKeydown);
   });
 
-  afterUpdate(() => {
-    if (aceEditor && activeTab) {
-      if (aceEditor.getSession() !== activeTab.session) {
-        aceEditor.setSession(activeTab.session);
-        aceEditor.resize();
-        aceEditor.focus();
-      }
-    }
+  onDestroy(() => {
+    view?.destroy();
   });
 
   async function handleKeydown(e: KeyboardEvent) {
@@ -47,11 +77,15 @@
     }
   }
 
+  function getContent(): string {
+    return view?.state.doc.toString() ?? "";
+  }
+
   async function save() {
     const tab = tabStore.getActive();
     if (!tab || !window.__TAURI__) return;
 
-    const content = tab.session.getValue();
+    const content = getContent();
 
     if (tab.filePath) {
       try {
@@ -72,14 +106,13 @@
     const tab = tabStore.getActive();
     if (!tab || !window.__TAURI__) return;
 
-    const content = tab.session.getValue();
+    const content = getContent();
     try {
-      const result = await window.__TAURI__.core.invoke<{
-        path: string;
-      } | null>("save_file_as", {
+      const result = (await window.__TAURI__.core.invoke("save_file_as", {
         content,
         suggestedName: tab.fileName,
-      });
+      })) as { path: string } | null;
+
       if (result) {
         tabStore.updateFilePath(tab.id, result.path);
         tabStore.markClean(tab.id);
@@ -101,7 +134,7 @@
     <span class="run-label">Run</span>
   </IconButton>
 </div>
-<div id="ace-editor" bind:this={editorEl}></div>
+<div id="codemirror-editor" bind:this={editorEl}></div>
 
 <style>
   #editor-toolbar {
@@ -118,10 +151,20 @@
     margin-left: 6px;
   }
 
-  #ace-editor {
+  #codemirror-editor {
     flex: 1;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
+    height: 100%;
+  }
+
+  #codemirror-editor :global(.cm-editor) {
+    height: 100%;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-variant-ligatures: none;
+  }
+
+  #codemirror-editor :global(.cm-scroller) {
+    overflow: auto;
   }
 </style>

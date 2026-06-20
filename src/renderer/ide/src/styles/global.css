@@ -88,3 +88,14 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
 }
+
+/* ── Editor decorator tokens ───────────────────────────────── */
+
+.cm-pascal-type {
+  color: var(--accent2) !important;
+  font-style: italic;
+}
+
+.cm-pascal-builtin {
+  color: #61AFEF !important;
+}

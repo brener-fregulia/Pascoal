@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { tabStore } from "@stores/tabs";
+import { tabStore } from '@stores/tabs'
 
 describe('tabStore', () => {
   beforeEach(() => {
@@ -32,6 +32,11 @@ describe('tabStore', () => {
       await tabStore.newTab('content')
       expect(get(tabStore).tabs).toHaveLength(1)
     })
+
+    it('tab state contains the initial content', async () => {
+      const tab = await tabStore.newTab('program Hello;')
+      expect(tab.state.doc.toString()).toBe('program Hello;')
+    })
   })
 
   describe('openFile', () => {
@@ -52,6 +57,11 @@ describe('tabStore', () => {
       await tabStore.openFile('/path/to/a.pas', 'a')
       await tabStore.openFile('/path/to/b.pas', 'b')
       expect(get(tabStore).tabs).toHaveLength(2)
+    })
+
+    it('tab state contains the file content', async () => {
+      const tab = await tabStore.openFile('/path/to/hello.pas', 'program Hello;')
+      expect(tab.state.doc.toString()).toBe('program Hello;')
     })
   })
 
@@ -143,6 +153,17 @@ describe('tabStore', () => {
       const tab = await tabStore.newTab('content')
       tabStore.activate(tab.id)
       expect(tabStore.getActive()?.id).toBe(tab.id)
+    })
+  })
+
+  describe('updateEditorState', () => {
+    it('replaces the state for the given tab', async () => {
+      const tab = await tabStore.newTab('original')
+      const { EditorState } = await import('@codemirror/state')
+      const newState = EditorState.create({ doc: 'updated' })
+      tabStore.updateEditorState(tab.id, newState)
+      const found = get(tabStore).tabs.find(t => t.id === tab.id)
+      expect(found?.state.doc.toString()).toBe('updated')
     })
   })
 })

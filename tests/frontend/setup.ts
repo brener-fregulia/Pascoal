@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { vi } from 'vitest'
 
-// Mock window.__TAURI__ — não existe no jsdom
+// Mock window.__TAURI__ — not available in jsdom
 Object.defineProperty(window, '__TAURI__', {
   value: undefined,
   writable: true,
@@ -14,31 +14,6 @@ Object.defineProperty(window, '__documentsDir', {
 
 Object.defineProperty(window, '__platform', {
   value: 'linux',
-  writable: true,
-})
-
-// Mock Ace Editor
-const mockSession = {
-  getValue: vi.fn(() => ''),
-  setValue: vi.fn(),
-  setTabSize: vi.fn(),
-  setUseSoftTabs: vi.fn(),
-  on: vi.fn(),
-}
-
-Object.defineProperty(window, 'ace', {
-  value: {
-    edit: vi.fn(() => ({
-      setTheme: vi.fn(),
-      setOptions: vi.fn(),
-      setSession: vi.fn(),
-      getSession: vi.fn(() => mockSession),
-      resize: vi.fn(),
-      focus: vi.fn(),
-      renderer: { setScrollMargin: vi.fn() },
-    })),
-    createEditSession: vi.fn(() => mockSession),
-  },
   writable: true,
 })
 
