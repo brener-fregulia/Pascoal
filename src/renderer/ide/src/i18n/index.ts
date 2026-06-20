@@ -1,17 +1,26 @@
 import { writable, derived, get } from 'svelte/store'
+
 import en from './locales/en.json'
 import ptBR from './locales/pt-BR.json'
+import es419 from './locales/es-419.json'
 
-export type Locale = 'en' | 'pt-BR'
+export type Locale = 'en' | 'pt-BR' | 'es-419'
 
 type LocaleData = typeof en
 
 const locales: Record<Locale, LocaleData> = {
   'en': en,
   'pt-BR': ptBR,
+  'es-419': es419,
 }
 
-const SUPPORTED: Locale[] = ['en', 'pt-BR']
+export const LOCALE_OPTIONS: Array<{ value: Locale; label: string }> = [
+  { value: 'en', label: 'English' },
+  { value: 'pt-BR', label: 'Português (Brasil)' },
+  { value: 'es-419', label: 'Español (Latinoamérica)' },
+]
+
+const SUPPORTED: Locale[] = LOCALE_OPTIONS.map(option => option.value)
 const FALLBACK: Locale = 'en'
 
 function detectLocale(): Locale {
@@ -23,6 +32,11 @@ function detectLocale(): Locale {
 
   for (const lang of candidates) {
     if (SUPPORTED.includes(lang as Locale)) return lang as Locale
+
+    const normalized = lang.toLowerCase()
+
+    if (normalized.startsWith('es')) return 'es-419'
+
     const prefix = lang.split('-')[0]
     const match = SUPPORTED.find(l => l.startsWith(prefix))
     if (match) return match
@@ -31,19 +45,17 @@ function detectLocale(): Locale {
   return FALLBACK
 }
 
-// Current locale store
 export const localeStore = writable<Locale>(detectLocale())
 
-// Resolve dot-path against locale data
 function resolve(obj: any, path: string): string | undefined {
   const result = path.split('.').reduce((acc, key) => acc?.[key], obj)
   return typeof result === 'string' ? result : undefined
 }
 
-// Non-reactive t() — use in stores and .ts files
-export function t(key: string, vars?: Record<string, string | number>): string {
+export function t(key: string, vars?: Record<string, unknown>): string {
   const locale = get(localeStore)
   const data = locales[locale] ?? locales[FALLBACK]
+
   let str = resolve(data, key) ?? resolve(locales[FALLBACK], key) ?? key
 
   if (vars) {
@@ -55,12 +67,10 @@ export function t(key: string, vars?: Record<string, string | number>): string {
   return str
 }
 
-// Reactive translation function — updates when locale changes
-// Usage in components: const $t = useT()  then {$t('key')}
 export const i18n = derived(localeStore, ($locale) => {
   const data = locales[$locale] ?? locales[FALLBACK]
 
-  return function translate(key: string, vars?: Record<string, string | number>): string {
+  return function translate(key: string, vars?: Record<string, unknown>): string {
     let str = resolve(data, key) ?? resolve(locales[FALLBACK], key) ?? key
 
     if (vars) {

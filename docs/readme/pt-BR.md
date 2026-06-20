@@ -2,7 +2,7 @@
 
 > Uma IDE Pascal moderna para desktop - escreva, compile e execute programas Pascal.
 
-🌐 [English](../../README.md)
+[English](../../README.md) · [Español (Latinoamérica)](es-419.md)
 
 ---
 

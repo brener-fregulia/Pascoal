@@ -1,9 +1,16 @@
 <script lang="ts">
   import { appStore } from "../stores/app";
-  import { i18n } from "../i18n";
+  import { i18n, LOCALE_OPTIONS, localeStore, type Locale } from "../i18n";
+
+  const showDevLocaleSwitcher = import.meta.env.DEV;
 
   $: platform = $appStore.info?.platform ?? "linux";
   $: isMac = platform === "macos";
+
+  function handleLocaleChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    localeStore.set(target.value as Locale);
+  }
 
   async function close() {
     if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close();
@@ -24,19 +31,49 @@
 <header id="titlebar" class:mac={isMac}>
   {#if isMac}
     <div class="mac-group">
-      <button class="mac-btn mac-close" aria-label={$i18n('titlebar.close')} on:click={close}>
-        <svg viewBox="0 0 8 8" fill="none" stroke="#7a1010" stroke-width="1.2" stroke-linecap="round">
+      <button
+        class="mac-btn mac-close"
+        aria-label={$i18n("titlebar.close")}
+        on:click={close}
+      >
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#7a1010"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
           <line x1="1.5" y1="1.5" x2="6.5" y2="6.5" />
           <line x1="6.5" y1="1.5" x2="1.5" y2="6.5" />
         </svg>
       </button>
-      <button class="mac-btn mac-min" aria-label={$i18n('titlebar.minimize')} on:click={minimize}>
-        <svg viewBox="0 0 8 8" fill="none" stroke="#7a5500" stroke-width="1.2" stroke-linecap="round">
+      <button
+        class="mac-btn mac-min"
+        aria-label={$i18n("titlebar.minimize")}
+        on:click={minimize}
+      >
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#7a5500"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
           <line x1="1.5" y1="4" x2="6.5" y2="4" />
         </svg>
       </button>
-      <button class="mac-btn mac-max" aria-label={$i18n('titlebar.maximize')} on:click={maximize}>
-        <svg viewBox="0 0 8 8" fill="none" stroke="#0a4a18" stroke-width="1.2" stroke-linecap="round">
+      <button
+        class="mac-btn mac-max"
+        aria-label={$i18n("titlebar.maximize")}
+        on:click={maximize}
+      >
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#0a4a18"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
           <polyline points="1.5,4.5 1.5,1.5 4.5,1.5" />
           <polyline points="3.5,6.5 6.5,6.5 6.5,3.5" />
         </svg>
@@ -46,20 +83,69 @@
 
   <span class="logo">Pascoal</span>
 
+  {#if showDevLocaleSwitcher}
+    <label class="dev-locale-switcher" title="Dev locale switcher">
+      <span class="dev-locale-label">Locale</span>
+
+      <select
+        value={$localeStore}
+        on:change={handleLocaleChange}
+        aria-label="Dev locale switcher"
+      >
+        {#each LOCALE_OPTIONS as option}
+          <option value={option.value}>
+            {option.label}
+          </option>
+        {/each}
+      </select>
+    </label>
+  {/if}
+
   {#if !isMac}
     <div class="win-group">
-      <button class="wc-btn" aria-label={$i18n('titlebar.minimize')} on:click={minimize}>
-        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <button
+        class="wc-btn"
+        aria-label={$i18n("titlebar.minimize")}
+        on:click={minimize}
+      >
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
           <line x1="2" y1="7" x2="12" y2="7" />
         </svg>
       </button>
-      <button class="wc-btn" aria-label={$i18n('titlebar.maximize')} on:click={maximize}>
-        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <button
+        class="wc-btn"
+        aria-label={$i18n("titlebar.maximize")}
+        on:click={maximize}
+      >
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <rect x="2.5" y="2.5" width="9" height="9" rx="1.5" />
         </svg>
       </button>
-      <button class="wc-btn wc-close" aria-label={$i18n('titlebar.close')} on:click={close}>
-        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <button
+        class="wc-btn wc-close"
+        aria-label={$i18n("titlebar.close")}
+        on:click={close}
+      >
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
           <line x1="3" y1="3" x2="11" y2="11" />
           <line x1="11" y1="3" x2="3" y2="11" />
         </svg>
@@ -81,7 +167,9 @@
     height: 36px;
   }
 
-  #titlebar.mac { padding-left: 12px; }
+  #titlebar.mac {
+    padding-left: 12px;
+  }
 
   .logo {
     font-family: var(--font-mono);
@@ -89,6 +177,46 @@
     font-weight: 700;
     color: var(--accent);
     letter-spacing: 0.5px;
+  }
+
+  .dev-locale-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    font-size: 12px;
+    color: var(--text-dim);
+    opacity: 0.9;
+    -webkit-app-region: no-drag;
+  }
+
+  .dev-locale-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .dev-locale-switcher select {
+    height: 22px;
+    max-width: 180px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--sidebar);
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+    padding: 0 6px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .dev-locale-switcher select:hover {
+    border-color: var(--accent);
+  }
+
+  .dev-locale-switcher select:focus {
+    border-color: var(--accent);
   }
 
   .win-group {
@@ -115,13 +243,24 @@
     justify-content: center;
     border-radius: 4px;
     color: var(--text-dim);
-    transition: background 0.15s, color 0.15s;
+    transition:
+      background 0.15s,
+      color 0.15s;
     -webkit-app-region: no-drag;
   }
 
-  .wc-btn svg { width: 14px; height: 14px; }
-  .wc-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
-  .wc-btn.wc-close:hover { background: var(--accent); color: #fff; }
+  .wc-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .wc-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+  }
+  .wc-btn.wc-close:hover {
+    background: var(--accent);
+    color: #fff;
+  }
 
   .mac-btn {
     width: 13px;
@@ -144,8 +283,16 @@
     position: absolute;
   }
 
-  .mac-group:hover .mac-btn svg { opacity: 1; }
-  .mac-close { background: #ff5f57; }
-  .mac-min   { background: #ffbd2e; }
-  .mac-max   { background: #28c840; }
+  .mac-group:hover .mac-btn svg {
+    opacity: 1;
+  }
+  .mac-close {
+    background: #ff5f57;
+  }
+  .mac-min {
+    background: #ffbd2e;
+  }
+  .mac-max {
+    background: #28c840;
+  }
 </style>
