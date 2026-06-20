@@ -1,4 +1,4 @@
-use crate::detect_fpc;
+use crate::env::detect_fpc;
 
 #[test]
 fn detect_fpc_returns_tuple() {

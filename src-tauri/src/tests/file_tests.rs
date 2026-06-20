@@ -1,4 +1,4 @@
-use crate::{check_file_exists, write_file};
+use crate::fs::{check_file_exists, write_file};
 use std::fs;
 
 #[test]
