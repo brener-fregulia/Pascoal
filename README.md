@@ -8,15 +8,15 @@
 
 ## What is Pascoal?
 
-Pascoal is a desktop Pascal IDE built with Tauri and Rust, designed to bring Pascal programming to a modern audience. Clean interface, real compilation via Free Pascal (FPC), and an interactive terminal - all in one lightweight package.
+Pascoal is a desktop Pascal IDE built with Tauri and Rust, designed to bring Pascal programming to a modern audience. Clean interface, real compilation via Free Pascal (FPC), and an interactive program console - all in one lightweight package.
 
 It was born as a rebellion against outdated tools like Pascalzim, with the goal of making Pascal approachable and fun again - without the weight of Electron or the clutter of legacy UIs.
 
 ## Features
 
-- **Modern editor** powered by Ace Editor with Pascal syntax highlighting
+- **Modern editor** powered by CodeMirror 6 with Pascal syntax highlighting and reactive theming
 - **Real compilation** via Free Pascal Compiler (FPC)
-- **Interactive terminal** with stdin/stdout support - `readln` works
+- **Interactive console** with separate build and program output zones - `readln` works
 - **Multi-tab editing** - open multiple files simultaneously
 - **Three themes** - Dark, Light and Charcoal, with system detection
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
@@ -56,9 +56,10 @@ npm run dev:ide
 ### Running tests
 
 ```bash
-npm test              # frontend + Rust
+npm test              # frontend + Rust + Pascal
 npm run test:frontend # Vitest only
 npm run test:rust     # cargo test only
+npm run test:pascal   # Pascal integration tests (requires FPC)
 ```
 
 ## Project structure
@@ -68,19 +69,23 @@ src/
   renderer/
     ide/                    # Svelte + Vite frontend
       src/
-        components/         # Svelte components (Titlebar, TabBar, Editor, Terminal...)
+        components/         # Svelte components (Titlebar, TabBar, Editor, Console...)
         icons/              # SVG icon components
-        stores/             # Svelte stores (tabs, theme, terminal, runner, settings)
+        stores/             # Svelte stores (tabs, theme, console, runner, settings)
         styles/             # Global CSS
-        tests/              # Vitest tests
-      public/
-        vendor/             # Ace Editor (ace.js, mode-pascal.js, theme)
 src-tauri/
   src/
-    lib.rs                  # Tauri commands and core logic
+    lib.rs                  # App setup and command registration
+    env.rs                  # FPC detection and documents directory
+    fs.rs                   # File I/O commands
+    compiler.rs             # FPC compilation logic
+    process.rs              # Process state, run_with_pipes, run_with_pty
     tests/                  # Rust unit tests
   tauri.conf.json
   Cargo.toml
+tests/
+  frontend/                 # Vitest tests
+  pascal/                   # Pascal integration tests and scripts
 docs/
   readme/                   # README translations
 scripts/
@@ -95,8 +100,8 @@ scripts/
 | Backend | Rust |
 | Frontend | Svelte 5 + Vite + TypeScript |
 | Compiler | Free Pascal (FPC) |
-| Terminal | xterm.js |
-| Editor | Ace Editor |
+| Editor | CodeMirror 6 |
+| Console | xterm.js |
 | Tests | Vitest + cargo test |
 
 ## Roadmap
@@ -105,6 +110,7 @@ scripts/
 - [ ] Git integration
 - [ ] PTY terminal (PowerShell, bash, fish)
 - [ ] Settings persistence
+- [ ] Pascal Tree-sitter grammar (full syntax highlighting, indent guides, code outline)
 - [ ] Playground mode
 - [ ] Challenge mode with test cases
 - [ ] GitHub Actions CI/CD
