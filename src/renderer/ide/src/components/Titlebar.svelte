@@ -1,16 +1,9 @@
 <script lang="ts">
   import { appStore } from "../stores/app";
-  import { i18n, LOCALE_OPTIONS, localeStore, type Locale } from "../i18n";
-
-  const showDevLocaleSwitcher = import.meta.env.DEV;
+  import { i18n } from "../i18n";
 
   $: platform = $appStore.info?.platform ?? "linux";
   $: isMac = platform === "macos";
-
-  function handleLocaleChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    localeStore.set(target.value as Locale);
-  }
 
   async function close() {
     if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close();
@@ -82,24 +75,6 @@
   {/if}
 
   <span class="logo">Pascoal</span>
-
-  {#if showDevLocaleSwitcher}
-    <label class="dev-locale-switcher" title="Dev locale switcher">
-      <span class="dev-locale-label">Locale</span>
-
-      <select
-        value={$localeStore}
-        on:change={handleLocaleChange}
-        aria-label="Dev locale switcher"
-      >
-        {#each LOCALE_OPTIONS as option}
-          <option value={option.value}>
-            {option.label}
-          </option>
-        {/each}
-      </select>
-    </label>
-  {/if}
 
   {#if !isMac}
     <div class="win-group">
@@ -177,46 +152,6 @@
     font-weight: 700;
     color: var(--accent);
     letter-spacing: 0.5px;
-  }
-
-  .dev-locale-switcher {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 24px;
-    font-size: 12px;
-    color: var(--text-dim);
-    opacity: 0.9;
-    -webkit-app-region: no-drag;
-  }
-
-  .dev-locale-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  .dev-locale-switcher select {
-    height: 22px;
-    max-width: 180px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--sidebar);
-    color: var(--text);
-    font: inherit;
-    font-size: 12px;
-    padding: 0 6px;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .dev-locale-switcher select:hover {
-    border-color: var(--accent);
-  }
-
-  .dev-locale-switcher select:focus {
-    border-color: var(--accent);
   }
 
   .win-group {
