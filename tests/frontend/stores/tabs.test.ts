@@ -1,6 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { tabStore } from '@stores/tabs'
+import { tabStore, type Tab } from '../../../src/renderer/ide/src/stores/tabs'
+
+interface TabState {
+  tabs: Tab[]
+  activeTabId: string | null
+  activeView: 'welcome' | 'editor'
+}
+
+function state(): TabState {
+  return get(tabStore) as TabState
+}
 
 describe('tabStore', () => {
   beforeEach(() => {
@@ -30,7 +40,7 @@ describe('tabStore', () => {
 
     it('adds tab to store', async () => {
       await tabStore.newTab('content')
-      expect(get(tabStore).tabs).toHaveLength(1)
+      expect(state().tabs).toHaveLength(1)
     })
 
     it('tab state contains the initial content', async () => {
@@ -50,13 +60,13 @@ describe('tabStore', () => {
       const first = await tabStore.openFile('/path/to/hello.pas', 'content')
       const second = await tabStore.openFile('/path/to/hello.pas', 'content')
       expect(first.id).toBe(second.id)
-      expect(get(tabStore).tabs).toHaveLength(1)
+      expect(state().tabs).toHaveLength(1)
     })
 
     it('opens different files as separate tabs', async () => {
       await tabStore.openFile('/path/to/a.pas', 'a')
       await tabStore.openFile('/path/to/b.pas', 'b')
-      expect(get(tabStore).tabs).toHaveLength(2)
+      expect(state().tabs).toHaveLength(2)
     })
 
     it('tab state contains the file content', async () => {
@@ -69,9 +79,8 @@ describe('tabStore', () => {
     it('sets activeTabId and switches view to editor', async () => {
       const tab = await tabStore.newTab('content')
       tabStore.activate(tab.id)
-      const state = get(tabStore)
-      expect(state.activeTabId).toBe(tab.id)
-      expect(state.activeView).toBe('editor')
+      expect(state().activeTabId).toBe(tab.id)
+      expect(state().activeView).toBe('editor')
     })
   })
 
@@ -80,7 +89,7 @@ describe('tabStore', () => {
       const tab = await tabStore.newTab('content')
       tabStore.activate(tab.id)
       tabStore.showWelcome()
-      expect(get(tabStore).activeView).toBe('welcome')
+      expect(state().activeView).toBe('welcome')
     })
   })
 
@@ -88,7 +97,7 @@ describe('tabStore', () => {
     it('marks tab as dirty', async () => {
       const tab = await tabStore.newTab('content')
       tabStore.markDirty(tab.id)
-      const found = get(tabStore).tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find(t => t.id === tab.id)
       expect(found?.isDirty).toBe(true)
     })
 
@@ -96,7 +105,7 @@ describe('tabStore', () => {
       const tab = await tabStore.newTab('content')
       tabStore.markDirty(tab.id)
       tabStore.markClean(tab.id)
-      const found = get(tabStore).tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find(t => t.id === tab.id)
       expect(found?.isDirty).toBe(false)
     })
   })
@@ -106,14 +115,14 @@ describe('tabStore', () => {
       const tab = await tabStore.newTab('content')
       vi.spyOn(window, 'confirm').mockReturnValue(true)
       await tabStore.close(tab.id)
-      expect(get(tabStore).tabs).toHaveLength(0)
+      expect(state().tabs).toHaveLength(0)
     })
 
     it('switches to welcome when last tab is closed', async () => {
       const tab = await tabStore.newTab('content')
       vi.spyOn(window, 'confirm').mockReturnValue(true)
       await tabStore.close(tab.id)
-      expect(get(tabStore).activeView).toBe('welcome')
+      expect(state().activeView).toBe('welcome')
     })
 
     it('activates adjacent tab when closing active tab', async () => {
@@ -122,7 +131,7 @@ describe('tabStore', () => {
       tabStore.activate(second.id)
       vi.spyOn(window, 'confirm').mockReturnValue(true)
       await tabStore.close(second.id)
-      expect(get(tabStore).activeTabId).toBe(first.id)
+      expect(state().activeTabId).toBe(first.id)
     })
 
     it('does not close dirty tab if user cancels', async () => {
@@ -130,7 +139,7 @@ describe('tabStore', () => {
       tabStore.markDirty(tab.id)
       vi.spyOn(window, 'confirm').mockReturnValue(false)
       await tabStore.close(tab.id)
-      expect(get(tabStore).tabs).toHaveLength(1)
+      expect(state().tabs).toHaveLength(1)
     })
   })
 
@@ -138,7 +147,7 @@ describe('tabStore', () => {
     it('updates filePath and fileName on save as', async () => {
       const tab = await tabStore.newTab('content')
       tabStore.updateFilePath(tab.id, '/new/path/program.pas')
-      const found = get(tabStore).tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find(t => t.id === tab.id)
       expect(found?.filePath).toBe('/new/path/program.pas')
       expect(found?.fileName).toBe('program.pas')
     })
@@ -162,7 +171,7 @@ describe('tabStore', () => {
       const { EditorState } = await import('@codemirror/state')
       const newState = EditorState.create({ doc: 'updated' })
       tabStore.updateEditorState(tab.id, newState)
-      const found = get(tabStore).tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find(t => t.id === tab.id)
       expect(found?.state.doc.toString()).toBe('updated')
     })
   })

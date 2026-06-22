@@ -1,19 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { get } from 'svelte/store'
-
-// Re-import after each test by resetting the module isn't straightforward with
-// Vitest's module cache, so we test the public API directly instead.
-import { localeStore, i18n, t, LOCALE_OPTIONS, type Locale } from '@stores/../i18n'
-
+import { localeStore, i18n, t, LOCALE_OPTIONS, type Locale } from '../../../src/renderer/ide/src/i18n'
 describe('localeStore', () => {
     beforeEach(() => {
         localStorage.clear()
-        // Reset to English (navigator.languages is mocked to ['en-US'] in setup.ts)
         localeStore.set('en')
     })
 
     it('starts with a supported locale', () => {
-        const locale = get(localeStore)
+        const locale: Locale = get(localeStore)
         const supported = LOCALE_OPTIONS.map(o => o.value)
         expect(supported).toContain(locale)
     })
@@ -25,7 +20,6 @@ describe('localeStore', () => {
 
     it('restores locale from localStorage', () => {
         localStorage.setItem('pascoal-locale', 'pl')
-        // Re-read by calling set with the saved value (simulating fresh init)
         localeStore.set('pl')
         expect(get(localeStore)).toBe('pl')
     })
@@ -74,7 +68,6 @@ describe('t() non-reactive translation function', () => {
     })
 
     it('falls back to English when key is missing in locale', () => {
-        // All locales have console.title, so use a key we know English has
         localeStore.set('pl')
         expect(t('console.title')).toBe('Konsola')
     })
@@ -90,25 +83,25 @@ describe('i18n derived store', () => {
     })
 
     it('translates a known key in English', () => {
-        const translate = get(i18n)
+        const translate = get(i18n) as (key: string, vars?: Record<string, unknown>) => string
         expect(translate('editor.run')).toBe('Run')
     })
 
     it('updates when locale changes', () => {
         localeStore.set('pt-BR')
-        const translate = get(i18n)
+        const translate = get(i18n) as (key: string, vars?: Record<string, unknown>) => string
         expect(translate('editor.run')).toBe('Executar')
     })
 
     it('interpolates variables', () => {
-        const translate = get(i18n)
+        const translate = get(i18n) as (key: string, vars?: Record<string, unknown>) => string
         expect(translate('console.exit_failure', { code: 42 })).toBe(
             'Process finished with exit code 42'
         )
     })
 
     it('returns key when translation is missing everywhere', () => {
-        const translate = get(i18n)
+        const translate = get(i18n) as (key: string, vars?: Record<string, unknown>) => string
         expect(translate('totally.missing.key')).toBe('totally.missing.key')
     })
 })
