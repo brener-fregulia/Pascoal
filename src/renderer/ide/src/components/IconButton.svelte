@@ -1,9 +1,8 @@
 <script lang="ts">
-  export let label: string;
-  export let active: boolean = false;
-  export let variant: "activity" | "welcome" | "toolbar" | "inline" =
-    "activity";
-  export let title: string = "";
+  export let label: string
+  export let active: boolean = false
+  export let variant: 'activity' | 'welcome' | 'toolbar' | 'inline' = 'activity'
+  export let title: string = ''
 </script>
 
 <button
@@ -14,7 +13,7 @@
   on:click
 >
   <slot />
-  {#if variant === "welcome"}
+  {#if variant === 'welcome'}
     <span>{label}</span>
   {/if}
 </button>

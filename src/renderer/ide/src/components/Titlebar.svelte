@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { appStore } from "../stores/app";
-  import { i18n } from "../i18n";
+  import { appStore } from '../stores/app'
+  import { i18n } from '../i18n'
 
-  $: platform = $appStore.info?.platform ?? "linux";
-  $: isMac = platform === "macos";
+  $: platform = $appStore.info?.platform ?? 'linux'
+  $: isMac = platform === 'macos'
 
   async function close() {
-    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close();
+    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close()
   }
 
   async function minimize() {
-    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().minimize();
+    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().minimize()
   }
 
   async function maximize() {
-    if (!window.__TAURI__) return;
-    const win = window.__TAURI__.window.getCurrentWindow();
-    const isMax = await win.isMaximized();
-    isMax ? win.unmaximize() : win.maximize();
+    if (!window.__TAURI__) return
+    const win = window.__TAURI__.window.getCurrentWindow()
+    const isMax = await win.isMaximized()
+    isMax ? win.unmaximize() : win.maximize()
   }
 </script>
 
@@ -26,7 +26,7 @@
     <div class="mac-group">
       <button
         class="mac-btn mac-close"
-        aria-label={$i18n("titlebar.close")}
+        aria-label={$i18n('titlebar.close')}
         on:click={close}
       >
         <svg
@@ -42,7 +42,7 @@
       </button>
       <button
         class="mac-btn mac-min"
-        aria-label={$i18n("titlebar.minimize")}
+        aria-label={$i18n('titlebar.minimize')}
         on:click={minimize}
       >
         <svg
@@ -57,7 +57,7 @@
       </button>
       <button
         class="mac-btn mac-max"
-        aria-label={$i18n("titlebar.maximize")}
+        aria-label={$i18n('titlebar.maximize')}
         on:click={maximize}
       >
         <svg
@@ -80,7 +80,7 @@
     <div class="win-group">
       <button
         class="wc-btn"
-        aria-label={$i18n("titlebar.minimize")}
+        aria-label={$i18n('titlebar.minimize')}
         on:click={minimize}
       >
         <svg
@@ -95,7 +95,7 @@
       </button>
       <button
         class="wc-btn"
-        aria-label={$i18n("titlebar.maximize")}
+        aria-label={$i18n('titlebar.maximize')}
         on:click={maximize}
       >
         <svg
@@ -111,7 +111,7 @@
       </button>
       <button
         class="wc-btn wc-close"
-        aria-label={$i18n("titlebar.close")}
+        aria-label={$i18n('titlebar.close')}
         on:click={close}
       >
         <svg

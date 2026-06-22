@@ -24,39 +24,39 @@ function createConsoleStore() {
   })
 
   function setRunning(running: boolean) {
-    update(s => ({ ...s, running }))
+    update((s) => ({ ...s, running }))
   }
 
   function setBuildStatus(buildStatus: BuildStatus) {
-    update(s => ({ ...s, buildStatus }))
+    update((s) => ({ ...s, buildStatus }))
   }
 
   function appendBuildOutput(text: string) {
-    update(s => ({ ...s, buildOutput: s.buildOutput + text }))
+    update((s) => ({ ...s, buildOutput: s.buildOutput + text }))
   }
 
   function resetBuild() {
-    update(s => ({ ...s, buildStatus: 'compiling', buildOutput: '' }))
+    update((s) => ({ ...s, buildStatus: 'compiling', buildOutput: '' }))
   }
 
   function show() {
-    update(s => ({ ...s, visible: true }))
+    update((s) => ({ ...s, visible: true }))
   }
 
   function hide() {
-    update(s => ({ ...s, visible: false }))
+    update((s) => ({ ...s, visible: false }))
   }
 
   function toggle() {
-    update(s => ({ ...s, visible: !s.visible }))
+    update((s) => ({ ...s, visible: !s.visible }))
   }
 
   function setPosition(position: ConsolePosition) {
-    update(s => ({ ...s, position }))
+    update((s) => ({ ...s, position }))
   }
 
   function setDocked(docked: boolean) {
-    update(s => ({ ...s, docked }))
+    update((s) => ({ ...s, docked }))
   }
 
   function reset() {

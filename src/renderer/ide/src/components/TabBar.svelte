@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { tabStore } from "../stores/tabs";
-  import { i18n } from "../i18n";
-  import Tab from "./Tab.svelte";
-  import Home from "../icons/Home.svelte";
-  import File from "../icons/File.svelte";
+  import { tabStore } from '../stores/tabs'
+  import { i18n } from '../i18n'
+  import Tab from './Tab.svelte'
+  import Home from '../icons/Home.svelte'
+  import File from '../icons/File.svelte'
 
-  $: tabs = $tabStore.tabs;
-  $: activeTabId = $tabStore.activeTabId;
-  $: activeView = $tabStore.activeView;
+  $: tabs = $tabStore.tabs
+  $: activeTabId = $tabStore.activeTabId
+  $: activeView = $tabStore.activeView
 </script>
 
 <div id="tab-bar">
   <Tab
     label={$i18n('tabs.welcome')}
-    active={activeView === "welcome"}
+    active={activeView === 'welcome'}
     on:click={() => tabStore.showWelcome()}
-    on:keydown={(e) => e.key === "Enter" && tabStore.showWelcome()}
+    on:keydown={(e) => e.key === 'Enter' && tabStore.showWelcome()}
   >
     <Home slot="icon" size={14} />
   </Tab>
@@ -23,12 +23,12 @@
   {#each tabs as tab (tab.id)}
     <Tab
       label={tab.fileName}
-      active={tab.id === activeTabId && activeView === "editor"}
+      active={tab.id === activeTabId && activeView === 'editor'}
       isDirty={tab.isDirty}
       closable
       onClose={() => tabStore.close(tab.id)}
       on:click={() => tabStore.activate(tab.id)}
-      on:keydown={(e) => e.key === "Enter" && tabStore.activate(tab.id)}
+      on:keydown={(e) => e.key === 'Enter' && tabStore.activate(tab.id)}
     >
       <File slot="icon" size={14} />
     </Tab>

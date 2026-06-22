@@ -1,33 +1,33 @@
 <script lang="ts">
-  import Welcome from "./Welcome.svelte";
-  import TabBar from "./TabBar.svelte";
-  import Editor from "./Editor.svelte";
-  import Console from "./Console.svelte";
-  import { tabStore } from "../stores/tabs";
-  import { consoleStore } from "../stores/console";
+  import Welcome from './Welcome.svelte'
+  import TabBar from './TabBar.svelte'
+  import Editor from './Editor.svelte'
+  import Console from './Console.svelte'
+  import { tabStore } from '../stores/tabs'
+  import { consoleStore } from '../stores/console'
 
-  $: hasOpenTabs = $tabStore.tabs.length > 0;
-  $: showConsole = $consoleStore.visible;
-  $: position = $consoleStore.position;
+  $: hasOpenTabs = $tabStore.tabs.length > 0
+  $: showConsole = $consoleStore.visible
+  $: position = $consoleStore.position
 </script>
 
 <div id="editor-area">
   <TabBar />
-  <div id="editor-content" class:right={position === "right"}>
+  <div id="editor-content" class:right={position === 'right'}>
     <div id="view-area">
-      {#if !hasOpenTabs || $tabStore.activeView === "welcome"}
+      {#if !hasOpenTabs || $tabStore.activeView === 'welcome'}
         <Welcome />
       {/if}
       <div
         id="editor-wrapper"
-        class:visible={hasOpenTabs && $tabStore.activeView === "editor"}
+        class:visible={hasOpenTabs && $tabStore.activeView === 'editor'}
       >
         <Editor />
       </div>
     </div>
 
     {#if showConsole}
-      <div id="console-area" class:right={position === "right"}>
+      <div id="console-area" class:right={position === 'right'}>
         <Console />
       </div>
     {/if}

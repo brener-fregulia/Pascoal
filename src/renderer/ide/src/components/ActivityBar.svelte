@@ -1,22 +1,22 @@
 <script lang="ts">
-  import { themeStore } from "../stores/theme";
-  import { i18n } from "../i18n";
-  import IconButton from "./IconButton.svelte";
-  import Folder from "../icons/Folder.svelte";
-  import Search from "../icons/Search.svelte";
-  import Git from "../icons/Git.svelte";
-  import Play from "../icons/Play.svelte";
-  import Sun from "../icons/Sun.svelte";
-  import Settings from "../icons/Settings.svelte";
+  import { themeStore } from '../stores/theme'
+  import { i18n } from '../i18n'
+  import IconButton from './IconButton.svelte'
+  import Folder from '../icons/Folder.svelte'
+  import Search from '../icons/Search.svelte'
+  import Git from '../icons/Git.svelte'
+  import Play from '../icons/Play.svelte'
+  import Sun from '../icons/Sun.svelte'
+  import Settings from '../icons/Settings.svelte'
 
-  let active = "explorer";
+  let active = 'explorer'
 
   $: items = [
-    { id: "explorer", label: $i18n('activity.explorer'), icon: Folder },
-    { id: "search",   label: $i18n('activity.search'),   icon: Search },
-    { id: "git",      label: $i18n('activity.git'),       icon: Git },
-    { id: "playground", label: $i18n('activity.playground'), icon: Play },
-  ];
+    { id: 'explorer', label: $i18n('activity.explorer'), icon: Folder },
+    { id: 'search', label: $i18n('activity.search'), icon: Search },
+    { id: 'git', label: $i18n('activity.git'), icon: Git },
+    { id: 'playground', label: $i18n('activity.playground'), icon: Play },
+  ]
 </script>
 
 <nav id="activity-bar">
@@ -32,7 +32,10 @@
 
   <div class="spacer"></div>
 
-  <IconButton label={$i18n('activity.toggle_theme')} on:click={() => themeStore.cycle()}>
+  <IconButton
+    label={$i18n('activity.toggle_theme')}
+    on:click={() => themeStore.cycle()}
+  >
     <Sun size={20} />
   </IconButton>
 

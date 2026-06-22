@@ -10,20 +10,24 @@ export type Locale = 'en' | 'pt-BR' | 'es-419' | 'pl'
 type LocaleData = typeof en
 
 const locales: Record<Locale, LocaleData> = {
-  'en': en,
+  en: en,
   'pt-BR': ptBR,
   'es-419': es419,
-  'pl': pl,
+  pl: pl,
 }
 
-export const LOCALE_OPTIONS: Array<{ value: Locale; label: string; flag: string }> = [
+export const LOCALE_OPTIONS: Array<{
+  value: Locale
+  label: string
+  flag: string
+}> = [
   { value: 'en', label: 'English', flag: '🇺🇸' },
   { value: 'pt-BR', label: 'Português (Brasil)', flag: '🇧🇷' },
   { value: 'es-419', label: 'Español (Latinoamérica)', flag: '🌎' },
   { value: 'pl', label: 'Polski', flag: '🇵🇱' },
 ]
 
-const SUPPORTED: Locale[] = LOCALE_OPTIONS.map(o => o.value)
+const SUPPORTED: Locale[] = LOCALE_OPTIONS.map((o) => o.value)
 const FALLBACK: Locale = 'en'
 const STORAGE_KEY = 'pascoal-locale'
 
@@ -51,7 +55,7 @@ function detectLocale(): Locale {
     const normalized = lang.toLowerCase()
     if (normalized.startsWith('es')) return 'es-419'
     const prefix = lang.split('-')[0]
-    const match = SUPPORTED.find(l => l.startsWith(prefix))
+    const match = SUPPORTED.find((l) => l.startsWith(prefix))
     if (match) return match
   }
 
@@ -64,7 +68,9 @@ function createLocaleStore() {
   function setLocale(locale: Locale) {
     try {
       localStorage.setItem(STORAGE_KEY, locale)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     set(locale)
   }
 
@@ -92,7 +98,10 @@ export function t(key: string, vars?: Record<string, unknown>): string {
 
 export const i18n = derived(localeStore, ($locale) => {
   const data = locales[$locale] ?? locales[FALLBACK]
-  return function translate(key: string, vars?: Record<string, unknown>): string {
+  return function translate(
+    key: string,
+    vars?: Record<string, unknown>,
+  ): string {
     let str = resolve(data, key) ?? resolve(locales[FALLBACK], key) ?? key
     if (vars) {
       for (const [k, v] of Object.entries(vars)) {

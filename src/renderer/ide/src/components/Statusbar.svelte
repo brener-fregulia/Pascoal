@@ -1,26 +1,26 @@
 <script lang="ts">
-  import { appStore } from "../stores/app";
-  import { themeStore } from "../stores/theme";
-  import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from "../i18n";
+  import { appStore } from '../stores/app'
+  import { themeStore } from '../stores/theme'
+  import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'
 
-  $: info = $appStore.info;
+  $: info = $appStore.info
   $: fpcLabel = info?.fpcInstalled
     ? `FPC ${info.fpcVersion}`
-    : $i18n("statusbar.fpc_not_found");
-  $: versionLabel = info ? `${info.name} v${info.version}` : "Pascoal";
+    : $i18n('statusbar.fpc_not_found')
+  $: versionLabel = info ? `${info.name} v${info.version}` : 'Pascoal'
   $: themeLabel =
-    $themeStore.current.charAt(0).toUpperCase() + $themeStore.current.slice(1);
-  $: currentLocale = LOCALE_OPTIONS.find((o) => o.value === $localeStore)!;
+    $themeStore.current.charAt(0).toUpperCase() + $themeStore.current.slice(1)
+  $: currentLocale = LOCALE_OPTIONS.find((o) => o.value === $localeStore)!
 
-  let showLocalePicker = false;
+  let showLocalePicker = false
 
   function selectLocale(locale: Locale) {
-    localeStore.set(locale);
-    showLocalePicker = false;
+    localeStore.set(locale)
+    showLocalePicker = false
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "Escape") showLocalePicker = false;
+    if (e.key === 'Escape') showLocalePicker = false
   }
 
   // Returns SVG markup string for a given locale flag
@@ -36,20 +36,20 @@
         <rect y="9.69" width="20" height="1.08" fill="#fff"/>
         <rect y="11.85" width="20" height="1.08" fill="#fff"/>
         <rect width="8" height="7.54" fill="#3C3B6E"/>`,
-      "pt-BR": `
+      'pt-BR': `
         <rect width="20" height="14" fill="#009C3B"/>
         <polygon points="10,1.5 18.5,7 10,12.5 1.5,7" fill="#FEDF00"/>
         <circle cx="10" cy="7" r="3.2" fill="#002776"/>
         <path d="M7.1 6.4 Q10 5.2 12.9 6.4" stroke="#fff" stroke-width="0.7" fill="none"/>`,
-      "es-419": `
+      'es-419': `
         <rect width="20" height="4.67" fill="#CE1126"/>
         <rect y="4.67" width="20" height="4.67" fill="#FCD116"/>
         <rect y="9.33" width="20" height="4.67" fill="#CE1126"/>`,
       pl: `
         <rect width="20" height="7" fill="#fff"/>
         <rect y="7" width="20" height="7" fill="#DC143C"/>`,
-    };
-    return flags[locale] ?? "";
+    }
+    return flags[locale] ?? ''
   }
 </script>
 
@@ -139,7 +139,7 @@
     position: relative;
   }
 
-  :global([data-theme="charcoal"]) #statusbar {
+  :global([data-theme='charcoal']) #statusbar {
     color: #e8d8c0;
   }
 

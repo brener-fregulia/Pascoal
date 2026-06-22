@@ -8,14 +8,7 @@
   export let onClose: (() => void) | null = null
 </script>
 
-<div
-  class="tab"
-  class:active
-  role="tab"
-  tabindex="0"
-  on:click
-  on:keydown
->
+<div class="tab" class:active role="tab" tabindex="0" on:click on:keydown>
   <slot name="icon" />
 
   <span class="tab-label">
@@ -49,7 +42,9 @@
     white-space: nowrap;
     flex-shrink: 0;
     outline: none;
-    transition: color 0.15s, background 0.15s;
+    transition:
+      color 0.15s,
+      background 0.15s;
     height: 100%;
   }
 
@@ -78,7 +73,9 @@
     padding: 0;
     margin-left: 2px;
     opacity: 0;
-    transition: opacity 0.15s, background 0.15s;
+    transition:
+      opacity 0.15s,
+      background 0.15s;
     flex-shrink: 0;
   }
 

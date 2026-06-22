@@ -51,7 +51,10 @@ describe('tabStore', () => {
 
   describe('openFile', () => {
     it('opens a file and sets filePath and fileName', async () => {
-      const tab = await tabStore.openFile('/path/to/hello.pas', 'program Hello;')
+      const tab = await tabStore.openFile(
+        '/path/to/hello.pas',
+        'program Hello;',
+      )
       expect(tab.filePath).toBe('/path/to/hello.pas')
       expect(tab.fileName).toBe('hello.pas')
     })
@@ -70,7 +73,10 @@ describe('tabStore', () => {
     })
 
     it('tab state contains the file content', async () => {
-      const tab = await tabStore.openFile('/path/to/hello.pas', 'program Hello;')
+      const tab = await tabStore.openFile(
+        '/path/to/hello.pas',
+        'program Hello;',
+      )
       expect(tab.state.doc.toString()).toBe('program Hello;')
     })
   })
@@ -97,7 +103,7 @@ describe('tabStore', () => {
     it('marks tab as dirty', async () => {
       const tab = await tabStore.newTab('content')
       tabStore.markDirty(tab.id)
-      const found = state().tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find((t) => t.id === tab.id)
       expect(found?.isDirty).toBe(true)
     })
 
@@ -105,7 +111,7 @@ describe('tabStore', () => {
       const tab = await tabStore.newTab('content')
       tabStore.markDirty(tab.id)
       tabStore.markClean(tab.id)
-      const found = state().tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find((t) => t.id === tab.id)
       expect(found?.isDirty).toBe(false)
     })
   })
@@ -147,7 +153,7 @@ describe('tabStore', () => {
     it('updates filePath and fileName on save as', async () => {
       const tab = await tabStore.newTab('content')
       tabStore.updateFilePath(tab.id, '/new/path/program.pas')
-      const found = state().tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find((t) => t.id === tab.id)
       expect(found?.filePath).toBe('/new/path/program.pas')
       expect(found?.fileName).toBe('program.pas')
     })
@@ -171,7 +177,7 @@ describe('tabStore', () => {
       const { EditorState } = await import('@codemirror/state')
       const newState = EditorState.create({ doc: 'updated' })
       tabStore.updateEditorState(tab.id, newState)
-      const found = state().tabs.find(t => t.id === tab.id)
+      const found = state().tabs.find((t) => t.id === tab.id)
       expect(found?.state.doc.toString()).toBe('updated')
     })
   })

@@ -39,17 +39,18 @@ function createTabStore() {
 
   async function newTab(content: string): Promise<Tab> {
     const state = getState()
-    const existingNames = state.tabs.map(t => t.fileName)
+    const existingNames = state.tabs.map((t) => t.fileName)
 
     let candidate = 'untitled.pas'
     let n = 1
 
     while (
       existingNames.includes(candidate) ||
-      (window.__TAURI__ && window.__documentsDir &&
-        await (window.__TAURI__.core.invoke('file_exists', {
-          path: `${window.__documentsDir}/${candidate}`
-        }) as Promise<boolean>))
+      (window.__TAURI__ &&
+        window.__documentsDir &&
+        (await (window.__TAURI__.core.invoke('file_exists', {
+          path: `${window.__documentsDir}/${candidate}`,
+        }) as Promise<boolean>)))
     ) {
       n++
       candidate = `untitled-${n}.pas`
@@ -64,13 +65,13 @@ function createTabStore() {
       state: makeEditorState(content, id),
     }
 
-    update(s => ({ ...s, tabs: [...s.tabs, tab] }))
+    update((s) => ({ ...s, tabs: [...s.tabs, tab] }))
     return tab
   }
 
   async function openFile(filePath: string, content: string): Promise<Tab> {
     const state = getState()
-    const existing = state.tabs.find(t => t.filePath === filePath)
+    const existing = state.tabs.find((t) => t.filePath === filePath)
     if (existing) {
       activate(existing.id)
       return existing
@@ -86,53 +87,55 @@ function createTabStore() {
       state: makeEditorState(content, id),
     }
 
-    update(s => ({ ...s, tabs: [...s.tabs, tab] }))
+    update((s) => ({ ...s, tabs: [...s.tabs, tab] }))
     return tab
   }
 
   // Called by Editor.svelte whenever CodeMirror dispatches a transaction
   function updateEditorState(id: string, state: EditorState) {
-    update(s => ({
+    update((s) => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, state } : t),
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, state } : t)),
     }))
   }
 
   function activate(id: string) {
-    update(s => ({ ...s, activeTabId: id, activeView: 'editor' }))
+    update((s) => ({ ...s, activeTabId: id, activeView: 'editor' }))
   }
 
   function showWelcome() {
-    update(s => ({ ...s, activeView: 'welcome' }))
+    update((s) => ({ ...s, activeView: 'welcome' }))
   }
 
   function markDirty(id: string) {
-    update(s => ({
+    update((s) => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: true } : t),
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, isDirty: true } : t)),
     }))
   }
 
   function markClean(id: string) {
-    update(s => ({
+    update((s) => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, isDirty: false } : t),
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, isDirty: false } : t)),
     }))
   }
 
   async function close(id: string): Promise<boolean> {
     const state = getState()
-    const tab = state.tabs.find(t => t.id === id)
+    const tab = state.tabs.find((t) => t.id === id)
     if (!tab) return false
 
     if (tab.isDirty) {
-      const confirmed = window.confirm(t('tabs.unsaved_confirm', { name: tab.fileName }))
+      const confirmed = window.confirm(
+        t('tabs.unsaved_confirm', { name: tab.fileName }),
+      )
       if (!confirmed) return false
     }
 
-    update(s => {
-      const index = s.tabs.findIndex(t => t.id === id)
-      const newTabs = s.tabs.filter(t => t.id !== id)
+    update((s) => {
+      const index = s.tabs.findIndex((t) => t.id === id)
+      const newTabs = s.tabs.filter((t) => t.id !== id)
       let activeTabId = s.activeTabId
       let activeView = s.activeView
 
@@ -154,15 +157,15 @@ function createTabStore() {
 
   function updateFilePath(id: string, filePath: string) {
     const fileName = filePath.split(/[\\/]/).pop() ?? filePath
-    update(s => ({
+    update((s) => ({
       ...s,
-      tabs: s.tabs.map(t => t.id === id ? { ...t, filePath, fileName } : t),
+      tabs: s.tabs.map((t) => (t.id === id ? { ...t, filePath, fileName } : t)),
     }))
   }
 
   function getActive(): Tab | null {
     const state = getState()
-    return state.tabs.find(t => t.id === state.activeTabId) ?? null
+    return state.tabs.find((t) => t.id === state.activeTabId) ?? null
   }
 
   function reset() {

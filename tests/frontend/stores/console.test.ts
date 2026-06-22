@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { get } from 'svelte/store'
-import { consoleStore, clearConsoleSignal, type BuildStatus, type ConsolePosition } from '../../../src/renderer/ide/src/stores/console'
+import {
+  consoleStore,
+  clearConsoleSignal,
+  type BuildStatus,
+  type ConsolePosition,
+} from '../../../src/renderer/ide/src/stores/console'
 
 interface ConsoleState {
   visible: boolean
@@ -137,7 +142,7 @@ describe('consoleStore', () => {
     })
 
     it('increments when updated', () => {
-      clearConsoleSignal.update(n => n + 1)
+      clearConsoleSignal.update((n) => n + 1)
       expect(get(clearConsoleSignal) as number).toBeGreaterThan(0)
     })
   })

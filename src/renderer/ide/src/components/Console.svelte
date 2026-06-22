@@ -1,35 +1,35 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import { consoleStore, clearConsoleSignal } from "../stores/console";
-  import { i18n } from "../i18n";
-  import PanelHeader from "./PanelHeader.svelte";
-  import IconButton from "./IconButton.svelte";
-  import X from "../icons/X.svelte";
+  import { onMount, onDestroy } from 'svelte'
+  import { consoleStore, clearConsoleSignal } from '../stores/console'
+  import { i18n } from '../i18n'
+  import PanelHeader from './PanelHeader.svelte'
+  import IconButton from './IconButton.svelte'
+  import X from '../icons/X.svelte'
 
-  let programEl: HTMLDivElement;
-  let term: any = null;
-  let fitAddon: any = null;
-  let isRunning = false;
-  let unlistenBuild: (() => void) | null = null;
-  let unlistenStarted: (() => void) | null = null;
-  let unlistenProgramOut: (() => void) | null = null;
-  let unlistenProgramErr: (() => void) | null = null;
-  let unlistenExit: (() => void) | null = null;
+  let programEl: HTMLDivElement
+  let term: any = null
+  let fitAddon: any = null
+  let isRunning = false
+  let unlistenBuild: (() => void) | null = null
+  let unlistenStarted: (() => void) | null = null
+  let unlistenProgramOut: (() => void) | null = null
+  let unlistenProgramErr: (() => void) | null = null
+  let unlistenExit: (() => void) | null = null
 
-  let buildStatus = $derived($consoleStore.buildStatus);
-  let buildOutput = $derived($consoleStore.buildOutput);
-  let copied = $state(false);
+  let buildStatus = $derived($consoleStore.buildStatus)
+  let buildOutput = $derived($consoleStore.buildOutput)
+  let copied = $state(false)
 
   $effect(() => {
-    if ($clearConsoleSignal > 0) term?.reset();
-  });
+    if ($clearConsoleSignal > 0) term?.reset()
+  })
 
   onMount(() => {
-    let resizeObserver: ResizeObserver;
+    let resizeObserver: ResizeObserver
 
     async function setup() {
-      const { Terminal } = await import("@xterm/xterm");
-      const { FitAddon } = await import("@xterm/addon-fit");
+      const { Terminal } = await import('@xterm/xterm')
+      const { FitAddon } = await import('@xterm/addon-fit')
 
       term = new Terminal({
         fontFamily: '"JetBrains Mono", "Cascadia Code", monospace',
@@ -38,147 +38,147 @@
         theme: getTheme(),
         cursorBlink: true,
         convertEol: true,
-      });
+      })
 
-      fitAddon = new FitAddon();
-      term.loadAddon(fitAddon);
-      term.open(programEl);
-      fitAddon.fit();
+      fitAddon = new FitAddon()
+      term.loadAddon(fitAddon)
+      term.open(programEl)
+      fitAddon.fit()
 
       term.onData((data: string) => {
         if (window.__TAURI__ && isRunning) {
-          if (data === "\r") {
-            term.write("\r\n");
-          } else if (data === "\x7f") {
-            term.write("\b \b");
+          if (data === '\r') {
+            term.write('\r\n')
+          } else if (data === '\x7f') {
+            term.write('\b \b')
           } else {
-            term.write(data);
+            term.write(data)
           }
-          window.__TAURI__.core.invoke("send_input", {
-            data: data === "\r" ? "\n" : data,
-          });
+          window.__TAURI__.core.invoke('send_input', {
+            data: data === '\r' ? '\n' : data,
+          })
         }
-      });
+      })
 
       if (window.__TAURI__) {
-        const { listen } = await import("@tauri-apps/api/event");
+        const { listen } = await import('@tauri-apps/api/event')
 
         unlistenBuild = await listen<string>(
-          "console-build-output",
+          'console-build-output',
           (event) => {
-            consoleStore.appendBuildOutput(event.payload);
+            consoleStore.appendBuildOutput(event.payload)
           },
-        );
+        )
 
-        unlistenStarted = await listen("console-started", () => {
-          consoleStore.setBuildStatus("success");
-          consoleStore.setRunning(true);
-          isRunning = true;
-        });
+        unlistenStarted = await listen('console-started', () => {
+          consoleStore.setBuildStatus('success')
+          consoleStore.setRunning(true)
+          isRunning = true
+        })
 
         unlistenProgramOut = await listen<string>(
-          "console-program-output",
+          'console-program-output',
           (event) => term?.write(event.payload),
-        );
+        )
 
         unlistenProgramErr = await listen<string>(
-          "console-program-error",
+          'console-program-error',
           (event) => term?.write(`\x1b[31m${event.payload}\x1b[0m`),
-        );
+        )
 
-        unlistenExit = await listen<number>("console-exit", (event) => {
-          const code = event.payload;
-          if ($consoleStore.buildStatus === "compiling") {
-            consoleStore.setBuildStatus("error");
+        unlistenExit = await listen<number>('console-exit', (event) => {
+          const code = event.payload
+          if ($consoleStore.buildStatus === 'compiling') {
+            consoleStore.setBuildStatus('error')
           } else {
             const msg =
               code === 0
-                ? `\r\n\x1b[32m${$i18n("console.exit_success")}\x1b[0m\r\n`
-                : `\r\n\x1b[31m${$i18n("console.exit_failure", { code })}\x1b[0m\r\n`;
-            term?.write(msg);
+                ? `\r\n\x1b[32m${$i18n('console.exit_success')}\x1b[0m\r\n`
+                : `\r\n\x1b[31m${$i18n('console.exit_failure', { code })}\x1b[0m\r\n`
+            term?.write(msg)
           }
-          consoleStore.setRunning(false);
-          isRunning = false;
-        });
+          consoleStore.setRunning(false)
+          isRunning = false
+        })
       }
 
-      resizeObserver = new ResizeObserver(() => fitAddon?.fit());
-      resizeObserver.observe(programEl);
+      resizeObserver = new ResizeObserver(() => fitAddon?.fit())
+      resizeObserver.observe(programEl)
 
-      window.dispatchEvent(new CustomEvent("console-ready"));
+      window.dispatchEvent(new CustomEvent('console-ready'))
     }
 
-    setup();
+    setup()
 
     return () => {
-      resizeObserver?.disconnect();
-    };
-  });
+      resizeObserver?.disconnect()
+    }
+  })
 
   onDestroy(() => {
-    unlistenBuild?.();
-    unlistenStarted?.();
-    unlistenProgramOut?.();
-    unlistenProgramErr?.();
-    unlistenExit?.();
-    term?.dispose();
-  });
+    unlistenBuild?.()
+    unlistenStarted?.()
+    unlistenProgramOut?.()
+    unlistenProgramErr?.()
+    unlistenExit?.()
+    term?.dispose()
+  })
 
   function getTheme() {
-    const style = getComputedStyle(document.documentElement);
-    const get = (v: string) => style.getPropertyValue(v).trim();
+    const style = getComputedStyle(document.documentElement)
+    const get = (v: string) => style.getPropertyValue(v).trim()
     return {
-      background: get("--bg") || "#0D0D0D",
-      foreground: get("--text") || "#F0F0F0",
-      cursor: get("--accent") || "#E94560",
-      black: "#000000",
-      red: get("--error") || "#E94560",
-      green: get("--success") || "#4CAF82",
-      cyan: get("--accent2") || "#A8DADC",
-      white: get("--text") || "#F0F0F0",
-      brightBlack: get("--text-dim") || "#7A7A9A",
-      brightWhite: get("--text") || "#F0F0F0",
-    };
+      background: get('--bg') || '#0D0D0D',
+      foreground: get('--text') || '#F0F0F0',
+      cursor: get('--accent') || '#E94560',
+      black: '#000000',
+      red: get('--error') || '#E94560',
+      green: get('--success') || '#4CAF82',
+      cyan: get('--accent2') || '#A8DADC',
+      white: get('--text') || '#F0F0F0',
+      brightBlack: get('--text-dim') || '#7A7A9A',
+      brightWhite: get('--text') || '#F0F0F0',
+    }
   }
 
   async function copyProgramOutput() {
-    const text = term?.getSelection();
+    const text = term?.getSelection()
     if (text) {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(text)
     } else {
-      const all = term?.buffer.active;
-      if (!all) return;
-      const lines: string[] = [];
+      const all = term?.buffer.active
+      if (!all) return
+      const lines: string[] = []
       for (let i = 0; i < all.length; i++) {
-        lines.push(all.getLine(i)?.translateToString(true) ?? "");
+        lines.push(all.getLine(i)?.translateToString(true) ?? '')
       }
-      await navigator.clipboard.writeText(lines.join("\n").trimEnd());
+      await navigator.clipboard.writeText(lines.join('\n').trimEnd())
     }
-    copied = true;
-    setTimeout(() => (copied = false), 2000);
+    copied = true
+    setTimeout(() => (copied = false), 2000)
   }
 
   const statusLabels = $derived({
-    idle: $i18n("console.status_idle"),
-    compiling: $i18n("console.status_compiling"),
-    success: $i18n("console.status_success"),
-    error: $i18n("console.status_error"),
-  });
+    idle: $i18n('console.status_idle'),
+    compiling: $i18n('console.status_compiling'),
+    success: $i18n('console.status_success'),
+    error: $i18n('console.status_error'),
+  })
 </script>
 
 <div id="console-panel">
-  <PanelHeader title={$i18n("console.title")}>
+  <PanelHeader title={$i18n('console.title')}>
     <IconButton
       variant="inline"
-      label={$i18n("console.clear")}
-      title={$i18n("console.clear")}
+      label={$i18n('console.clear')}
+      title={$i18n('console.clear')}
       on:click={() => term?.reset()}
     >
-      {$i18n("console.clear")}
+      {$i18n('console.clear')}
     </IconButton>
     <IconButton
       variant="inline"
-      label={$i18n("console.title")}
+      label={$i18n('console.title')}
       title="Close"
       on:click={() => consoleStore.hide()}
     >
@@ -186,9 +186,9 @@
     </IconButton>
   </PanelHeader>
 
-  <section class="console-build" class:error={buildStatus === "error"}>
+  <section class="console-build" class:error={buildStatus === 'error'}>
     <div class="zone-label">
-      <span>{$i18n("console.build")}</span>
+      <span>{$i18n('console.build')}</span>
       <span class="status status-{buildStatus}"
         >{statusLabels[buildStatus]}</span
       >
@@ -200,14 +200,14 @@
 
   <section class="console-program">
     <div class="zone-label">
-      <span>{$i18n("console.program")}</span>
+      <span>{$i18n('console.program')}</span>
       <IconButton
         variant="inline"
-        label={$i18n("console.copy")}
-        title={$i18n("console.copy")}
+        label={$i18n('console.copy')}
+        title={$i18n('console.copy')}
         on:click={copyProgramOutput}
       >
-        {copied ? $i18n("console.copied") : $i18n("console.copy")}
+        {copied ? $i18n('console.copied') : $i18n('console.copy')}
       </IconButton>
     </div>
     <div id="program-output" bind:this={programEl}></div>

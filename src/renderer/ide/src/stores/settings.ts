@@ -52,7 +52,7 @@ function createSettingsStore() {
   }
 
   function updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
-    update(s => {
+    update((s) => {
       const next = { ...s, [key]: value }
       save(next)
       return next

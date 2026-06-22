@@ -42,7 +42,9 @@ function createAppStore() {
         platform: string
         documents_dir: string
       }
-      const raw = await window.__TAURI__.core.invoke('get_app_info') as RawAppInfo
+      const raw = (await window.__TAURI__.core.invoke(
+        'get_app_info',
+      )) as RawAppInfo
 
       const info: AppInfo = {
         name: raw.name,

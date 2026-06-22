@@ -15,7 +15,8 @@
   let currentTabId: string | null = null
 
   $effect(() => {
-    const activeTab = $tabStore.tabs.find(t => t.id === $tabStore.activeTabId) ?? null
+    const activeTab =
+      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null
     if (!view || !activeTab) return
     if (activeTab.id === currentTabId) return
     view.setState(activeTab.state)
@@ -34,7 +35,8 @@
   })
 
   onMount(() => {
-    const activeTab = $tabStore.tabs.find(t => t.id === $tabStore.activeTabId) ?? null
+    const activeTab =
+      $tabStore.tabs.find((t) => t.id === $tabStore.activeTabId) ?? null
 
     view = new EditorView({
       state: activeTab?.state,
@@ -54,7 +56,9 @@
     return () => document.removeEventListener('keydown', handleKeydown)
   })
 
-  onDestroy(() => { view?.destroy() })
+  onDestroy(() => {
+    view?.destroy()
+  })
 
   async function handleKeydown(e: KeyboardEvent) {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -77,7 +81,10 @@
     const content = getContent()
     if (tab.filePath) {
       try {
-        await window.__TAURI__.core.invoke('save_file', { content, filePath: tab.filePath })
+        await window.__TAURI__.core.invoke('save_file', {
+          content,
+          filePath: tab.filePath,
+        })
         tabStore.markClean(tab.id)
       } catch (e) {
         console.error('save_file failed:', e)
@@ -92,10 +99,10 @@
     if (!tab || !window.__TAURI__) return
     const content = getContent()
     try {
-      const result = await window.__TAURI__.core.invoke('save_file_as', {
+      const result = (await window.__TAURI__.core.invoke('save_file_as', {
         content,
         suggestedName: tab.fileName,
-      }) as { path: string } | null
+      })) as { path: string } | null
       if (result) {
         tabStore.updateFilePath(tab.id, result.path)
         tabStore.markClean(tab.id)
@@ -107,7 +114,12 @@
 </script>
 
 <div id="editor-toolbar">
-  <IconButton variant="toolbar" label={$i18n('editor.run')} title="Run (F5)" on:click={runActiveFile}>
+  <IconButton
+    variant="toolbar"
+    label={$i18n('editor.run')}
+    title="Run (F5)"
+    on:click={runActiveFile}
+  >
     <Play size={14} stroke="#fff" />
     <span class="run-label">{$i18n('editor.run')}</span>
   </IconButton>
@@ -125,7 +137,9 @@
     flex-shrink: 0;
   }
 
-  .run-label { margin-left: 6px; }
+  .run-label {
+    margin-left: 6px;
+  }
 
   #codemirror-editor {
     flex: 1;

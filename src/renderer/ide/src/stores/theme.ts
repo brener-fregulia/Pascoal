@@ -6,10 +6,14 @@ const THEMES: Theme[] = ['dark', 'light', 'charcoal']
 const STORAGE_KEY = 'pascoal-theme'
 
 function createThemeStore() {
-  const { subscribe, update, set } = writable<{ current: Theme }>({ current: 'dark' })
+  const { subscribe, update, set } = writable<{ current: Theme }>({
+    current: 'dark',
+  })
 
   function detectSystem(): Theme {
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+    return window.matchMedia('(prefers-color-scheme: light)').matches
+      ? 'light'
+      : 'dark'
   }
 
   function getSaved(): Theme | null {
@@ -24,7 +28,9 @@ function createThemeStore() {
   function apply(theme: Theme) {
     try {
       localStorage.setItem(STORAGE_KEY, theme)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     set({ current: theme })
   }
 
@@ -32,15 +38,21 @@ function createThemeStore() {
     const theme = getSaved() ?? detectSystem()
     apply(theme)
 
-    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
-      if (!getSaved()) apply(e.matches ? 'light' : 'dark')
-    })
+    window
+      .matchMedia('(prefers-color-scheme: light)')
+      .addEventListener('change', (e) => {
+        if (!getSaved()) apply(e.matches ? 'light' : 'dark')
+      })
   }
 
   function cycle() {
-    update(state => {
+    update((state) => {
       const next = THEMES[(THEMES.indexOf(state.current) + 1) % THEMES.length]
-      try { localStorage.setItem(STORAGE_KEY, next) } catch { /* ignore */ }
+      try {
+        localStorage.setItem(STORAGE_KEY, next)
+      } catch {
+        /* ignore */
+      }
       return { current: next }
     })
   }

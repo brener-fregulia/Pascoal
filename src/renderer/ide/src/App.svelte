@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import Titlebar from "./components/Titlebar.svelte";
-  import ActivityBar from "./components/ActivityBar.svelte";
-  import EditorArea from "./components/EditorArea.svelte";
-  import Statusbar from "./components/Statusbar.svelte";
-  import { appStore } from "./stores/app";
-  import { themeStore } from "./stores/theme";
+  import { onMount } from 'svelte'
+  import Titlebar from './components/Titlebar.svelte'
+  import ActivityBar from './components/ActivityBar.svelte'
+  import EditorArea from './components/EditorArea.svelte'
+  import Statusbar from './components/Statusbar.svelte'
+  import { appStore } from './stores/app'
+  import { themeStore } from './stores/theme'
 
   onMount(async () => {
-    themeStore.init();
-    await appStore.init();
-  });
+    themeStore.init()
+    await appStore.init()
+  })
 
   $effect(() => {
-    document.documentElement.setAttribute("data-theme", $themeStore.current);
-  });
+    document.documentElement.setAttribute('data-theme', $themeStore.current)
+  })
 </script>
 
 <div id="layout">
