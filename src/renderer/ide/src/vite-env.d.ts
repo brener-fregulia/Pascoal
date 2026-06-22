@@ -6,7 +6,6 @@ declare global {
         __TAURI__: any
         __documentsDir: string
         __platform: string
-        ace: any
     }
 }
 

@@ -34,14 +34,15 @@ function createAppStore() {
     }
 
     try {
-      const raw = await window.__TAURI__.core.invoke<{
+      type RawAppInfo = {
         name: string
         version: string
         fpc_installed: boolean
         fpc_version: string | null
         platform: string
         documents_dir: string
-      }>('get_app_info')
+      }
+      const raw = await window.__TAURI__.core.invoke('get_app_info') as RawAppInfo
 
       const info: AppInfo = {
         name: raw.name,
@@ -52,7 +53,6 @@ function createAppStore() {
         documentsDir: raw.documents_dir,
       }
 
-      // Expõe globalmente para módulos não-Svelte (Ace Editor, etc)
       window.__documentsDir = info.documentsDir
       window.__platform = info.platform
 
