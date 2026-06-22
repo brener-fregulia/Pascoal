@@ -30,10 +30,23 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 
-// Mock matchMedia
+// Mock navigator.languages — pin to English so localeStore is deterministic
+Object.defineProperty(window.navigator, 'languages', {
+  value: ['en-US', 'en'],
+  writable: true,
+  configurable: true,
+})
+
+Object.defineProperty(window.navigator, 'language', {
+  value: 'en-US',
+  writable: true,
+  configurable: true,
+})
+
+// Mock matchMedia — always returns dark (light: false) so themeStore defaults to dark
 Object.defineProperty(window, 'matchMedia', {
   value: vi.fn((query: string) => ({
-    matches: query.includes('light') ? false : false,
+    matches: false, // prefers-color-scheme: light → false means dark mode
     media: query,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
