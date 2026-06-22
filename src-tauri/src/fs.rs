@@ -33,6 +33,11 @@ pub async fn open_file(app: tauri::AppHandle) -> Option<(String, String)> {
 }
 
 #[tauri::command]
+pub async fn read_file(path: String) -> Result<String, String> {
+    std::fs::read_to_string(&path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub async fn save_file(content: String, file_path: String) -> Result<SaveResult, String> {
     write_file(&file_path, &content)?;
     Ok(SaveResult { path: file_path })

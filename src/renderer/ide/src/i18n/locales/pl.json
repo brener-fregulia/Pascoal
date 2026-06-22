@@ -10,7 +10,12 @@
         "new_project_git": "Nowy projekt + Git...",
         "open_playground": "Otwórz Playground",
         "configure_git": "Skonfiguruj Git",
-        "no_recent": "Brak ostatnich projektów."
+        "no_recent": "Brak ostatnich projektów.",
+        "open_recent": "Otwórz ostatni plik",
+        "remove_recent": "Usuń z ostatnich",
+        "recent_today": "Dzisiaj",
+        "recent_yesterday": "Wczoraj",
+        "recent_days_ago": "{n} dni temu"
     },
     "console": {
         "title": "Konsola",
