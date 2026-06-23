@@ -106,6 +106,7 @@ scripts/
 
 ## Roadmap
 
+- [x] Arquivos recentes (tela de boas-vindas)
 - [ ] Abrir Pasta / Projeto
 - [ ] Integração com Git
 - [ ] Terminal PTY (PowerShell, bash, fish)
@@ -113,7 +114,7 @@ scripts/
 - [ ] Gramática Tree-sitter para Pascal (highlight completo, indent guides, outline)
 - [ ] Modo Playground
 - [ ] Modo Desafio com casos de teste
-- [ ] CI/CD com GitHub Actions
+- [x] CI/CD com GitHub Actions
 
 ## Contribuindo
 

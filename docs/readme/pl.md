@@ -112,6 +112,7 @@ scripts/
 
 ## Roadmap
 
+* [x] Ostatnie pliki (ekran powitalny)
 * [ ] Otwieranie folderu / projektu
 * [ ] Integracja z Git
 * [ ] Terminal PTY (PowerShell, bash, fish)
@@ -119,7 +120,7 @@ scripts/
 * [ ] Gramatyka Tree-sitter dla Pascala (pełne podświetlanie, prowadnice wcięć, outline)
 * [ ] Tryb Playground
 * [ ] Tryb wyzwań z przypadkami testowymi
-* [ ] CI/CD z GitHub Actions
+* [x] GitHub Actions CI/CD
 
 ## Współtworzenie
 

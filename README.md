@@ -106,6 +106,7 @@ scripts/
 
 ## Roadmap
 
+- [x] Recent files (Welcome screen)
 - [ ] Open Folder / Project
 - [ ] Git integration
 - [ ] PTY terminal (PowerShell, bash, fish)
@@ -113,7 +114,7 @@ scripts/
 - [ ] Pascal Tree-sitter grammar (full syntax highlighting, indent guides, code outline)
 - [ ] Playground mode
 - [ ] Challenge mode with test cases
-- [ ] GitHub Actions CI/CD
+- [x] GitHub Actions CI/CD
 
 ## Contributing
 
