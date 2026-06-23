@@ -12,7 +12,8 @@
     "test:frontend:watch": "cd src/renderer/ide && npx vitest",
     "test:rust": "cd src-tauri && cargo test --lib",
     "test:pascal": "cd src-tauri && cargo test --test pascal_runner -- --nocapture",
-    "test": "npm run test:frontend && npm run test:rust && npm run test:pascal"
+    "test": "npm run test:frontend && npm run test:rust && npm run test:pascal",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "@testing-library/svelte": "^5.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^25.9.3",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.4",
     "prettier-plugin-svelte": "^4.1.1",
