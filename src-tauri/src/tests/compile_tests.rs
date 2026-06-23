@@ -8,19 +8,20 @@ fn tmp_dir(name: &str) -> std::path::PathBuf {
 }
 
 #[test]
+#[ignore = "requires FPC installed"]
 fn compile_valid_program_succeeds() {
     let dir = tmp_dir("valid");
     let src = dir.join("program.pas");
 
-    fs::write(
-        &src,
-        "program Valid;\nbegin\n  writeln('ok');\nend.\n",
-    )
-    .unwrap();
+    fs::write(&src, "program Valid;\nbegin\n  writeln('ok');\nend.\n").unwrap();
 
     let result = compile(&src, &dir);
 
-    assert!(result.success, "expected compile success, got:\n{}", result.output);
+    assert!(
+        result.success,
+        "expected compile success, got:\n{}",
+        result.output
+    );
     assert!(
         result.output.contains("lines compiled"),
         "expected FPC summary in output"
@@ -28,6 +29,7 @@ fn compile_valid_program_succeeds() {
 }
 
 #[test]
+#[ignore = "requires FPC installed"]
 fn compile_invalid_program_fails() {
     let dir = tmp_dir("invalid");
     let src = dir.join("program.pas");
@@ -44,6 +46,7 @@ fn compile_invalid_program_fails() {
 }
 
 #[test]
+#[ignore = "requires FPC installed"]
 fn compile_missing_source_fails() {
     let dir = tmp_dir("missing");
     let src = dir.join("nonexistent.pas");
@@ -54,6 +57,7 @@ fn compile_missing_source_fails() {
 }
 
 #[test]
+#[ignore = "requires FPC installed"]
 fn compile_produces_executable() {
     let dir = tmp_dir("exe");
     let src = dir.join("program.pas");
