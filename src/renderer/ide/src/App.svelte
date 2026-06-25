@@ -7,6 +7,8 @@
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
 
+  let activePanel = $state<string | null>(null)
+
   onMount(async () => {
     themeStore.init()
     await appStore.init()
@@ -20,8 +22,8 @@
 <div id="layout">
   <Titlebar />
   <div id="main">
-    <ActivityBar />
-    <EditorArea />
+    <ActivityBar bind:activePanel />
+    <EditorArea {activePanel} />
   </div>
   <Statusbar />
 </div>

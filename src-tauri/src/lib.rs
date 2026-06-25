@@ -53,10 +53,12 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_app_info,
             fs::open_file,
-            fs::read_file,
             fs::save_file,
             fs::save_file_as,
             fs::file_exists,
+            fs::read_file,
+            fs::open_folder,
+            fs::list_folder_files,
             process::compile_and_run,
             process::send_input,
         ])

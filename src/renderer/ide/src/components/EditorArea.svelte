@@ -3,17 +3,27 @@
   import TabBar from './TabBar.svelte'
   import Editor from './Editor.svelte'
   import Console from './Console.svelte'
+  import FileTree from './FileTree.svelte'
   import { tabStore } from '../stores/tabs'
   import { consoleStore } from '../stores/console'
+
+  export let activePanel: string | null
 
   $: hasOpenTabs = $tabStore.tabs.length > 0
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
+  $: showFileTree = activePanel === 'explorer'
 </script>
 
 <div id="editor-area">
   <TabBar />
   <div id="editor-content" class:right={position === 'right'}>
+    {#if showFileTree}
+      <div id="file-tree-panel">
+        <FileTree />
+      </div>
+    {/if}
+
     <div id="view-area">
       {#if !hasOpenTabs || $tabStore.activeView === 'welcome'}
         <Welcome />
@@ -45,12 +55,16 @@
   #editor-content {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     overflow: hidden;
   }
 
-  #editor-content.right {
-    flex-direction: row;
+  #file-tree-panel {
+    width: 220px;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   #view-area {
@@ -59,6 +73,7 @@
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
+    min-width: 0;
   }
 
   #editor-wrapper {
