@@ -1,0 +1,32 @@
+name: Documentation
+description: Something in the docs is wrong, missing, or unclear.
+title: "[Docs] "
+labels: ["documentation"]
+
+body:
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Which documentation is affected?
+      options:
+        - README (English)
+        - README (Portugues)
+        - README (Espanol)
+        - README (Polski)
+        - CONTRIBUTING / setup instructions
+        - In-app text / UI strings
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested correction or improvement

@@ -1,0 +1,114 @@
+name: Compiler / Runtime Issue
+description: FPC not found, program won't compile, wrong output, readln not working, etc.
+title: "[Pascal] "
+labels: ["pascal", "compiler", "needs triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for issues related to Free Pascal (FPC), compilation errors, or program runtime behavior inside Pascoal.
+
+  - type: input
+    id: pascoal_version
+    attributes:
+      label: Pascoal version
+      placeholder: "e.g. 0.20.0"
+    validations:
+      required: true
+
+  - type: input
+    id: fpc_version
+    attributes:
+      label: FPC version
+      description: Run `fpc -iV` in a terminal to find out. Leave blank if FPC is not found.
+      placeholder: "e.g. 3.2.2"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - Ubuntu / Debian
+        - Arch / CachyOS
+        - macOS
+        - Other Linux
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: What kind of issue is this?
+      options:
+        - FPC not found / not detected
+        - Program compiles in terminal but not in Pascoal
+        - Compilation error (unexpected)
+        - Wrong or missing output
+        - readln / interactive input not working
+        - write() without writeln not flushing
+        - Program crashes at runtime
+        - Behavior differs between Windows and Linux
+        - Syntax highlighting wrong
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Minimal Pascal code that reproduces the issue
+      description: Please keep it as short as possible.
+      render: pascal
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_output
+    attributes:
+      label: Expected output
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_output
+    attributes:
+      label: Actual output in Pascoal
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: terminal_works
+    attributes:
+      label: Does it work when compiled manually in the terminal? (fpc file.pas && ./file)
+      options:
+        - "Yes - works in terminal, broken in Pascoal"
+        - "No - also fails in terminal"
+        - "Not tested"
+        - "FPC not available in terminal"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: features_used
+    attributes:
+      label: Which features does your code use? (check all that apply)
+      options:
+        - label: "readln / interactive input"
+        - label: "write without writeln (unbuffered output)"
+        - label: "File I/O (assign, reset, rewrite)"
+        - label: "Accented characters / Unicode"
+        - label: "Path with spaces"
+        - label: "External units (uses SysUtils, etc.)"
+        - label: "Pointers or dynamic memory"
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Additional context, logs, screenshots, etc.

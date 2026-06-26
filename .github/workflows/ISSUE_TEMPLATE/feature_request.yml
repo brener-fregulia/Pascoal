@@ -1,0 +1,51 @@
+name: Feature Request
+description: Suggest a new feature or improvement for Pascoal.
+title: "[Feature] "
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion. Please describe your idea clearly so it can be evaluated.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the situation or pain point this feature would address.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the feature you'd like
+      description: What should Pascoal do? How should it work?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Any workarounds or other approaches you've thought about?
+
+  - type: dropdown
+    id: context
+    attributes:
+      label: Who would benefit from this?
+      options:
+        - Students learning Pascal
+        - Teachers / educators
+        - Developers using Pascal professionally
+        - All users
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, mockups, links, references, etc.

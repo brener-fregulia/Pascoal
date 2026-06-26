@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Discussion / Question
+    url: https://github.com/brener-fregulia/Pascoal/discussions
+    about: Ask questions and discuss ideas here instead of opening an issue.
