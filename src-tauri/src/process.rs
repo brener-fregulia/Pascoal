@@ -246,6 +246,9 @@ async fn run_with_pty(
         }
     };
 
+    // Drop slave immediately after spawning - prevents terminal escape leakage
+    drop(pair.slave);
+
     let writer = pair.master.take_writer().unwrap();
     {
         let binding = app.state::<ProcessState>();

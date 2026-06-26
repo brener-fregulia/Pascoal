@@ -4,6 +4,11 @@
   import { recentStore, type RecentFile } from '../stores/recent'
   import { explorerStore } from '../stores/explorerStore'
   import { i18n } from '../i18n'
+  import FileNew from '../icons/FileNew.svelte'
+  import File from '../icons/File.svelte'
+  import Folder from '../icons/Folder.svelte'
+  import Git from '../icons/Git.svelte'
+  import Play from '../icons/Play.svelte'
   import X from '../icons/X.svelte'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
@@ -64,102 +69,37 @@
 
   <div class="welcome-section">
     <h2>{$i18n('welcome.section_start')}</h2>
+
     <button class="welcome-action" on:click={handleNewFile}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="12" y1="18" x2="12" y2="12" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
+      <FileNew size={16} />
       {$i18n('welcome.new_file')}
     </button>
+
     <button class="welcome-action" on:click={handleOpenFile}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-      </svg>
+      <File size={16} />
       {$i18n('welcome.open_file')}
     </button>
-    <button
-      class="welcome-action"
-      on:click={async () => {
-        await explorerStore.openFolder()
-      }}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-        />
-      </svg>
+
+    <button class="welcome-action" on:click={() => explorerStore.openFolder()}>
+      <Folder size={16} />
       {$i18n('welcome.open_folder')}
     </button>
+
     <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="6" cy="6" r="2" />
-        <circle cx="18" cy="6" r="2" />
-        <circle cx="6" cy="18" r="2" />
-        <path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2" />
-      </svg>
+      <Git size={16} />
       {$i18n('welcome.new_project_git')}
     </button>
 
     <hr class="divider" />
     <h2>{$i18n('welcome.section_walkthroughs')}</h2>
+
     <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polygon points="5 3 19 12 5 21 5 3" />
-      </svg>
+      <Play size={16} />
       {$i18n('welcome.open_playground')}
     </button>
+
     <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="6" cy="6" r="2" />
-        <circle cx="18" cy="6" r="2" />
-        <circle cx="6" cy="18" r="2" />
-        <path d="M6 8v8M8 6h7a2 2 0 0 1 2 2v2" />
-      </svg>
+      <Git size={16} />
       {$i18n('welcome.configure_git')}
     </button>
   </div>
@@ -177,19 +117,7 @@
             on:click={() => openRecent(entry)}
             aria-label={$i18n('welcome.open_recent')}
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
+            <File size={16} />
             <span class="recent-name">{entry.fileName}</span>
             <span class="recent-date">{formatDate(entry.openedAt)}</span>
           </button>
@@ -270,12 +198,6 @@
 
   .welcome-action:hover {
     color: var(--text);
-  }
-
-  .welcome-action svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
   }
 
   .empty {
