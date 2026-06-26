@@ -6,6 +6,7 @@
   import Statusbar from './components/Statusbar.svelte'
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
+  import { explorerStore } from './stores/explorerStore'
 
   let activePanel = $state<string | null>(null)
 
@@ -16,6 +17,12 @@
 
   $effect(() => {
     document.documentElement.setAttribute('data-theme', $themeStore.current)
+  })
+
+  $effect(() => {
+    if ($explorerStore.folder && activePanel !== 'explorer') {
+      activePanel = 'explorer'
+    }
   })
 </script>
 

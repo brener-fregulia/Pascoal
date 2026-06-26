@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { tabStore } from '../stores/tabs'
   import { recentStore, type RecentFile } from '../stores/recent'
+  import { explorerStore } from '../stores/explorerStore'
   import { i18n } from '../i18n'
   import X from '../icons/X.svelte'
 
@@ -93,7 +94,12 @@
       </svg>
       {$i18n('welcome.open_file')}
     </button>
-    <button class="welcome-action" on:click={() => console.log('coming soon')}>
+    <button
+      class="welcome-action"
+      on:click={async () => {
+        await explorerStore.openFolder()
+      }}
+    >
       <svg
         viewBox="0 0 24 24"
         fill="none"
