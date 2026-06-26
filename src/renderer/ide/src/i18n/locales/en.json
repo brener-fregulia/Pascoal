@@ -53,5 +53,13 @@
   "tabs": {
     "welcome": "Welcome",
     "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?"
+  },
+  "explorer": {
+    "no_folder": "No folder open.",
+    "open_folder": "Open Folder...",
+    "refresh": "Refresh",
+    "close_folder": "Close folder",
+    "loading": "Loading...",
+    "no_files": "No Pascal files found."
   }
 }
