@@ -53,5 +53,13 @@
     "tabs": {
         "welcome": "Start",
         "unsaved_confirm": "\"{name}\" ma niezapisane zmiany.\nCzy mimo to zamknąć?"
+    },
+    "explorer": {
+        "no_folder": "Brak otwartego folderu.",
+        "open_folder": "Otwórz folder...",
+        "refresh": "Odśwież",
+        "close_folder": "Zamknij folder",
+        "loading": "Ładowanie...",
+        "no_files": "Nie znaleziono plików Pascal."
     }
 }
