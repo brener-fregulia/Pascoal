@@ -53,5 +53,13 @@
     "tabs": {
         "welcome": "Inicio",
         "unsaved_confirm": "\"{name}\" tiene cambios sin guardar.\n¿Cerrar de todos modos?"
+    },
+    "explorer": {
+        "no_folder": "Ninguna carpeta abierta.",
+        "open_folder": "Abrir carpeta...",
+        "refresh": "Actualizar",
+        "close_folder": "Cerrar carpeta",
+        "loading": "Cargando...",
+        "no_files": "No se encontraron archivos Pascal."
     }
 }
