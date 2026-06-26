@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store'
 import { EditorState } from '@codemirror/state'
 import { pascalExtensions } from './editor-extensions'
 import { t } from '../i18n'
+import { ask } from '@tauri-apps/plugin-dialog'
 
 let tabCounter = 0
 
@@ -127,9 +128,9 @@ function createTabStore() {
     if (!tab) return false
 
     if (tab.isDirty) {
-      const confirmed = window.confirm(
-        t('tabs.unsaved_confirm', { name: tab.fileName }),
-      )
+      const confirmed = window.__TAURI__
+        ? await ask(t('tabs.unsaved_confirm', { name: tab.fileName }), { title: 'Pascoal', kind: 'warning' })
+        : window.confirm(t('tabs.unsaved_confirm', { name: tab.fileName }))
       if (!confirmed) return false
     }
 
