@@ -59,6 +59,7 @@ pub fn run() {
             fs::read_file,
             fs::open_folder,
             fs::list_folder_files,
+            fs::open_url,
             process::compile_and_run,
             process::send_input,
         ])

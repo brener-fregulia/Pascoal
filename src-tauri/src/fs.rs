@@ -165,3 +165,15 @@ pub fn list_folder_files(folder_path: String) -> Vec<ExplorerFile> {
     let path = std::path::PathBuf::from(&folder_path);
     collect_pas_files(&path, &path)
 }
+
+#[tauri::command]
+pub fn open_url(url: String) {
+    #[cfg(target_os = "windows")]
+    let _ = std::process::Command::new("cmd")
+        .args(["/c", "start", &url])
+        .spawn();
+    #[cfg(target_os = "macos")]
+    let _ = std::process::Command::new("open").arg(&url).spawn();
+    #[cfg(target_os = "linux")]
+    let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+}

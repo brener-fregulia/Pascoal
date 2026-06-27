@@ -1,15 +1,83 @@
 <script lang="ts">
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
-  import MacClose from '../icons/MacClose.svelte'
-  import MacMin from '../icons/MacMin.svelte'
-  import MacMax from '../icons/MacMax.svelte'
-  import Minus from '../icons/Minus.svelte'
-  import Maximize from '../icons/Maximize.svelte'
-  import X from '../icons/X.svelte'
+  import { onMount } from 'svelte'
 
   $: platform = $appStore.info?.platform ?? 'linux'
   $: isMac = platform === 'macos'
+
+  let openMenu: string | null = null
+
+  type MenuItem =
+    | { type: 'action'; label: string; event: string }
+    | { type: 'separator' }
+    | { type: 'link'; label: string; url: string }
+
+  const fileItems: MenuItem[] = [
+    { type: 'action', label: 'New File', event: 'menu-new-file' },
+    { type: 'action', label: 'Open File...', event: 'menu-open-file' },
+    { type: 'action', label: 'Open Folder...', event: 'menu-open-folder' },
+    { type: 'separator' },
+    { type: 'action', label: 'Save', event: 'menu-save-file' },
+    { type: 'action', label: 'Save As...', event: 'menu-save-file-as' },
+  ]
+
+  const REPO = 'https://github.com/brener-fregulia/Pascoal'
+  const helpItems: MenuItem[] = [
+    {
+      type: 'link',
+      label: 'Report a Bug',
+      url: `${REPO}/issues/new?template=bug_report.yml`,
+    },
+    {
+      type: 'link',
+      label: 'Report a Pascal / Compiler Issue',
+      url: `${REPO}/issues/new?template=compiler_runtime_issue.yml`,
+    },
+    {
+      type: 'link',
+      label: 'Request a Feature',
+      url: `${REPO}/issues/new?template=feature_request.yml`,
+    },
+    { type: 'separator' },
+    { type: 'link', label: 'View on GitHub', url: REPO },
+    { type: 'separator' },
+    { type: 'action', label: 'About Pascoal', event: 'menu-about' },
+  ]
+
+  const menus = [
+    { id: 'file', label: 'File', items: fileItems },
+    { id: 'help', label: 'Help', items: helpItems },
+  ]
+
+  function toggleMenu(id: string) {
+    openMenu = openMenu === id ? null : id
+  }
+
+  function closeMenus() {
+    openMenu = null
+  }
+
+  async function handleItem(item: MenuItem) {
+    closeMenus()
+    if (item.type === 'action') {
+      if (!window.__TAURI__) return
+      const { emit } = await import('@tauri-apps/api/event')
+      await emit(item.event)
+    } else if (item.type === 'link') {
+      window.__TAURI__
+        ? await import('@tauri-apps/api/event').then(() =>
+            window.__TAURI__.core
+              .invoke('open_url', { url: item.url })
+              .catch(() => window.open(item.url)),
+          )
+        : window.open(item.url)
+    }
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') closeMenus()
+  }
 
   async function close() {
     if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close()
@@ -27,6 +95,14 @@
   }
 </script>
 
+<svelte:window on:keydown={handleKeydown} />
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+{#if openMenu}
+  <div class="menu-backdrop" on:click={closeMenus}></div>
+{/if}
+
 <header id="titlebar" class:mac={isMac}>
   {#if isMac}
     <div class="mac-group">
@@ -35,49 +111,138 @@
         aria-label={$i18n('titlebar.close')}
         on:click={close}
       >
-        <MacClose />
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#7a1010"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
+          <line x1="1.5" y1="1.5" x2="6.5" y2="6.5" />
+          <line x1="6.5" y1="1.5" x2="1.5" y2="6.5" />
+        </svg>
       </button>
       <button
         class="mac-btn mac-min"
         aria-label={$i18n('titlebar.minimize')}
         on:click={minimize}
       >
-        <MacMin />
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#7a5500"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
+          <line x1="1.5" y1="4" x2="6.5" y2="4" />
+        </svg>
       </button>
       <button
         class="mac-btn mac-max"
         aria-label={$i18n('titlebar.maximize')}
         on:click={maximize}
       >
-        <MacMax />
+        <svg
+          viewBox="0 0 8 8"
+          fill="none"
+          stroke="#0a4a18"
+          stroke-width="1.2"
+          stroke-linecap="round"
+        >
+          <polyline points="1.5,4.5 1.5,1.5 4.5,1.5" />
+          <polyline points="3.5,6.5 6.5,6.5 6.5,3.5" />
+        </svg>
       </button>
     </div>
   {/if}
 
-  <span class="logo">Pascoal</span>
+  <!-- Logo -->
+  <img
+    src="/src/assets/pascoal-logo.svg"
+    alt="Pascoal"
+    class="logo"
+    draggable="false"
+  />
+
+  <!-- Menu bar -->
+  <div class="menubar" style="-webkit-app-region: no-drag">
+    {#each menus as menu}
+      <div class="menu-root">
+        <button
+          class="menu-trigger"
+          class:open={openMenu === menu.id}
+          on:click={() => toggleMenu(menu.id)}
+        >
+          {menu.label}
+        </button>
+
+        {#if openMenu === menu.id}
+          <div class="menu-dropdown">
+            {#each menu.items as item}
+              {#if item.type === 'separator'}
+                <hr class="menu-sep" />
+              {:else}
+                <button class="menu-item" on:click={() => handleItem(item)}>
+                  {item.label}
+                </button>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+
+  <div class="drag-region"></div>
 
   {#if !isMac}
-    <div class="win-group">
+    <div class="win-group" style="-webkit-app-region: no-drag">
       <button
         class="wc-btn"
         aria-label={$i18n('titlebar.minimize')}
         on:click={minimize}
       >
-        <Minus />
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
+          <line x1="2" y1="7" x2="12" y2="7" />
+        </svg>
       </button>
       <button
         class="wc-btn"
         aria-label={$i18n('titlebar.maximize')}
         on:click={maximize}
       >
-        <Maximize />
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="2.5" y="2.5" width="9" height="9" rx="1.5" />
+        </svg>
       </button>
       <button
         class="wc-btn wc-close"
         aria-label={$i18n('titlebar.close')}
         on:click={close}
       >
-        <X size={12} />
+        <svg
+          viewBox="0 0 14 14"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
+          <line x1="3" y1="3" x2="11" y2="11" />
+          <line x1="11" y1="3" x2="3" y2="11" />
+        </svg>
       </button>
     </div>
   {/if}
@@ -89,62 +254,120 @@
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 12px;
+    gap: 0;
     -webkit-app-region: drag;
     user-select: none;
     height: 36px;
+    position: relative;
   }
 
   #titlebar.mac {
-    padding-left: 12px;
+    padding-left: 80px;
   }
 
   .logo {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.5px;
-  }
-
-  .win-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: auto;
-  }
-
-  .mac-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .wc-btn {
-    width: 32px;
-    height: 28px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    color: var(--text-dim);
-    transition:
-      background 0.15s,
-      color 0.15s;
+    height: 26px;
+    width: auto;
+    flex-shrink: 0;
+    margin: 0 8px 0 12px;
     -webkit-app-region: no-drag;
   }
 
-  .wc-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+  /* Drag region fills remaining space between menus and win controls */
+  .drag-region {
+    flex: 1;
+    height: 100%;
+    -webkit-app-region: drag;
+  }
+
+  /* Menu bar */
+  .menubar {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+  }
+
+  .menu-root {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .menu-trigger {
+    padding: 0 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    cursor: pointer;
+    height: 100%;
+    transition:
+      background 0.1s,
+      color 0.1s;
+  }
+
+  .menu-trigger:hover,
+  .menu-trigger.open {
+    background: rgba(128, 128, 128, 0.12);
     color: var(--text);
   }
-  .wc-btn.wc-close:hover {
-    background: var(--accent);
-    color: #fff;
+
+  .menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+  }
+
+  .menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    min-width: 200px;
+    z-index: 100;
+    padding: 4px 0;
+  }
+
+  .menu-item {
+    display: block;
+    width: 100%;
+    padding: 6px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background 0.1s,
+      color 0.1s;
+    white-space: nowrap;
+  }
+
+  .menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+  }
+
+  .menu-sep {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+
+  /* Mac controls */
+  .mac-group {
+    position: absolute;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-app-region: no-drag;
   }
 
   .mac-btn {
@@ -160,13 +383,15 @@
     -webkit-app-region: no-drag;
   }
 
-  .mac-btn :global(svg) {
+  .mac-btn svg {
+    width: 8px;
+    height: 8px;
     opacity: 0;
     transition: opacity 0.15s;
     position: absolute;
   }
 
-  .mac-group:hover .mac-btn :global(svg) {
+  .mac-group:hover .mac-btn svg {
     opacity: 1;
   }
   .mac-close {
@@ -177,5 +402,40 @@
   }
   .mac-max {
     background: #28c840;
+  }
+
+  /* Windows controls */
+  .win-group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .wc-btn {
+    width: 32px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .wc-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .wc-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+  }
+  .wc-btn.wc-close:hover {
+    background: var(--accent);
+    color: #fff;
   }
 </style>
