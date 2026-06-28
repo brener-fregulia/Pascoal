@@ -1,65 +1,77 @@
 {
-    "welcome": {
-        "subtitle": "IDE y Playground de Pascal",
-        "section_start": "Inicio",
-        "section_walkthroughs": "Tutoriales",
-        "section_recent": "Recientes",
-        "new_file": "Nuevo archivo...",
-        "open_file": "Abrir archivo...",
-        "open_folder": "Abrir carpeta...",
-        "new_project_git": "Nuevo proyecto + Git...",
-        "open_playground": "Abrir Playground",
-        "configure_git": "Configurar Git",
-        "no_recent": "No hay proyectos recientes.",
-        "open_recent": "Abrir archivo reciente",
-        "remove_recent": "Quitar de recientes",
-        "recent_today": "Hoy",
-        "recent_yesterday": "Ayer",
-        "recent_days_ago": "Hace {n} días"
-    },
-    "console": {
-        "title": "Consola",
-        "clear": "Limpiar",
-        "copy": "Copiar",
-        "copied": "¡Copiado!",
-        "build": "Compilar",
-        "program": "Programa",
-        "status_idle": "Aún no hay compilación",
-        "status_compiling": "Compilando...",
-        "status_success": "Compilación exitosa",
-        "status_error": "Error de compilación",
-        "exit_success": "Proceso finalizado con código 0",
-        "exit_failure": "Proceso finalizado con código {code}"
-    },
-    "editor": {
-        "run": "Ejecutar"
-    },
-    "activity": {
-        "explorer": "Explorador",
-        "search": "Buscar",
-        "git": "Git",
-        "playground": "Playground",
-        "toggle_theme": "Cambiar tema",
-        "settings": "Configuración"
-    },
-    "titlebar": {
-        "close": "Cerrar",
-        "minimize": "Minimizar",
-        "maximize": "Maximizar"
-    },
-    "statusbar": {
-        "fpc_not_found": "FPC no encontrado"
-    },
-    "tabs": {
-        "welcome": "Inicio",
-        "unsaved_confirm": "\"{name}\" tiene cambios sin guardar.\n¿Cerrar de todos modos?"
-    },
-    "explorer": {
-        "no_folder": "Ninguna carpeta abierta.",
-        "open_folder": "Abrir carpeta...",
-        "refresh": "Actualizar",
-        "close_folder": "Cerrar carpeta",
-        "loading": "Cargando...",
-        "no_files": "No se encontraron archivos Pascal."
-    }
+  "welcome": {
+    "subtitle": "IDE y Playground de Pascal",
+    "section_start": "Inicio",
+    "section_walkthroughs": "Tutoriales",
+    "section_recent": "Recientes",
+    "new_file": "Nuevo archivo...",
+    "open_file": "Abrir archivo...",
+    "open_folder": "Abrir carpeta...",
+    "new_project_git": "Nuevo proyecto + Git...",
+    "open_playground": "Abrir Playground",
+    "configure_git": "Configurar Git",
+    "no_recent": "No hay proyectos recientes.",
+    "open_recent": "Abrir archivo reciente",
+    "remove_recent": "Quitar de recientes",
+    "recent_today": "Hoy",
+    "recent_yesterday": "Ayer",
+    "recent_days_ago": "Hace {n} días"
+  },
+  "console": {
+    "title": "Consola",
+    "clear": "Limpiar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "build": "Compilar",
+    "program": "Programa",
+    "status_idle": "Aún no hay compilación",
+    "status_compiling": "Compilando...",
+    "status_success": "Compilación exitosa",
+    "status_error": "Error de compilación",
+    "exit_success": "Proceso finalizado con código 0",
+    "exit_failure": "Proceso finalizado con código {code}"
+  },
+  "editor": {
+    "run": "Ejecutar"
+  },
+  "activity": {
+    "explorer": "Explorador",
+    "search": "Buscar",
+    "git": "Git",
+    "playground": "Playground",
+    "toggle_theme": "Cambiar tema",
+    "settings": "Configuración"
+  },
+  "titlebar": {
+    "close": "Cerrar",
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "file": "Archivo",
+    "new_file": "Nuevo archivo",
+    "open_file": "Abrir archivo...",
+    "open_folder": "Abrir carpeta...",
+    "save": "Guardar",
+    "save_as": "Guardar como...",
+    "help": "Ayuda",
+    "report_bug": "Reportar un error",
+    "report_pascal_compiler_issue": "Reportar un problema de Pascal / compilador",
+    "request_feature": "Solicitar una función",
+    "view_on_github": "Ver en GitHub",
+    "about_pascoal": "Acerca de Pascoal"
+  },
+  "statusbar": {
+    "fpc_not_found": "FPC no encontrado"
+  },
+  "tabs": {
+    "welcome": "Inicio",
+    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar.\n¿Cerrar de todos modos?"
+  },
+  "explorer": {
+    "no_folder": "Ninguna carpeta abierta.",
+    "open_folder": "Abrir carpeta...",
+    "refresh": "Actualizar",
+    "close_folder": "Cerrar carpeta",
+    "loading": "Cargando...",
+    "no_files": "No se encontraron archivos Pascal."
+  }
 }

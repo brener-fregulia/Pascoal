@@ -45,7 +45,19 @@
   "titlebar": {
     "close": "Fechar",
     "minimize": "Minimizar",
-    "maximize": "Maximizar"
+    "maximize": "Maximizar",
+    "file": "Arquivo",
+    "new_file": "Novo Arquivo",
+    "open_file": "Abrir Arquivo...",
+    "open_folder": "Abrir Pasta...",
+    "save": "Salvar",
+    "save_as": "Salvar Como...",
+    "help": "Ajuda",
+    "report_bug": "Reportar um Bug",
+    "report_pascal_compiler_issue": "Reportar um Problema do Pascal / Compilador",
+    "request_feature": "Solicitar um Recurso",
+    "view_on_github": "Ver no GitHub",
+    "about_pascoal": "Sobre o Pascoal"
   },
   "statusbar": {
     "fpc_not_found": "FPC não encontrado"

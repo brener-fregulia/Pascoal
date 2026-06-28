@@ -9,45 +9,53 @@
   let openMenu: string | null = null
 
   type MenuItem =
-    | { type: 'action'; label: string; event: string }
+    | { type: 'action'; labelKey: string; event: string }
     | { type: 'separator' }
-    | { type: 'link'; label: string; url: string }
+    | { type: 'link'; labelKey: string; url: string }
 
   const fileItems: MenuItem[] = [
-    { type: 'action', label: 'New File', event: 'menu-new-file' },
-    { type: 'action', label: 'Open File...', event: 'menu-open-file' },
-    { type: 'action', label: 'Open Folder...', event: 'menu-open-folder' },
+    { type: 'action', labelKey: 'titlebar.new_file', event: 'menu-new-file' },
+    { type: 'action', labelKey: 'titlebar.open_file', event: 'menu-open-file' },
+    {
+      type: 'action',
+      labelKey: 'titlebar.open_folder',
+      event: 'menu-open-folder',
+    },
     { type: 'separator' },
-    { type: 'action', label: 'Save', event: 'menu-save-file' },
-    { type: 'action', label: 'Save As...', event: 'menu-save-file-as' },
+    { type: 'action', labelKey: 'titlebar.save', event: 'menu-save-file' },
+    {
+      type: 'action',
+      labelKey: 'titlebar.save_as',
+      event: 'menu-save-file-as',
+    },
   ]
 
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
   const helpItems: MenuItem[] = [
     {
       type: 'link',
-      label: 'Report a Bug',
+      labelKey: 'titlebar.report_bug',
       url: `${REPO}/issues/new?template=bug_report.yml`,
     },
     {
       type: 'link',
-      label: 'Report a Pascal / Compiler Issue',
+      labelKey: 'titlebar.report_pascal_compiler_issue',
       url: `${REPO}/issues/new?template=compiler_runtime_issue.yml`,
     },
     {
       type: 'link',
-      label: 'Request a Feature',
+      labelKey: 'titlebar.request_feature',
       url: `${REPO}/issues/new?template=feature_request.yml`,
     },
     { type: 'separator' },
-    { type: 'link', label: 'View on GitHub', url: REPO },
+    { type: 'link', labelKey: 'titlebar.view_on_github', url: REPO },
     { type: 'separator' },
-    { type: 'action', label: 'About Pascoal', event: 'menu-about' },
+    { type: 'action', labelKey: 'titlebar.about_pascoal', event: 'menu-about' },
   ]
 
   const menus = [
-    { id: 'file', label: 'File', items: fileItems },
-    { id: 'help', label: 'Help', items: helpItems },
+    { id: 'file', labelKey: 'titlebar.file', items: fileItems },
+    { id: 'help', labelKey: 'titlebar.help', items: helpItems },
   ]
 
   function toggleMenu(id: string) {
@@ -173,7 +181,7 @@
           class:open={openMenu === menu.id}
           on:click={() => toggleMenu(menu.id)}
         >
-          {menu.label}
+          {$i18n(menu.labelKey)}
         </button>
 
         {#if openMenu === menu.id}
@@ -183,7 +191,7 @@
                 <hr class="menu-sep" />
               {:else}
                 <button class="menu-item" on:click={() => handleItem(item)}>
-                  {item.label}
+                  {$i18n(item.labelKey)}
                 </button>
               {/if}
             {/each}
