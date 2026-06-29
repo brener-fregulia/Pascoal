@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
+  import { get } from 'svelte/store'
   import { EditorView } from '@codemirror/view'
   import { tabStore } from '../stores/tabs'
   import { themeStore } from '../stores/theme'
+  import { explorerStore } from '../stores/explorerStore'
   import { runActiveFile } from '../stores/runner'
   import { themeCompartment } from '../stores/editor-extensions'
   import { buildPascoalTheme } from '../stores/editor-theme'
@@ -61,6 +63,11 @@
   })
 
   async function handleKeydown(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+      e.preventDefault()
+      await saveAs()
+      return
+    }
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault()
       await save()
@@ -98,10 +105,12 @@
     const tab = tabStore.getActive()
     if (!tab || !window.__TAURI__) return
     const content = getContent()
+    const folderPath = get(explorerStore).folder?.path ?? null
     try {
       const result = (await window.__TAURI__.core.invoke('save_file_as', {
         content,
         suggestedName: tab.fileName,
+        folderPath,
       })) as { path: string } | null
       if (result) {
         tabStore.updateFilePath(tab.id, result.path)

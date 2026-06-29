@@ -48,10 +48,14 @@ pub async fn save_file_as(
     app: tauri::AppHandle,
     content: String,
     suggested_name: String,
+    folder_path: Option<String>,
 ) -> Option<SaveResult> {
     use tauri_plugin_dialog::DialogExt;
 
-    let default_dir = get_documents_dir(&app);
+    let default_dir = match folder_path {
+        Some(p) => std::path::PathBuf::from(p),
+        None => get_documents_dir(&app),
+    };
 
     let path = app
         .dialog()
@@ -66,7 +70,6 @@ pub async fn save_file_as(
 
     Some(SaveResult { path: path_str })
 }
-
 #[tauri::command]
 pub fn file_exists(path: String) -> bool {
     check_file_exists(&path)

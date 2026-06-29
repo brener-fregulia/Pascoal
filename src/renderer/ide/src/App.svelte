@@ -6,12 +6,65 @@
   import Statusbar from './components/Statusbar.svelte'
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
+  import { tabStore } from './stores/tabs'
+  import { explorerStore } from './stores/explorerStore'
+
+  const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
   let activePanel = $state<string | null>(null)
 
   onMount(async () => {
     themeStore.init()
     await appStore.init()
+
+    if (!window.__TAURI__) return
+    const { listen } = await import('@tauri-apps/api/event')
+
+    await listen('menu-new-file', async () => {
+      const tab = await tabStore.newTab(PASCAL_TEMPLATE)
+      tabStore.activate(tab.id)
+    })
+
+    await listen('menu-open-file', async () => {
+      try {
+        const result = (await window.__TAURI__.core.invoke('open_file')) as
+          | [string, string]
+          | null
+        if (result) {
+          const [filePath, content] = result
+          const tab = await tabStore.openFile(filePath, content)
+          tabStore.activate(tab.id)
+        }
+      } catch (e) {
+        console.error('open_file failed:', e)
+      }
+    })
+
+    await listen('menu-open-folder', async () => {
+      const opened = await explorerStore.openFolder()
+      if (opened) activePanel = 'explorer'
+    })
+
+    await listen('menu-save-file', () => {
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 's',
+          ctrlKey: true,
+          bubbles: true,
+        }),
+      )
+    })
+
+    await listen('menu-save-file-as', () => {
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'S',
+          ctrlKey: true,
+          shiftKey: true,
+          bubbles: true,
+        }),
+      )
+    })
   })
 
   $effect(() => {
