@@ -1,7 +1,7 @@
 <script lang="ts">
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
-  import { onMount } from 'svelte'
+  import PascoalLogo from './PascoalLogo.svelte'
 
   $: platform = $appStore.info?.platform ?? 'linux'
   $: isMac = platform === 'macos'
@@ -165,12 +165,7 @@
   {/if}
 
   <!-- Logo -->
-  <img
-    src="/src/assets/pascoal-logo.svg"
-    alt="Pascoal"
-    class="logo"
-    draggable="false"
-  />
+  <PascoalLogo height={26} />
 
   <!-- Menu bar -->
   <div class="menubar" style="-webkit-app-region: no-drag">
@@ -271,14 +266,6 @@
 
   #titlebar.mac {
     padding-left: 80px;
-  }
-
-  .logo {
-    height: 26px;
-    width: auto;
-    flex-shrink: 0;
-    margin: 0 8px 0 12px;
-    -webkit-app-region: no-drag;
   }
 
   /* Drag region fills remaining space between menus and win controls */
