@@ -1,21 +1,7 @@
-import {
-  keymap,
-  highlightActiveLine,
-  lineNumbers,
-  highlightActiveLineGutter,
-} from '@codemirror/view'
+import { keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, EditorView } from '@codemirror/view'
 import { EditorState, Compartment } from '@codemirror/state'
-import {
-  defaultKeymap,
-  historyKeymap,
-  history,
-  indentWithTab,
-} from '@codemirror/commands'
-import {
-  StreamLanguage,
-  indentOnInput,
-  bracketMatching,
-} from '@codemirror/language'
+import { defaultKeymap, historyKeymap, history, indentWithTab, } from '@codemirror/commands'
+import { StreamLanguage, indentOnInput, bracketMatching, } from '@codemirror/language'
 import { pascal } from '@codemirror/legacy-modes/mode/pascal'
 import { buildPascoalTheme, pascalDecoratorPlugins } from './editor-theme'
 
@@ -35,9 +21,10 @@ export function pascalExtensions(onDocChange: () => void) {
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
     ...pascalDecoratorPlugins,
     themeCompartment.of(buildPascoalTheme()),
-    EditorState.changeFilter.of(() => {
-      onDocChange()
-      return true
+    EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        onDocChange()
+      }
     }),
   ]
 }
