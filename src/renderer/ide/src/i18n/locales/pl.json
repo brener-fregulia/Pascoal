@@ -73,5 +73,12 @@
     "close_folder": "Zamknij folder",
     "loading": "Ładowanie...",
     "no_files": "Nie znaleziono plików Pascal."
+  },
+  "search": {
+    "placeholder": "Szukaj w plikach...",
+    "case_sensitive": "Rozroznianie wielkosci liter",
+    "no_folder": "Otworz folder, aby przeszukac pliki.",
+    "no_results": "Nie znaleziono wynikow.",
+    "results_count": "{count} wynikow"
   }
 }
