@@ -17,6 +17,11 @@
     themeStore.init()
     await appStore.init()
 
+    // Disable native context menu in production builds
+    if (window.__TAURI__) {
+      document.addEventListener('contextmenu', (e) => e.preventDefault())
+    }
+
     if (!window.__TAURI__) return
     const { listen } = await import('@tauri-apps/api/event')
 
