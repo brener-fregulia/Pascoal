@@ -73,5 +73,12 @@
     "close_folder": "Close folder",
     "loading": "Loading...",
     "no_files": "No Pascal files found."
+  },
+  "search": {
+    "placeholder": "Search in files...",
+    "case_sensitive": "Match case",
+    "no_folder": "Open a folder to search across files.",
+    "no_results": "No results found.",
+    "results_count": "{count} results"
   }
 }
