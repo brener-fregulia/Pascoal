@@ -7,6 +7,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-user-select: inherit;
+  user-select: inherit;
 }
 
 /* ── Themes ────────────────────────────────────────────────── */
@@ -61,8 +63,11 @@ body {
   color: var(--text);
   font-family: var(--font-ui);
   overflow: hidden;
-  user-select: none;
   cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #app {
