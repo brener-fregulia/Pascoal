@@ -73,5 +73,12 @@
     "close_folder": "Cerrar carpeta",
     "loading": "Cargando...",
     "no_files": "No se encontraron archivos Pascal."
+  },
+  "search": {
+    "placeholder": "Buscar en archivos...",
+    "case_sensitive": "Distinguir mayusculas",
+    "no_folder": "Abre una carpeta para buscar en los archivos.",
+    "no_results": "No se encontraron resultados.",
+    "results_count": "{count} resultados"
   }
 }
