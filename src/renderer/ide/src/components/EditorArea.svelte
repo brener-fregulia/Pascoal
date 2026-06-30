@@ -4,6 +4,7 @@
   import Editor from './Editor.svelte'
   import Console from './Console.svelte'
   import FileTree from './FileTree.svelte'
+  import SearchPanel from './SearchPanel.svelte'
   import { tabStore } from '../stores/tabs'
   import { consoleStore } from '../stores/console'
 
@@ -13,14 +14,19 @@
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
   $: showFileTree = activePanel === 'explorer'
+  $: showSearchPanel = activePanel === 'search'
 </script>
 
 <div id="editor-area">
   <TabBar />
   <div id="editor-content" class:right={position === 'right'}>
     {#if showFileTree}
-      <div id="file-tree-panel">
+      <div id="side-panel">
         <FileTree />
+      </div>
+    {:else if showSearchPanel}
+      <div id="side-panel">
+        <SearchPanel />
       </div>
     {/if}
 
@@ -59,7 +65,7 @@
     overflow: hidden;
   }
 
-  #file-tree-panel {
+  #side-panel {
     width: 220px;
     flex-shrink: 0;
     overflow: hidden;

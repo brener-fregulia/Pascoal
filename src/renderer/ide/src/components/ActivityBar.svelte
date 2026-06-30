@@ -19,9 +19,10 @@
   ]
 
   function handleItemClick(id: string) {
-    if (id === 'explorer') {
-      activePanel = activePanel === 'explorer' ? null : 'explorer'
+    if (id === 'explorer' || id === 'search') {
+      activePanel = activePanel === id ? null : id
     }
+    // git, playground: future panels - do nothing for now
   }
 </script>
 

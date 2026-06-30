@@ -180,3 +180,61 @@ pub fn open_url(url: String) {
     #[cfg(target_os = "linux")]
     let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
 }
+
+#[derive(serde::Serialize)]
+pub struct SearchMatch {
+    pub file_path: String,
+    pub file_name: String,
+    pub line_number: usize,
+    pub line_text: String,
+    pub column: usize,
+}
+
+#[tauri::command]
+pub fn search_in_folder(
+    folder_path: String,
+    query: String,
+    case_sensitive: bool,
+) -> Vec<SearchMatch> {
+    let mut results = Vec::new();
+
+    if query.trim().is_empty() {
+        return results;
+    }
+
+    let path = std::path::PathBuf::from(&folder_path);
+    let files = collect_pas_files(&path, &path);
+
+    let needle = if case_sensitive {
+        query.clone()
+    } else {
+        query.to_lowercase()
+    };
+
+    for file in files {
+        let content = match std::fs::read_to_string(&file.path) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+
+        for (i, line) in content.lines().enumerate() {
+            let haystack = if case_sensitive {
+                line.to_string()
+            } else {
+                line.to_lowercase()
+            };
+
+            if let Some(column) = haystack.find(&needle) {
+                results.push(SearchMatch {
+                    file_path: file.path.clone(),
+                    file_name: file.name.clone(),
+                    line_number: i + 1,
+                    line_text: line.to_string(),
+                    column,
+                });
+            }
+        }
+    }
+
+    results
+}
