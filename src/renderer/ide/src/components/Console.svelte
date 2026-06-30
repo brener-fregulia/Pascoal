@@ -294,6 +294,7 @@
     flex: 1;
     overflow: hidden;
     padding: 8px;
+    user-select: text;
   }
 
   #program-output :global(.xterm) {

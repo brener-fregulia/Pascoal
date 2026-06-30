@@ -161,6 +161,8 @@
     font-family: var(--font-mono);
     font-size: 13px;
     font-variant-ligatures: none;
+    user-select: text;
+    cursor: text;
   }
 
   #codemirror-editor :global(.cm-scroller) {
