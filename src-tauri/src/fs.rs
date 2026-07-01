@@ -182,6 +182,7 @@ pub fn open_url(url: String) {
 }
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SearchMatch {
     pub file_path: String,
     pub file_name: String,
