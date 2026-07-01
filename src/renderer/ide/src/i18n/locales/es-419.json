@@ -80,5 +80,20 @@
     "no_folder": "Abre una carpeta para buscar en los archivos.",
     "no_results": "No se encontraron resultados.",
     "results_count": "{count} resultados"
+  },
+  "find": {
+    "find_placeholder": "Buscar",
+    "replace_placeholder": "Reemplazar",
+    "match_case": "Distinguir mayusculas",
+    "whole_word": "Palabra completa",
+    "use_regex": "Usar expresion regular",
+    "toggle_replace": "Alternar reemplazo",
+    "no_results": "Sin resultados",
+    "of": "de",
+    "previous": "Coincidencia anterior",
+    "next": "Siguiente coincidencia",
+    "close": "Cerrar",
+    "replace": "Reemplazar",
+    "replace_all": "Reemplazar todo"
   }
 }
