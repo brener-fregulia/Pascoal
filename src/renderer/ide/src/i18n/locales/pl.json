@@ -80,5 +80,20 @@
     "no_folder": "Otworz folder, aby przeszukac pliki.",
     "no_results": "Nie znaleziono wynikow.",
     "results_count": "{count} wynikow"
+  },
+  "find": {
+    "find_placeholder": "Znajdz",
+    "replace_placeholder": "Zamien",
+    "match_case": "Rozroznianie wielkosci liter",
+    "whole_word": "Cale slowo",
+    "use_regex": "Uzyj wyrazenia regularnego",
+    "toggle_replace": "Przelacz zamiane",
+    "no_results": "Brak wynikow",
+    "of": "z",
+    "previous": "Poprzednie dopasowanie",
+    "next": "Nastepne dopasowanie",
+    "close": "Zamknij",
+    "replace": "Zamien",
+    "replace_all": "Zamien wszystko"
   }
 }
