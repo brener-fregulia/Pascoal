@@ -80,5 +80,20 @@
     "no_folder": "Abra uma pasta para buscar nos arquivos.",
     "no_results": "Nenhum resultado encontrado.",
     "results_count": "{count} resultados"
+  },
+  "find": {
+    "find_placeholder": "Buscar",
+    "replace_placeholder": "Substituir",
+    "match_case": "Diferenciar maiusculas",
+    "whole_word": "Palavra inteira",
+    "use_regex": "Usar expressao regular",
+    "toggle_replace": "Alternar substituicao",
+    "no_results": "Nenhum resultado",
+    "of": "de",
+    "previous": "Ocorrencia anterior",
+    "next": "Proxima ocorrencia",
+    "close": "Fechar",
+    "replace": "Substituir",
+    "replace_all": "Substituir tudo"
   }
 }
