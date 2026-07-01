@@ -2,9 +2,10 @@ import { keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, Ed
 import { EditorState, Compartment } from '@codemirror/state'
 import { defaultKeymap, historyKeymap, history, indentWithTab } from '@codemirror/commands'
 import { StreamLanguage, indentOnInput, bracketMatching } from '@codemirror/language'
-import { search, searchKeymap } from '@codemirror/search'
+import { search } from '@codemirror/search'
 import { pascal } from '@codemirror/legacy-modes/mode/pascal'
 import { buildPascoalTheme, pascalDecoratorPlugins } from './editor-theme'
+import { matchHighlightField } from './search-highlight'
 
 // Shared compartment - allows swapping theme without destroying editor state
 export const themeCompartment = new Compartment()
@@ -17,13 +18,17 @@ export function pascalExtensions(onDocChange: () => void) {
     history(),
     indentOnInput(),
     bracketMatching(),
-    search({ top: true }),
+    // search() gives us findNext/findPrevious/replaceNext/replaceAll and
+    // the query state field that FindWidget.svelte drives directly.
+    // Actual match highlighting is done by our own matchHighlightField
+    // below, since it needs to work reliably without the default panel.
+    search(),
+    matchHighlightField,
     StreamLanguage.define(pascal),
     EditorState.tabSize.of(2),
     keymap.of([
       ...defaultKeymap,
       ...historyKeymap,
-      ...searchKeymap,
       indentWithTab,
     ]),
     ...pascalDecoratorPlugins,

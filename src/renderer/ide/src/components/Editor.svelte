@@ -5,16 +5,21 @@
   import { tabStore } from '../stores/tabs'
   import { themeStore } from '../stores/theme'
   import { explorerStore } from '../stores/explorerStore'
+  import { pendingJumpLine } from '../stores/searchStore'
   import { runActiveFile } from '../stores/runner'
   import { themeCompartment } from '../stores/editor-extensions'
   import { buildPascoalTheme } from '../stores/editor-theme'
   import { i18n } from '../i18n'
   import IconButton from './IconButton.svelte'
+  import FindWidget from './FindWidget.svelte'
   import Play from '../icons/Play.svelte'
 
   let editorEl: HTMLDivElement
-  let view: EditorView | null = null
+  let view = $state<EditorView | null>(null)
   let currentTabId: string | null = null
+
+  let showFind = $state(false)
+  let findFocusTick = $state(0)
 
   $effect(() => {
     const activeTab =
@@ -33,6 +38,26 @@
       view?.dispatch({
         effects: themeCompartment.reconfigure(buildPascoalTheme()),
       })
+    })
+  })
+
+  // Jump to a specific line after a search result is clicked.
+  $effect(() => {
+    const line = $pendingJumpLine
+    if (line === null) return
+
+    Promise.resolve().then(() => {
+      if (!view) return
+      const totalLines = view.state.doc.lines
+      const target = Math.min(Math.max(line, 1), totalLines)
+      const lineInfo = view.state.doc.line(target)
+
+      view.dispatch({
+        selection: { anchor: lineInfo.from, head: lineInfo.to },
+        effects: EditorView.scrollIntoView(lineInfo.from, { y: 'center' }),
+      })
+      view.focus()
+      pendingJumpLine.set(null)
     })
   })
 
@@ -63,6 +88,20 @@
   })
 
   async function handleKeydown(e: KeyboardEvent) {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      e.key.toLowerCase() === 'f' &&
+      !e.shiftKey
+    ) {
+      e.preventDefault()
+      showFind = true
+      findFocusTick++
+      return
+    }
+    if (e.key === 'Escape' && showFind) {
+      showFind = false
+      return
+    }
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
       e.preventDefault()
       await saveAs()
@@ -133,7 +172,10 @@
     <span class="run-label">{$i18n('editor.run')}</span>
   </IconButton>
 </div>
-<div id="codemirror-editor" bind:this={editorEl}></div>
+<div id="editor-body">
+  <div id="codemirror-editor" bind:this={editorEl}></div>
+  <FindWidget bind:open={showFind} {view} focusTick={findFocusTick} />
+</div>
 
 <style>
   #editor-toolbar {
@@ -148,6 +190,13 @@
 
   .run-label {
     margin-left: 6px;
+  }
+
+  #editor-body {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
   }
 
   #codemirror-editor {
@@ -167,5 +216,29 @@
 
   #codemirror-editor :global(.cm-scroller) {
     overflow: auto;
+  }
+
+  /* Custom find-match highlight - controlled entirely by FindWidget,
+     not the default CodeMirror search panel decorations */
+  #codemirror-editor :global(.cm-pascal-match) {
+    background-color: rgba(255, 193, 7, 0.35);
+    border-radius: 2px;
+  }
+
+  :global([data-theme='light']) #codemirror-editor :global(.cm-pascal-match) {
+    background-color: rgba(255, 152, 0, 0.4);
+  }
+
+  #codemirror-editor :global(.cm-pascal-match-selected) {
+    background-color: rgba(255, 152, 0, 0.75);
+    outline: 1.5px solid rgba(255, 111, 0, 0.9);
+    border-radius: 2px;
+  }
+
+  :global([data-theme='light'])
+    #codemirror-editor
+    :global(.cm-pascal-match-selected) {
+    background-color: rgba(255, 111, 0, 0.55);
+    outline-color: rgba(230, 81, 0, 0.9);
   }
 </style>

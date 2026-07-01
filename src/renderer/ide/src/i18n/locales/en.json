@@ -80,5 +80,20 @@
     "no_folder": "Open a folder to search across files.",
     "no_results": "No results found.",
     "results_count": "{count} results"
+  },
+  "find": {
+    "find_placeholder": "Find",
+    "replace_placeholder": "Replace",
+    "match_case": "Match Case",
+    "whole_word": "Match Whole Word",
+    "use_regex": "Use Regular Expression",
+    "toggle_replace": "Toggle Replace",
+    "no_results": "No results",
+    "of": "of",
+    "previous": "Previous Match",
+    "next": "Next Match",
+    "close": "Close",
+    "replace": "Replace",
+    "replace_all": "Replace All"
   }
 }
