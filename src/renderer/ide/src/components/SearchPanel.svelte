@@ -118,19 +118,19 @@
 
   .search-header {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 4px;
-    padding: 8px;
+    padding: 6px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
-
   .search-input {
     flex: 1;
+    min-width: 0;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 5px 8px;
+    padding: 5px 6px;
     font-family: var(--font-ui);
     font-size: 12px;
     color: var(--text);
@@ -142,14 +142,19 @@
   }
 
   .case-toggle {
+    flex-shrink: 0;
+    width: 26px;
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 4px;
     color: var(--text-dim);
+    font-family: var(--font-ui);
     font-size: 11px;
     font-weight: 700;
-    padding: 5px 8px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition:
       color 0.15s,
       border-color 0.15s;
