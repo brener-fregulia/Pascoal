@@ -4,6 +4,7 @@
   import ActivityBar from './components/ActivityBar.svelte'
   import EditorArea from './components/EditorArea.svelte'
   import Statusbar from './components/Statusbar.svelte'
+  import AboutModal from './components/AboutModal.svelte'
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
   import { tabStore } from './stores/tabs'
@@ -12,15 +13,11 @@
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
   let activePanel = $state<string | null>(null)
+  let showAbout = $state(false)
 
   onMount(async () => {
     themeStore.init()
     await appStore.init()
-
-    // Disable native context menu in production builds
-    if (window.__TAURI__) {
-      document.addEventListener('contextmenu', (e) => e.preventDefault())
-    }
 
     if (!window.__TAURI__) return
     const { listen } = await import('@tauri-apps/api/event')
@@ -70,6 +67,10 @@
         }),
       )
     })
+
+    await listen('menu-about', () => {
+      showAbout = true
+    })
   })
 
   $effect(() => {
@@ -85,6 +86,8 @@
   </div>
   <Statusbar />
 </div>
+
+<AboutModal bind:open={showAbout} />
 
 <style>
   #layout {

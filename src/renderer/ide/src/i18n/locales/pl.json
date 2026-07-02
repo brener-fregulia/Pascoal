@@ -95,5 +95,15 @@
     "close": "Zamknij",
     "replace": "Zamien",
     "replace_all": "Zamien wszystko"
+  },
+  "about": {
+    "title": "O Pascoal",
+    "version": "Wersja",
+    "fpc": "Free Pascal",
+    "fpc_not_found": "Nie znaleziono",
+    "detected": "Wykryto",
+    "platform": "Platforma",
+    "view_repo": "Zobacz na GitHub",
+    "license": "Licencja MIT - Brener Fregulia, 2026"
   }
 }
