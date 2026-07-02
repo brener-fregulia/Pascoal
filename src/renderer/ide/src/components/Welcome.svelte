@@ -39,6 +39,12 @@
     }
   }
 
+  async function handleOpenFolder() {
+    if (!window.__TAURI__) return
+    const { emit } = await import('@tauri-apps/api/event')
+    await emit('menu-open-folder')
+  }
+
   async function openRecent(entry: RecentFile) {
     if (!window.__TAURI__) return
     try {
@@ -80,7 +86,7 @@
       {$i18n('welcome.open_file')}
     </button>
 
-    <button class="welcome-action" on:click={() => explorerStore.openFolder()}>
+    <button class="welcome-action" on:click={handleOpenFolder}>
       <Folder size={16} />
       {$i18n('welcome.open_folder')}
     </button>
