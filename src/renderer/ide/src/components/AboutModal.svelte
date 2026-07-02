@@ -33,19 +33,20 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if open}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="about-backdrop" on:click={close}>
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="about-backdrop" onclick={close}>
     <div
       class="about-modal"
-      on:click|stopPropagation
+      onclick={(e) => e.stopPropagation()}
       role="dialog"
       aria-label={$i18n('about.title')}
+      tabindex="-1"
     >
       <button
         class="about-close"
         aria-label={$i18n('find.close')}
-        on:click={close}>×</button
+        onclick={close}>×</button
       >
 
       <div class="about-logo">
@@ -76,7 +77,7 @@
         </div>
       </div>
 
-      <button class="about-repo-btn" on:click={openRepo}>
+      <button class="about-repo-btn" onclick={openRepo}>
         {$i18n('about.view_repo')}
       </button>
 
