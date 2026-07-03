@@ -1,6 +1,7 @@
 mod compiler;
 mod env;
 mod fs;
+mod git;
 mod process;
 
 use env::{detect_fpc, get_documents_dir};
@@ -61,6 +62,14 @@ pub fn run() {
             fs::list_folder_files,
             fs::open_url,
             fs::search_in_folder,
+            git::git_status,
+            git::git_diff,
+            git::git_stage,
+            git::git_unstage,
+            git::git_stage_all,
+            git::git_unstage_all,
+            git::git_commit,
+            git::git_init,
             process::compile_and_run,
             process::send_input,
         ])

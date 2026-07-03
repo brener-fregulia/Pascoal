@@ -105,5 +105,21 @@
     "platform": "Plataforma",
     "view_repo": "Ver no GitHub",
     "license": "Licenca MIT - Brener Fregulia, 2026"
+  },
+  "git": {
+    "no_folder": "Abra uma pasta para usar o Git.",
+    "not_a_repo": "Esta pasta nao e um repositorio Git.",
+    "init_repo": "Inicializar Repositorio",
+    "no_branch": "sem branch",
+    "commit_placeholder": "Mensagem do commit",
+    "commit": "Commit",
+    "staged_changes": "Alteracoes Preparadas",
+    "changes": "Alteracoes",
+    "stage": "Preparar",
+    "unstage": "Remover do stage",
+    "stage_all": "Preparar tudo",
+    "unstage_all": "Remover tudo do stage",
+    "untracked_no_diff": "Arquivo novo — nada para comparar ainda.",
+    "clean": "Nenhuma alteracao."
   }
 }

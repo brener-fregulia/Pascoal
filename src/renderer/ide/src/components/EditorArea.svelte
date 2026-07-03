@@ -5,6 +5,7 @@
   import Console from './Console.svelte'
   import FileTree from './FileTree.svelte'
   import SearchPanel from './SearchPanel.svelte'
+  import GitPanel from './GitPanel.svelte'
   import { tabStore } from '../stores/tabs'
   import { consoleStore } from '../stores/console'
 
@@ -13,20 +14,22 @@
   $: hasOpenTabs = $tabStore.tabs.length > 0
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
-  $: showFileTree = activePanel === 'explorer'
-  $: showSearchPanel = activePanel === 'search'
 </script>
 
 <div id="editor-area">
   <TabBar />
   <div id="editor-content" class:right={position === 'right'}>
-    {#if showFileTree}
+    {#if activePanel === 'explorer'}
       <div id="side-panel">
         <FileTree />
       </div>
-    {:else if showSearchPanel}
+    {:else if activePanel === 'search'}
       <div id="side-panel">
         <SearchPanel />
+      </div>
+    {:else if activePanel === 'git'}
+      <div id="side-panel">
+        <GitPanel />
       </div>
     {/if}
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { explorerStore } from '../../../src/renderer/ide/src/stores//explorerStore'
+import { explorerStore } from '../../../src/renderer/ide/src/stores/explorerStore'
 
 function state() {
     return get(explorerStore)
