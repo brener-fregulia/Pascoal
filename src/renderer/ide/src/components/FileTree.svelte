@@ -1,28 +1,35 @@
 <script lang="ts">
-  import { explorerStore, type ExplorerFile } from '../stores/explorerStore'
+  import { explorerStore, type ExplorerNode } from '../stores/explorerStore'
   import { tabStore } from '../stores/tabs'
   import { i18n } from '../i18n'
-  import File from '../icons/File.svelte'
+  import FileTreeNode from './FileTreeNode.svelte'
   import Folder from '../icons/Folder.svelte'
 
-  $: folder = $explorerStore.folder
-  $: files = $explorerStore.files
-  $: loading = $explorerStore.loading
-  $: error = $explorerStore.error
+  let expandedPaths = $state(new Set<string>())
+
+  let folder = $derived($explorerStore.folder)
+  let tree = $derived($explorerStore.tree)
+  let loading = $derived($explorerStore.loading)
+  let error = $derived($explorerStore.error)
 
   async function handleOpenFolder() {
     await explorerStore.openFolder()
   }
 
-  async function handleFileClick(file: ExplorerFile) {
-    if (!window.__TAURI__) return
+  function toggle(path: string) {
+    const next = new Set(expandedPaths)
+    if (next.has(path)) next.delete(path)
+    else next.add(path)
+    expandedPaths = next
+  }
 
+  async function openFile(node: ExplorerNode) {
+    if (!window.__TAURI__) return
     try {
       const content = (await window.__TAURI__.core.invoke('read_file', {
-        path: file.path,
+        path: node.path,
       })) as string
-
-      const tab = await tabStore.openFile(file.path, content)
+      const tab = await tabStore.openFile(node.path, content)
       tabStore.activate(tab.id)
     } catch (e) {
       console.error('read_file failed:', e)
@@ -34,7 +41,7 @@
   {#if !folder}
     <div class="empty-state">
       <p class="empty-label">{$i18n('explorer.no_folder')}</p>
-      <button class="open-btn" on:click={handleOpenFolder}>
+      <button class="open-btn" onclick={handleOpenFolder}>
         <Folder size={14} />
         {$i18n('explorer.open_folder')}
       </button>
@@ -45,14 +52,14 @@
       <button
         class="icon-action"
         title={$i18n('explorer.refresh')}
-        on:click={() => explorerStore.refresh()}
+        onclick={() => explorerStore.refresh()}
       >
         ↻
       </button>
       <button
         class="icon-action"
         title={$i18n('explorer.close_folder')}
-        on:click={() => explorerStore.closeFolder()}
+        onclick={() => explorerStore.closeFolder()}
       >
         ×
       </button>
@@ -62,23 +69,20 @@
       <p class="status-msg">{$i18n('explorer.loading')}</p>
     {:else if error}
       <p class="status-msg error">{error}</p>
-    {:else if files.length === 0}
+    {:else if tree.length === 0}
       <p class="status-msg">{$i18n('explorer.no_files')}</p>
     {:else}
-      <ul class="file-list">
-        {#each files as file (file.path)}
-          <li>
-            <button
-              class="file-item"
-              title={file.relativePath}
-              on:click={() => handleFileClick(file)}
-            >
-              <File size={13} />
-              <span class="file-name">{file.name}</span>
-            </button>
-          </li>
+      <div class="tree-body">
+        {#each tree as node (node.path)}
+          <FileTreeNode
+            {node}
+            depth={0}
+            {expandedPaths}
+            onToggle={toggle}
+            onFileClick={openFile}
+          />
         {/each}
-      </ul>
+      </div>
     {/if}
   {/if}
 </div>
@@ -94,7 +98,6 @@
     min-width: 0;
   }
 
-  /* Empty state */
   .empty-state {
     flex: 1;
     display: flex;
@@ -131,7 +134,6 @@
     opacity: 0.85;
   }
 
-  /* Header */
   .tree-header {
     display: flex;
     align-items: center;
@@ -174,46 +176,12 @@
     background: rgba(128, 128, 128, 0.1);
   }
 
-  /* File list */
-  .file-list {
-    list-style: none;
-    overflow-y: auto;
+  .tree-body {
     flex: 1;
+    overflow-y: auto;
     padding: 4px 0;
   }
 
-  .file-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    padding: 4px 12px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-ui);
-    font-size: 12px;
-    color: var(--text-dim);
-    text-align: left;
-    transition:
-      background 0.1s,
-      color 0.1s;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .file-item:hover {
-    background: rgba(128, 128, 128, 0.08);
-    color: var(--text);
-  }
-
-  .file-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  /* Status messages */
   .status-msg {
     font-size: 12px;
     color: var(--text-dim);

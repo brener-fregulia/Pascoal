@@ -1,9 +1,11 @@
 import { writable, get } from 'svelte/store'
 
-export interface ExplorerFile {
+export interface ExplorerNode {
     name: string
     path: string
     relativePath: string
+    isDirectory: boolean
+    children: ExplorerNode[] | null
 }
 
 export interface ExplorerFolder {
@@ -13,7 +15,7 @@ export interface ExplorerFolder {
 
 interface ExplorerState {
     folder: ExplorerFolder | null
-    files: ExplorerFile[]
+    tree: ExplorerNode[]
     loading: boolean
     error: string | null
 }
@@ -21,7 +23,7 @@ interface ExplorerState {
 function createExplorerStore() {
     const { subscribe, update, set } = writable<ExplorerState>({
         folder: null,
-        files: [],
+        tree: [],
         loading: false,
         error: null,
     })
@@ -34,11 +36,10 @@ function createExplorerStore() {
         try {
             const result = await window.__TAURI__.core.invoke('open_folder') as {
                 folder: ExplorerFolder
-                files: ExplorerFile[]
+                tree: ExplorerNode[]
             } | null
 
             if (!result) {
-                // User cancelled the dialog
                 update(s => ({ ...s, loading: false }))
                 return false
             }
@@ -46,7 +47,7 @@ function createExplorerStore() {
             update(s => ({
                 ...s,
                 folder: result.folder,
-                files: result.files,
+                tree: result.tree,
                 loading: false,
                 error: null,
             }))
@@ -66,11 +67,11 @@ function createExplorerStore() {
         update(s => ({ ...s, loading: true, error: null }))
 
         try {
-            const result = await window.__TAURI__.core.invoke('list_folder_files', {
+            const result = await window.__TAURI__.core.invoke('list_folder_tree', {
                 folderPath: state.folder.path,
-            }) as ExplorerFile[]
+            }) as ExplorerNode[]
 
-            update(s => ({ ...s, files: result, loading: false }))
+            update(s => ({ ...s, tree: result, loading: false }))
         } catch (e) {
             const msg = e instanceof Error ? e.message : String(e)
             update(s => ({ ...s, loading: false, error: msg }))
@@ -78,11 +79,11 @@ function createExplorerStore() {
     }
 
     function closeFolder() {
-        set({ folder: null, files: [], loading: false, error: null })
+        set({ folder: null, tree: [], loading: false, error: null })
     }
 
     function reset() {
-        set({ folder: null, files: [], loading: false, error: null })
+        set({ folder: null, tree: [], loading: false, error: null })
     }
 
     return {

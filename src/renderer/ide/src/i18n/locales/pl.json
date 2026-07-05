@@ -72,7 +72,7 @@
     "refresh": "Odśwież",
     "close_folder": "Zamknij folder",
     "loading": "Ładowanie...",
-    "no_files": "Nie znaleziono plików Pascal."
+    "no_files": "Ten folder jest pusty."
   },
   "search": {
     "placeholder": "Szukaj w plikach...",

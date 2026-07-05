@@ -7,15 +7,41 @@ function state() {
 }
 
 const MOCK_FOLDER = { name: 'MyProject', path: 'C:\\Users\\test\\MyProject' }
-const MOCK_FILES = [
-    { name: 'main.pas', path: 'C:\\Users\\test\\MyProject\\main.pas', relativePath: 'main.pas' },
-    { name: 'utils.pas', path: 'C:\\Users\\test\\MyProject\\utils.pas', relativePath: 'utils.pas' },
+const MOCK_TREE = [
+    {
+        name: 'src',
+        path: 'C:\\Users\\test\\MyProject\\src',
+        relativePath: 'src',
+        isDirectory: true,
+        children: [
+            {
+                name: 'main.pas',
+                path: 'C:\\Users\\test\\MyProject\\src\\main.pas',
+                relativePath: 'src\\main.pas',
+                isDirectory: false,
+                children: null,
+            },
+        ],
+    },
+    {
+        name: '.gitignore',
+        path: 'C:\\Users\\test\\MyProject\\.gitignore',
+        relativePath: '.gitignore',
+        isDirectory: false,
+        children: null,
+    },
 ]
+
+function mockTauri(invokeImpl: (...args: any[]) => any) {
+    vi.stubGlobal('__TAURI__', {
+        core: { invoke: vi.fn().mockImplementation(invokeImpl) },
+    })
+}
 
 describe('explorerStore', () => {
     beforeEach(() => {
         explorerStore.reset()
-        vi.restoreAllMocks()
+        vi.unstubAllGlobals()
     })
 
     describe('initial state', () => {
@@ -23,8 +49,8 @@ describe('explorerStore', () => {
             expect(state().folder).toBeNull()
         })
 
-        it('has empty file list', () => {
-            expect(state().files).toHaveLength(0)
+        it('has empty tree', () => {
+            expect(state().tree).toHaveLength(0)
         })
 
         it('is not loading', () => {
@@ -38,96 +64,52 @@ describe('explorerStore', () => {
 
     describe('openFolder', () => {
         it('returns false when not in Tauri context', async () => {
+            vi.stubGlobal('__TAURI__', undefined)
             const result = await explorerStore.openFolder()
             expect(result).toBe(false)
         })
 
         it('returns false when user cancels dialog', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: { invoke: vi.fn().mockResolvedValue(null) },
-                },
-                writable: true,
-                configurable: true,
-            })
-
+            mockTauri(() => Promise.resolve(null))
             const result = await explorerStore.openFolder()
             expect(result).toBe(false)
             expect(state().folder).toBeNull()
             expect(state().loading).toBe(false)
         })
 
-        it('sets folder and files on success', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: {
-                        invoke: vi.fn().mockResolvedValue({
-                            folder: MOCK_FOLDER,
-                            files: MOCK_FILES,
-                        }),
-                    },
-                },
-                writable: true,
-                configurable: true,
-            })
-
+        it('sets folder and tree on success', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
             const result = await explorerStore.openFolder()
-
             expect(result).toBe(true)
             expect(state().folder).toEqual(MOCK_FOLDER)
-            expect(state().files).toHaveLength(2)
-            expect(state().files[0].name).toBe('main.pas')
+            expect(state().tree).toHaveLength(2)
+        })
+
+        it('preserves nested children in the tree', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
+            await explorerStore.openFolder()
+            const srcNode = state().tree.find(n => n.name === 'src')
+            expect(srcNode?.isDirectory).toBe(true)
+            expect(srcNode?.children).toHaveLength(1)
+            expect(srcNode?.children?.[0].name).toBe('main.pas')
         })
 
         it('sets error on failure', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: { invoke: vi.fn().mockRejectedValue(new Error('permission denied')) },
-                },
-                writable: true,
-                configurable: true,
-            })
-
+            mockTauri(() => Promise.reject(new Error('permission denied')))
             const result = await explorerStore.openFolder()
-
             expect(result).toBe(false)
             expect(state().error).toBe('permission denied')
-            expect(state().loading).toBe(false)
-        })
-
-        it('clears loading state after success', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: {
-                        invoke: vi.fn().mockResolvedValue({ folder: MOCK_FOLDER, files: MOCK_FILES }),
-                    },
-                },
-                writable: true,
-                configurable: true,
-            })
-
-            await explorerStore.openFolder()
             expect(state().loading).toBe(false)
         })
     })
 
     describe('closeFolder', () => {
-        it('clears folder and files', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: {
-                        invoke: vi.fn().mockResolvedValue({ folder: MOCK_FOLDER, files: MOCK_FILES }),
-                    },
-                },
-                writable: true,
-                configurable: true,
-            })
-
+        it('clears folder and tree', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
             await explorerStore.openFolder()
             explorerStore.closeFolder()
-
             expect(state().folder).toBeNull()
-            expect(state().files).toHaveLength(0)
+            expect(state().tree).toHaveLength(0)
         })
     })
 
@@ -138,30 +120,19 @@ describe('explorerStore', () => {
         })
 
         it('does nothing outside Tauri context', async () => {
-            // folder set manually via reset + openFolder mock would be needed,
-            // but without Tauri the store guard prevents it
+            vi.stubGlobal('__TAURI__', undefined)
             await explorerStore.refresh()
-            expect(state().files).toHaveLength(0)
+            expect(state().tree).toHaveLength(0)
         })
     })
 
     describe('reset', () => {
         it('restores initial state', async () => {
-            Object.defineProperty(window, '__TAURI__', {
-                value: {
-                    core: {
-                        invoke: vi.fn().mockResolvedValue({ folder: MOCK_FOLDER, files: MOCK_FILES }),
-                    },
-                },
-                writable: true,
-                configurable: true,
-            })
-
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
             await explorerStore.openFolder()
             explorerStore.reset()
-
             expect(state().folder).toBeNull()
-            expect(state().files).toHaveLength(0)
+            expect(state().tree).toHaveLength(0)
             expect(state().error).toBeNull()
         })
     })

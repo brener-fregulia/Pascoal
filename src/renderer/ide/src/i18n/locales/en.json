@@ -72,7 +72,7 @@
     "refresh": "Refresh",
     "close_folder": "Close folder",
     "loading": "Loading...",
-    "no_files": "No Pascal files found."
+    "no_files": "This folder is empty."
   },
   "search": {
     "placeholder": "Search in files...",

@@ -3,6 +3,7 @@ use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
     let dir = std::env::temp_dir().join(format!("pascoal_search_test_{}", name));
+    let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -40,6 +41,23 @@ fn finds_matches_across_multiple_files() {
     );
 
     assert_eq!(results.len(), 3);
+}
+
+#[test]
+fn finds_matches_in_subfolders() {
+    let dir = tmp_dir("subfolder_search");
+    let sub = dir.join("src");
+    fs::create_dir(&sub).unwrap();
+    fs::write(sub.join("utils.pas"), "writeln('nested');\n").unwrap();
+
+    let results = search_in_folder(
+        dir.to_string_lossy().to_string(),
+        "writeln".to_string(),
+        false,
+    );
+
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].file_name, "utils.pas");
 }
 
 #[test]
@@ -98,6 +116,22 @@ fn case_sensitive_when_enabled() {
 fn ignores_non_pas_files() {
     let dir = tmp_dir("ignore_non_pas");
     fs::write(dir.join("notes.txt"), "writeln this is not pascal\n").unwrap();
+
+    let results = search_in_folder(
+        dir.to_string_lossy().to_string(),
+        "writeln".to_string(),
+        false,
+    );
+
+    assert_eq!(results.len(), 0);
+}
+
+#[test]
+fn ignores_git_directory() {
+    let dir = tmp_dir("ignore_git");
+    let git_dir = dir.join(".git");
+    fs::create_dir(&git_dir).unwrap();
+    fs::write(git_dir.join("fake.pas"), "writeln('should not match');\n").unwrap();
 
     let results = search_in_folder(
         dir.to_string_lossy().to_string(),

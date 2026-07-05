@@ -72,7 +72,7 @@
     "refresh": "Actualizar",
     "close_folder": "Cerrar carpeta",
     "loading": "Cargando...",
-    "no_files": "No se encontraron archivos Pascal."
+    "no_files": "Esta carpeta esta vacia."
   },
   "search": {
     "placeholder": "Buscar en archivos...",

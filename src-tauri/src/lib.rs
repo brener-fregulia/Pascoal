@@ -59,7 +59,7 @@ pub fn run() {
             fs::file_exists,
             fs::read_file,
             fs::open_folder,
-            fs::list_folder_files,
+            fs::list_folder_tree,
             fs::open_url,
             fs::search_in_folder,
             git::git_status,
