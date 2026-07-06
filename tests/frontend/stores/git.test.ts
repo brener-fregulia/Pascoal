@@ -8,6 +8,7 @@ function state() {
 }
 
 const MOCK_FOLDER = { name: 'MyProject', path: 'C:\\Users\\test\\MyProject' }
+const CONFIGURED_IDENTITY = { name: 'Test User', email: 'test@example.com' }
 
 function mockTauri(handlers: Record<string, (...args: any[]) => any>) {
     vi.stubGlobal('__TAURI__', {
@@ -22,7 +23,7 @@ function mockTauri(handlers: Record<string, (...args: any[]) => any>) {
 }
 
 async function openMockFolder() {
-    mockTauri({ open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, files: [] }) })
+    mockTauri({ open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }) })
     await explorerStore.openFolder()
 }
 
@@ -45,6 +46,14 @@ describe('gitStore', () => {
 
         it('has empty commit message', () => {
             expect(state().commitMessage).toBe('')
+        })
+
+        it('does not need identity', () => {
+            expect(state().needsIdentity).toBe(false)
+        })
+
+        it('has no notice', () => {
+            expect(state().notice).toBeNull()
         })
     })
 
@@ -129,6 +138,7 @@ describe('gitStore', () => {
             gitStore.setCommitMessage('Initial commit')
 
             mockTauri({
+                git_check_identity: () => Promise.resolve(CONFIGURED_IDENTITY),
                 git_commit: () => Promise.resolve(),
                 git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
             })
@@ -143,13 +153,110 @@ describe('gitStore', () => {
             await openMockFolder()
             gitStore.setCommitMessage('Initial commit')
 
-            mockTauri({ git_commit: () => Promise.reject(new Error('nothing to commit')) })
+            mockTauri({
+                git_check_identity: () => Promise.resolve(CONFIGURED_IDENTITY),
+                git_commit: () => Promise.reject(new Error('nothing to commit')),
+            })
 
             const result = await gitStore.commit()
 
             expect(result).toBe(false)
             expect(state().error).toBe('nothing to commit')
             expect(state().commitMessage).toBe('Initial commit')
+        })
+
+        it('sets needsIdentity when name is missing and does not attempt commit', async () => {
+            await openMockFolder()
+            gitStore.setCommitMessage('Initial commit')
+
+            let commitCalled = false
+            mockTauri({
+                git_check_identity: () => Promise.resolve({ name: null, email: 'test@example.com' }),
+                git_commit: () => { commitCalled = true; return Promise.resolve() },
+            })
+
+            const result = await gitStore.commit()
+
+            expect(result).toBe(false)
+            expect(state().needsIdentity).toBe(true)
+            expect(commitCalled).toBe(false)
+        })
+
+        it('sets needsIdentity when email is missing', async () => {
+            await openMockFolder()
+            gitStore.setCommitMessage('Initial commit')
+
+            mockTauri({
+                git_check_identity: () => Promise.resolve({ name: 'Test User', email: null }),
+            })
+
+            const result = await gitStore.commit()
+
+            expect(result).toBe(false)
+            expect(state().needsIdentity).toBe(true)
+        })
+
+        it('sets a success notice after committing', async () => {
+            await openMockFolder()
+            gitStore.setCommitMessage('Initial commit')
+
+            mockTauri({
+                git_check_identity: () => Promise.resolve(CONFIGURED_IDENTITY),
+                git_commit: () => Promise.resolve(),
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+
+            await gitStore.commit()
+
+            expect(state().notice?.type).toBe('success')
+        })
+
+        it('sets an error notice on commit failure', async () => {
+            await openMockFolder()
+            gitStore.setCommitMessage('Initial commit')
+
+            mockTauri({
+                git_check_identity: () => Promise.resolve(CONFIGURED_IDENTITY),
+                git_commit: () => Promise.reject(new Error('nothing to commit')),
+            })
+
+            await gitStore.commit()
+
+            expect(state().notice?.type).toBe('error')
+        })
+    })
+
+    describe('configureIdentity', () => {
+        it('sets identity then retries commit successfully', async () => {
+            await openMockFolder()
+            gitStore.setCommitMessage('Initial commit')
+
+            let setIdentityCalled = false
+            mockTauri({
+                git_set_identity: () => { setIdentityCalled = true; return Promise.resolve() },
+                git_check_identity: () => Promise.resolve(CONFIGURED_IDENTITY),
+                git_commit: () => Promise.resolve(),
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+
+            const result = await gitStore.configureIdentity('Test User', 'test@example.com', true)
+
+            expect(setIdentityCalled).toBe(true)
+            expect(result).toBe(true)
+            expect(state().needsIdentity).toBe(false)
+        })
+
+        it('sets error if git_set_identity fails', async () => {
+            await openMockFolder()
+
+            mockTauri({
+                git_set_identity: () => Promise.reject(new Error('config write failed')),
+            })
+
+            const result = await gitStore.configureIdentity('Test User', 'test@example.com', true)
+
+            expect(result).toBe(false)
+            expect(state().error).toBe('config write failed')
         })
     })
 
@@ -184,6 +291,8 @@ describe('gitStore', () => {
 
             expect(state().isRepo).toBe(false)
             expect(state().commitMessage).toBe('')
+            expect(state().needsIdentity).toBe(false)
+            expect(state().notice).toBeNull()
         })
     })
 })

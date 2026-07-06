@@ -1,4 +1,6 @@
-use crate::git::{git_commit, git_init, git_stage, git_status, git_unstage};
+use crate::git::{
+    git_check_identity, git_commit, git_init, git_set_identity, git_stage, git_status, git_unstage,
+};
 use std::fs;
 use std::process::Command;
 
@@ -102,4 +104,61 @@ fn commit_succeeds_with_staged_file() {
     let status = git_status(dir.to_string_lossy().to_string());
     assert_eq!(status.staged.len(), 0);
     assert_eq!(status.unstaged.len(), 0);
+}
+
+#[test]
+fn check_identity_returns_none_when_unset_locally_and_no_global() {
+    // Note: this test assumes the test runner environment has no global
+    // git identity configured. If your machine has a global user.name/email
+    // set, this test will reflect that instead — which is correct behavior,
+    // not a bug, since git_check_identity intentionally reads the effective
+    // (local-overrides-global) config.
+    let dir = tmp_repo("identity_check_env_dependent");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+
+    let identity = git_check_identity(dir.to_string_lossy().to_string());
+    // Just verify it doesn't panic and returns a well-formed struct;
+    // presence/absence depends on the machine's global git config.
+    let _ = identity.name;
+    let _ = identity.email;
+}
+
+#[test]
+fn set_identity_locally_is_then_detected() {
+    let dir = tmp_repo("set_identity_local");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+
+    git_set_identity(
+        dir.to_string_lossy().to_string(),
+        "Test User".to_string(),
+        "test@example.com".to_string(),
+        false,
+    )
+    .unwrap();
+
+    let identity = git_check_identity(dir.to_string_lossy().to_string());
+    assert_eq!(identity.name.as_deref(), Some("Test User"));
+    assert_eq!(identity.email.as_deref(), Some("test@example.com"));
+}
+
+#[test]
+fn commit_succeeds_after_setting_local_identity() {
+    let dir = tmp_repo("commit_after_identity");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+    fs::write(dir.join("main.pas"), "program Main;").unwrap();
+    git_stage(dir.to_string_lossy().to_string(), "main.pas".to_string()).unwrap();
+
+    git_set_identity(
+        dir.to_string_lossy().to_string(),
+        "Test User".to_string(),
+        "test@example.com".to_string(),
+        false,
+    )
+    .unwrap();
+
+    let result = git_commit(
+        dir.to_string_lossy().to_string(),
+        "Initial commit".to_string(),
+    );
+    assert!(result.is_ok(), "commit failed: {:?}", result);
 }

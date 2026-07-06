@@ -168,3 +168,41 @@ pub fn git_commit(folder_path: String, message: String) -> Result<(), String> {
 pub fn git_init(folder_path: String) -> Result<(), String> {
     run_git(&folder_path, &["init"]).map(|_| ())
 }
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GitIdentity {
+    pub name: Option<String>,
+    pub email: Option<String>,
+}
+
+/// Reads the *effective* user.name/user.email - git config already
+/// resolves local (--local) over global (--global) when no scope flag
+/// is given, so this reflects exactly what `git commit` would use.
+#[tauri::command]
+pub fn git_check_identity(folder_path: String) -> GitIdentity {
+    let name = run_git(&folder_path, &["config", "user.name"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    let email = run_git(&folder_path, &["config", "user.email"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    GitIdentity { name, email }
+}
+
+#[tauri::command]
+pub fn git_set_identity(
+    folder_path: String,
+    name: String,
+    email: String,
+    global: bool,
+) -> Result<(), String> {
+    let scope_flag = if global { "--global" } else { "--local" };
+    run_git(&folder_path, &["config", scope_flag, "user.name", &name])?;
+    run_git(&folder_path, &["config", scope_flag, "user.email", &email])?;
+    Ok(())
+}

@@ -8,6 +8,10 @@
   let diffText = $state<string>('')
   let diffLoading = $state(false)
 
+  let identityName = $state('')
+  let identityEmail = $state('')
+  let identityGlobal = $state(true)
+
   let isRepo = $derived($gitStore.isRepo)
   let branch = $derived($gitStore.branch)
   let staged = $derived($gitStore.staged)
@@ -15,8 +19,13 @@
   let loading = $derived($gitStore.loading)
   let error = $derived($gitStore.error)
   let commitMessage = $derived($gitStore.commitMessage)
+  let needsIdentity = $derived($gitStore.needsIdentity)
+  let notice = $derived($gitStore.notice)
   let folder = $derived($explorerStore.folder)
   let canCommit = $derived(staged.length > 0 && commitMessage.trim().length > 0)
+  let canSaveIdentity = $derived(
+    identityName.trim().length > 0 && identityEmail.trim().length > 0,
+  )
 
   onMount(() => {
     gitStore.refresh()
@@ -87,9 +96,26 @@
   async function handleCommit() {
     await gitStore.commit()
   }
+
+  async function handleSaveIdentity() {
+    if (!canSaveIdentity) return
+    const ok = await gitStore.configureIdentity(
+      identityName.trim(),
+      identityEmail.trim(),
+      identityGlobal,
+    )
+    if (ok) {
+      identityName = ''
+      identityEmail = ''
+    }
+  }
 </script>
 
 <div class="git-panel">
+  {#if notice}
+    <div class="notice notice-{notice.type}">{notice.message}</div>
+  {/if}
+
   {#if !folder}
     <p class="status-msg">{$i18n('git.no_folder')}</p>
   {:else if loading && !isRepo}
@@ -127,9 +153,37 @@
         oninput={(e) =>
           gitStore.setCommitMessage((e.target as HTMLTextAreaElement).value)}
         rows="2"></textarea>
-      <button class="commit-btn" disabled={!canCommit} onclick={handleCommit}>
-        {$i18n('git.commit')}
-      </button>
+
+      {#if needsIdentity}
+        <div class="identity-form">
+          <p class="identity-hint">{$i18n('git.identity_needed')}</p>
+          <input
+            class="identity-input"
+            placeholder={$i18n('git.identity_name')}
+            bind:value={identityName}
+          />
+          <input
+            class="identity-input"
+            placeholder={$i18n('git.identity_email')}
+            bind:value={identityEmail}
+          />
+          <label class="identity-global">
+            <input type="checkbox" bind:checked={identityGlobal} />
+            {$i18n('git.identity_global')}
+          </label>
+          <button
+            class="commit-btn"
+            disabled={!canSaveIdentity}
+            onclick={handleSaveIdentity}
+          >
+            {$i18n('git.identity_save_commit')}
+          </button>
+        </div>
+      {:else}
+        <button class="commit-btn" disabled={!canCommit} onclick={handleCommit}>
+          {$i18n('git.commit')}
+        </button>
+      {/if}
     </div>
 
     <div class="sections">
@@ -239,6 +293,26 @@
     background: var(--sidebar);
     border-right: 1px solid var(--border);
     min-width: 0;
+    position: relative;
+  }
+
+  .notice {
+    padding: 6px 12px;
+    font-size: 11px;
+    font-family: var(--font-ui);
+    flex-shrink: 0;
+  }
+
+  .notice-success {
+    background: rgba(76, 175, 130, 0.15);
+    color: var(--success);
+    border-bottom: 1px solid rgba(76, 175, 130, 0.3);
+  }
+
+  .notice-error {
+    background: rgba(233, 69, 96, 0.15);
+    color: var(--error);
+    border-bottom: 1px solid rgba(233, 69, 96, 0.3);
   }
 
   .status-msg {
@@ -371,6 +445,46 @@
   .commit-btn:disabled {
     opacity: 0.4;
     cursor: default;
+  }
+
+  .identity-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .identity-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .identity-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .identity-input:focus {
+    border-color: var(--accent);
+  }
+
+  .identity-global {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
   }
 
   .sections {

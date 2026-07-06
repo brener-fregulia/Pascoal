@@ -70,6 +70,8 @@ pub fn run() {
             git::git_unstage_all,
             git::git_commit,
             git::git_init,
+            git::git_check_identity,
+            git::git_set_identity,
             process::compile_and_run,
             process::send_input,
         ])
