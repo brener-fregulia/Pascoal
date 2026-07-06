@@ -72,11 +72,11 @@
     "refresh": "Atualizar",
     "close_folder": "Fechar pasta",
     "loading": "Carregando...",
-    "no_files": "Esta pasta esta vazia."
+    "no_files": "Esta pasta está vazia."
   },
   "search": {
     "placeholder": "Buscar nos arquivos...",
-    "case_sensitive": "Diferenciar maiusculas",
+    "case_sensitive": "Diferenciar maiúsculas",
     "no_folder": "Abra uma pasta para buscar nos arquivos.",
     "no_results": "Nenhum resultado encontrado.",
     "results_count": "{count} resultados"
@@ -84,42 +84,48 @@
   "find": {
     "find_placeholder": "Buscar",
     "replace_placeholder": "Substituir",
-    "match_case": "Diferenciar maiusculas",
+    "match_case": "Diferenciar maiúsculas",
     "whole_word": "Palavra inteira",
-    "use_regex": "Usar expressao regular",
-    "toggle_replace": "Alternar substituicao",
+    "use_regex": "Usar expressão regular",
+    "toggle_replace": "Alternar substituição",
     "no_results": "Nenhum resultado",
     "of": "de",
-    "previous": "Ocorrencia anterior",
-    "next": "Proxima ocorrencia",
+    "previous": "Ocorrência anterior",
+    "next": "Próxima ocorrência",
     "close": "Fechar",
     "replace": "Substituir",
     "replace_all": "Substituir tudo"
   },
   "about": {
     "title": "Sobre o Pascoal",
-    "version": "Versao",
+    "version": "Versão",
     "fpc": "Free Pascal",
-    "fpc_not_found": "Nao encontrado",
+    "fpc_not_found": "Não encontrado",
     "detected": "Detectado",
     "platform": "Plataforma",
     "view_repo": "Ver no GitHub",
-    "license": "Licenca MIT - Brener Fregulia, 2026"
+    "license": "Licença MIT - Brener Fregulia, 2026"
   },
   "git": {
     "no_folder": "Abra uma pasta para usar o Git.",
-    "not_a_repo": "Esta pasta nao e um repositorio Git.",
-    "init_repo": "Inicializar Repositorio",
+    "not_a_repo": "Esta pasta não é um repositório Git.",
+    "init_repo": "Inicializar Repositório",
     "no_branch": "sem branch",
     "commit_placeholder": "Mensagem do commit",
     "commit": "Commit",
-    "staged_changes": "Alteracoes Preparadas",
-    "changes": "Alteracoes",
+    "staged_changes": "Alterações Preparadas",
+    "changes": "Alterações",
     "stage": "Preparar",
     "unstage": "Remover do stage",
     "stage_all": "Preparar tudo",
     "unstage_all": "Remover tudo do stage",
     "untracked_no_diff": "Arquivo novo — nada para comparar ainda.",
-    "clean": "Nenhuma alteracao."
+    "clean": "Nenhuma alteração.",
+    "commit_success": "Commit criado com sucesso.",
+    "identity_needed": "O Git precisa saber quem você é antes de commitar.",
+    "identity_name": "Seu nome",
+    "identity_email": "seu.email@exemplo.com",
+    "identity_global": "Definir para todos os repositórios nesta máquina",
+    "identity_save_commit": "Salvar e Commitar"
   }
 }
