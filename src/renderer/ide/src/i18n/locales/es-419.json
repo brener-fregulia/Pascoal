@@ -24,10 +24,10 @@
     "copied": "¡Copiado!",
     "build": "Compilar",
     "program": "Programa",
-    "status_idle": "Aún no hay compilación",
+    "status_idle": "Aún no hay compilaciones",
     "status_compiling": "Compilando...",
-    "status_success": "Compilación exitosa",
-    "status_error": "Error de compilación",
+    "status_success": "Compilación completada",
+    "status_error": "La compilación falló",
     "exit_success": "Proceso finalizado con código 0",
     "exit_failure": "Proceso finalizado con código {code}"
   },
@@ -64,19 +64,19 @@
   },
   "tabs": {
     "welcome": "Inicio",
-    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar.\n¿Cerrar de todos modos?"
+    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar. ¿Cerrar de todos modos?"
   },
   "explorer": {
-    "no_folder": "Ninguna carpeta abierta.",
+    "no_folder": "No hay ninguna carpeta abierta.",
     "open_folder": "Abrir carpeta...",
     "refresh": "Actualizar",
     "close_folder": "Cerrar carpeta",
     "loading": "Cargando...",
-    "no_files": "Esta carpeta esta vacia."
+    "no_files": "Esta carpeta está vacía."
   },
   "search": {
     "placeholder": "Buscar en archivos...",
-    "case_sensitive": "Distinguir mayusculas",
+    "case_sensitive": "Distinguir mayúsculas",
     "no_folder": "Abre una carpeta para buscar en los archivos.",
     "no_results": "No se encontraron resultados.",
     "results_count": "{count} resultados"
@@ -84,9 +84,9 @@
   "find": {
     "find_placeholder": "Buscar",
     "replace_placeholder": "Reemplazar",
-    "match_case": "Distinguir mayusculas",
+    "match_case": "Distinguir mayúsculas",
     "whole_word": "Palabra completa",
-    "use_regex": "Usar expresion regular",
+    "use_regex": "Usar expresión regular",
     "toggle_replace": "Alternar reemplazo",
     "no_results": "Sin resultados",
     "of": "de",
@@ -98,7 +98,7 @@
   },
   "about": {
     "title": "Acerca de Pascoal",
-    "version": "Version",
+    "version": "Versión",
     "fpc": "Free Pascal",
     "fpc_not_found": "No encontrado",
     "detected": "Detectado",
@@ -109,17 +109,23 @@
   "git": {
     "no_folder": "Abre una carpeta para usar Git.",
     "not_a_repo": "Esta carpeta no es un repositorio Git.",
-    "init_repo": "Inicializar Repositorio",
+    "init_repo": "Inicializar repositorio",
     "no_branch": "sin rama",
     "commit_placeholder": "Mensaje del commit",
     "commit": "Commit",
-    "staged_changes": "Cambios Preparados",
+    "staged_changes": "Cambios preparados",
     "changes": "Cambios",
     "stage": "Preparar",
     "unstage": "Quitar del stage",
     "stage_all": "Preparar todo",
     "unstage_all": "Quitar todo del stage",
-    "untracked_no_diff": "Archivo nuevo — nada que comparar todavia.",
-    "clean": "Sin cambios."
+    "untracked_no_diff": "Archivo nuevo — nada que comparar todavía.",
+    "clean": "Sin cambios.",
+    "commit_success": "Commit creado correctamente.",
+    "identity_needed": "Git necesita saber quién eres antes de hacer commit.",
+    "identity_name": "Tu nombre",
+    "identity_email": "tu.correo@ejemplo.com",
+    "identity_global": "Establecer para todos los repositorios en esta máquina",
+    "identity_save_commit": "Guardar y hacer commit"
   }
 }
