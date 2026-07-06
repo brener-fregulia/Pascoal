@@ -24,10 +24,10 @@
     "copied": "Skopiowano!",
     "build": "Kompiluj",
     "program": "Program",
-    "status_idle": "Jeszcze nie kompilowano",
+    "status_idle": "Jeszcze nic nie skompilowano",
     "status_compiling": "Kompilowanie...",
-    "status_success": "Kompilacja zakończona powodzeniem",
-    "status_error": "Błąd kompilacji",
+    "status_success": "Kompilacja zakończona pomyślnie",
+    "status_error": "Kompilacja nie powiodła się",
     "exit_success": "Proces zakończony kodem 0",
     "exit_failure": "Proces zakończony kodem {code}"
   },
@@ -64,7 +64,7 @@
   },
   "tabs": {
     "welcome": "Start",
-    "unsaved_confirm": "\"{name}\" ma niezapisane zmiany.\nCzy mimo to zamknąć?"
+    "unsaved_confirm": "\"{name}\" ma niezapisane zmiany. Czy mimo to zamknąć?"
   },
   "explorer": {
     "no_folder": "Brak otwartego folderu.",
@@ -76,25 +76,25 @@
   },
   "search": {
     "placeholder": "Szukaj w plikach...",
-    "case_sensitive": "Rozroznianie wielkosci liter",
-    "no_folder": "Otworz folder, aby przeszukac pliki.",
-    "no_results": "Nie znaleziono wynikow.",
-    "results_count": "{count} wynikow"
+    "case_sensitive": "Rozróżniaj wielkość liter",
+    "no_folder": "Otwórz folder, aby przeszukać pliki.",
+    "no_results": "Nie znaleziono wyników.",
+    "results_count": "{count} wyników"
   },
   "find": {
-    "find_placeholder": "Znajdz",
-    "replace_placeholder": "Zamien",
-    "match_case": "Rozroznianie wielkosci liter",
-    "whole_word": "Cale slowo",
-    "use_regex": "Uzyj wyrazenia regularnego",
-    "toggle_replace": "Przelacz zamiane",
-    "no_results": "Brak wynikow",
+    "find_placeholder": "Znajdź",
+    "replace_placeholder": "Zamień",
+    "match_case": "Rozróżniaj wielkość liter",
+    "whole_word": "Całe słowo",
+    "use_regex": "Użyj wyrażenia regularnego",
+    "toggle_replace": "Przełącz zamianę",
+    "no_results": "Brak wyników",
     "of": "z",
     "previous": "Poprzednie dopasowanie",
-    "next": "Nastepne dopasowanie",
+    "next": "Następne dopasowanie",
     "close": "Zamknij",
-    "replace": "Zamien",
-    "replace_all": "Zamien wszystko"
+    "replace": "Zamień",
+    "replace_all": "Zamień wszystko"
   },
   "about": {
     "title": "O Pascoal",
@@ -103,15 +103,15 @@
     "fpc_not_found": "Nie znaleziono",
     "detected": "Wykryto",
     "platform": "Platforma",
-    "view_repo": "Zobacz na GitHub",
+    "view_repo": "Zobacz na GitHubie",
     "license": "Licencja MIT - Brener Fregulia, 2026"
   },
   "git": {
-    "no_folder": "Otworz folder, aby uzywac Git.",
+    "no_folder": "Otwórz folder, aby używać Git.",
     "not_a_repo": "Ten folder nie jest repozytorium Git.",
-    "init_repo": "Zainicjuj Repozytorium",
-    "no_branch": "brak galezi",
-    "commit_placeholder": "Wiadomosc commita",
+    "init_repo": "Zainicjuj repozytorium",
+    "no_branch": "brak gałęzi",
+    "commit_placeholder": "Wiadomość commita",
     "commit": "Commit",
     "staged_changes": "Przygotowane zmiany",
     "changes": "Zmiany",
@@ -119,7 +119,13 @@
     "unstage": "Cofnij przygotowanie",
     "stage_all": "Przygotuj wszystko",
     "unstage_all": "Cofnij przygotowanie wszystkiego",
-    "untracked_no_diff": "Nowy plik — nie ma jeszcze czego porownac.",
-    "clean": "Brak zmian."
+    "untracked_no_diff": "Nowy plik — nie ma jeszcze czego porównać.",
+    "clean": "Brak zmian.",
+    "commit_success": "Commit został utworzony pomyślnie.",
+    "identity_needed": "Git musi wiedzieć, kim jesteś, zanim wykonasz commit.",
+    "identity_name": "Twoje imię",
+    "identity_email": "twoj.email@przyklad.com",
+    "identity_global": "Ustaw dla wszystkich repozytoriów na tym komputerze",
+    "identity_save_commit": "Zapisz i wykonaj commit"
   }
 }
