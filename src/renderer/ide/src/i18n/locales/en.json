@@ -120,6 +120,12 @@
     "stage_all": "Stage All",
     "unstage_all": "Unstage All",
     "untracked_no_diff": "New file — nothing to compare yet.",
-    "clean": "No changes."
+    "clean": "No changes.",
+    "commit_success": "Commit created successfully.",
+    "identity_needed": "Git needs to know who you are before committing.",
+    "identity_name": "Your name",
+    "identity_email": "your.email@example.com",
+    "identity_global": "Set for all repositories on this machine",
+    "identity_save_commit": "Save and Commit"
   }
 }
