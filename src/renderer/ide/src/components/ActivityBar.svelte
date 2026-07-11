@@ -48,9 +48,11 @@
     <Sun size={20} />
   </IconButton>
 
-  <IconButton label={$i18n('activity.settings')}>
-    <Settings size={20} />
-  </IconButton>
+  {#if import.meta.env.DEV}
+    <IconButton label={$i18n('activity.settings')}>
+      <Settings size={20} />
+    </IconButton>
+  {/if}
 </nav>
 
 <style>
