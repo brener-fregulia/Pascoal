@@ -18,6 +18,10 @@ on:
       - '.gitattributes'
       - 'LICENSE'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-frontend:
     name: Frontend tests
