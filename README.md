@@ -137,6 +137,8 @@ scripts/
 - [x] Git integration
 - [x] Find and replace, cross-file search
 - [x] GitHub Actions CI/CD
+- [ ] Guided FPC installer (auto-install via winget/apt/pacman/dnf/zypper)
+- [ ] Version checker / updater
 - [ ] PTY terminal (PowerShell, bash, fish)
 - [ ] Detached terminal window for running Pascal programs
 - [ ] Settings persistence (editor font size, console position)
