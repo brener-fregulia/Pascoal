@@ -60,7 +60,21 @@
     "about_pascoal": "About Pascoal"
   },
   "statusbar": {
-    "fpc_not_found": "FPC not found"
+    "fpc_not_found": "FPC not found",
+    "fpc_install_hint": "Click to install"
+  },
+  "fpc_missing": {
+    "title": "Free Pascal not found",
+    "message": "No FPC installation was found on this machine. Would you like to install it now?",
+    "installing": "Installing Free Pascal…",
+    "success": "Free Pascal was installed successfully.",
+    "error": "Installation failed. You can try again or install it manually.",
+    "no_package_manager": "No supported package manager was detected. Please install manually.",
+    "install": "Install",
+    "installing_btn": "Installing…",
+    "download": "Download manually",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "tabs": {
     "welcome": "Welcome",
