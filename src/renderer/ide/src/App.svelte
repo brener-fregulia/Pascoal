@@ -5,10 +5,12 @@
   import EditorArea from './components/EditorArea.svelte'
   import Statusbar from './components/Statusbar.svelte'
   import AboutModal from './components/AboutModal.svelte'
+  import FpcMissingModal from './components/FpcMissingModal.svelte'
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
   import { tabStore } from './stores/tabs'
   import { explorerStore } from './stores/explorerStore'
+  import { fpcInstallStore } from './stores/fpcInstall'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
@@ -76,6 +78,12 @@
   $effect(() => {
     document.documentElement.setAttribute('data-theme', $themeStore.current)
   })
+
+  $effect(() => {
+    if ($appStore.info && !$appStore.loading && !$appStore.info.fpcInstalled) {
+      fpcInstallStore.show()
+    }
+  })
 </script>
 
 <div id="layout">
@@ -88,6 +96,7 @@
 </div>
 
 <AboutModal bind:open={showAbout} />
+<FpcMissingModal />
 
 <style>
   #layout {
