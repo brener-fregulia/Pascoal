@@ -2,6 +2,7 @@ mod compiler;
 mod env;
 mod fs;
 mod git;
+mod installer;
 mod process;
 
 use env::{detect_fpc, get_documents_dir};
@@ -74,6 +75,8 @@ pub fn run() {
             git::git_set_identity,
             process::compile_and_run,
             process::send_input,
+            installer::detect_installer,
+            installer::install_fpc,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")
