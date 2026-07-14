@@ -1,6 +1,7 @@
 <script lang="ts">
   import { appStore } from '../stores/app'
   import { themeStore } from '../stores/theme'
+  import { fpcInstallStore } from '../stores/fpcInstall'
   import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'
   import LocaleFlag from '../icons/LocaleFlag.svelte'
 
@@ -23,6 +24,10 @@
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') showLocalePicker = false
   }
+
+  function handleFpcClick() {
+    if (!info?.fpcInstalled) fpcInstallStore.show()
+  }
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
@@ -37,7 +42,17 @@
 {/if}
 
 <footer id="statusbar">
-  <span>{fpcLabel}</span>
+  {#if info?.fpcInstalled}
+    <span>{fpcLabel}</span>
+  {:else}
+    <button
+      class="status-btn"
+      title={$i18n('statusbar.fpc_install_hint')}
+      on:click={handleFpcClick}
+    >
+      {fpcLabel}
+    </button>
+  {/if}
   <span class="sep">|</span>
   <span>{versionLabel}</span>
 
