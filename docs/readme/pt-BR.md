@@ -137,6 +137,7 @@ scripts/
 * [x] Integração com Git
 * [x] Buscar e substituir, busca entre arquivos
 * [x] CI/CD com GitHub Actions
+* [ ] Instalador guiado do FPC (instalação automática via winget/apt/pacman/dnf/zypper)
 * [ ] Terminal PTY (PowerShell, bash, fish)
 * [ ] Janela de terminal destacada para executar programas em Pascal
 * [ ] Persistência de configurações (tamanho da fonte do editor, posição do console)
