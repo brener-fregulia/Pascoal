@@ -104,6 +104,7 @@ src-tauri/
     fs.rs                   # Komendy I/O plików, eksplorator folderów i wyszukiwanie w wielu plikach
     git.rs                  # Komendy Git: status, stage, diff, commit i init
     compiler.rs             # Logika kompilacji FPC
+    installer.rs            # Wykrywanie menedżera pakietów FPC i instalacja z przewodnikiem
     process.rs              # Stan procesów, run_with_pipes, run_with_pty
     tests/                  # Testy jednostkowe Rust
   tauri.conf.json
