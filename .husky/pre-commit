@@ -1,1 +1,7 @@
-npm run test:frontend
+CHANGED_FILES=$(git diff --cached --name-only)
+
+if echo "$CHANGED_FILES" | grep -qvE '\.md$|^docs/|^\.gitignore$|^\.gitattributes$|^LICENSE$'; then
+  npm run test:frontend
+else
+  echo "Only docs changed - skipping frontend tests"
+fi
