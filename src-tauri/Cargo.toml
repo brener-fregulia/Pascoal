@@ -32,3 +32,9 @@ tokio = { version = "1", features = ["rt", "macros"] }
 [[test]]
 name = "pascal_runner"
 path = "tests/pascal_runner.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "s"
