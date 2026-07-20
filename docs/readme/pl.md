@@ -26,7 +26,7 @@ Projekt powstał jako bunt przeciwko przestarzałym narzędziom, takim jak Pasca
 - **Natywne kontrolki okna** dostosowane do platformy (traffic lights w macOS, styl Windows/Linux)
 - **Automatyczne zapisywanie przed uruchomieniem** — konfigurowalne
 - **Interfejs wielojęzyczny** — English, Português (BR), Español (Latinoamérica) i Polski z zapamiętywaniem wybranego języka
-- **Lekka aplikacja** — około 25 MB pamięci RAM i instalatory o rozmiarze około 5 MB
+- **Lekka aplikacja** — około 270 MB pamięci RAM i instalatory o rozmiarze około 5 MB
 
 ## Wymagania
 
