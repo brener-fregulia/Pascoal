@@ -26,7 +26,7 @@ Ele nasceu como uma rebelião contra ferramentas ultrapassadas como o Pascalzim,
 * **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
 * **Salvamento automático antes de executar** — configurável
 * **Interface internacionalizada** — English, Português (BR), Español (Latinoamérica) e Polski, com persistência da seleção de idioma
-* **Leve** — ~270 MB de RAM, instaladores de ~5 MB
+* **Leve** - cerca de 170 MB de RAM no Windows (WebView2), 270 MB no Linux (WebKitGTK) e instaladores de aproximadamente 5 MB.
 
 ## Requisitos
 
