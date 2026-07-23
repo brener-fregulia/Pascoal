@@ -38,7 +38,7 @@ fn install_command(pm: &str) -> Option<(&'static str, &'static [&'static str])> 
             &[
                 "install",
                 "--id",
-                "FreePascal.FreePascal",
+                "FreePascal.FreePascalCompiler",
                 "-e",
                 "--accept-source-agreements",
                 "--accept-package-agreements",
