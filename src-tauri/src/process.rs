@@ -100,7 +100,7 @@ async fn run_with_pipes(
     use std::process::Stdio;
     use tauri::Manager;
 
-    let mut child = match std::process::Command::new(exe_file)
+    let mut child = match crate::winproc::no_window(std::process::Command::new(exe_file))
         .current_dir(tmp_dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())

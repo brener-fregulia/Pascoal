@@ -39,7 +39,7 @@ pub fn compile(src_file: &std::path::Path, out_dir: &std::path::Path) -> Compile
         let _ = std::fs::remove_file(&exe);
     }
 
-    let output = std::process::Command::new(fpc_bin())
+    let output = crate::winproc::no_window(std::process::Command::new(fpc_bin()))
         .args([
             src_file.to_str().unwrap_or(""),
             &format!("-FE{}", out_dir.to_str().unwrap_or("")),

@@ -91,7 +91,10 @@
           <p class="fpc-hint">{$i18n('fpc_missing.no_package_manager')}</p>
         {/if}
       {:else if state.status === 'installing'}
-        <p class="fpc-message">{$i18n('fpc_missing.installing')}</p>
+        <div class="fpc-installing-row">
+          <span class="fpc-spinner"></span>
+          <p class="fpc-message">{$i18n('fpc_missing.installing')}</p>
+        </div>
       {:else if state.status === 'success'}
         <p class="fpc-message fpc-success">{$i18n('fpc_missing.success')}</p>
       {:else if state.status === 'error'}
@@ -187,6 +190,33 @@
     font-weight: 700;
     color: var(--text);
     margin-bottom: 12px;
+  }
+
+  .fpc-installing-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .fpc-installing-row .fpc-message {
+    margin-bottom: 0;
+  }
+
+  .fpc-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: fpc-spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes fpc-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .fpc-message {

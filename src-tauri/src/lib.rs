@@ -4,6 +4,7 @@ mod fs;
 mod git;
 mod installer;
 mod process;
+mod winproc;
 
 use env::{detect_fpc, get_documents_dir};
 use process::ProcessState;

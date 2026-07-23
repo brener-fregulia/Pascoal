@@ -1,7 +1,9 @@
 use tauri::Manager;
 
 pub fn detect_fpc() -> (bool, Option<String>) {
-    let output = std::process::Command::new("fpc").arg("-iV").output();
+    let output = crate::winproc::no_window(std::process::Command::new("fpc"))
+        .arg("-iV")
+        .output();
 
     match output {
         Ok(o) if o.status.success() => {
