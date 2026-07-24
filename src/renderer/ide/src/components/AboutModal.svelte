@@ -1,11 +1,13 @@
 <script lang="ts">
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
+  import { updateStore } from '../stores/updateStore'
   import PascoalLogo from './PascoalLogo.svelte'
 
   let { open = $bindable(false) }: { open: boolean } = $props()
 
   let info = $derived($appStore.info)
+  let updateState = $derived($updateStore)
 
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
 
@@ -59,6 +61,19 @@
           ? `${$i18n('about.version')} ${info.version}`
           : $i18n('about.version')}
       </p>
+
+      <button
+        class="about-update-btn"
+        disabled={updateState.status === 'checking'}
+        onclick={() => updateStore.checkForUpdate(false)}
+      >
+        {updateState.status === 'checking'
+          ? $i18n('update.checking')
+          : $i18n('update.check_now')}
+      </button>
+      {#if updateState.status === 'up-to-date'}
+        <p class="about-update-status">{$i18n('update.up_to_date')}</p>
+      {/if}
 
       <div class="about-info">
         <div class="about-row">
@@ -163,6 +178,36 @@
     color: var(--text-dim);
     margin-top: 4px;
     margin-bottom: 20px;
+  }
+
+  .about-update-btn {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 12px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition:
+      opacity 0.15s,
+      color 0.15s;
+  }
+
+  .about-update-btn:hover:not(:disabled) {
+    color: var(--text);
+  }
+
+  .about-update-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .about-update-status {
+    font-size: 11px;
+    color: var(--success);
+    margin-bottom: 12px;
   }
 
   .about-info {

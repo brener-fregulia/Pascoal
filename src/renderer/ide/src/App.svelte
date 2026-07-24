@@ -6,11 +6,13 @@
   import Statusbar from './components/Statusbar.svelte'
   import AboutModal from './components/AboutModal.svelte'
   import FpcMissingModal from './components/FpcMissingModal.svelte'
+  import UpdateAvailableModal from './components/UpdateAvailableModal.svelte'
   import { appStore } from './stores/app'
   import { themeStore } from './stores/theme'
   import { tabStore } from './stores/tabs'
   import { explorerStore } from './stores/explorerStore'
   import { fpcInstallStore } from './stores/fpcInstall'
+  import { updateStore } from './stores/updateStore'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
@@ -23,6 +25,7 @@
 
     if (!import.meta.env.DEV) {
       window.addEventListener('contextmenu', (e) => e.preventDefault())
+      updateStore.checkForUpdate(true)
     }
 
     if (!window.__TAURI__) return
@@ -101,6 +104,7 @@
 
 <AboutModal bind:open={showAbout} />
 <FpcMissingModal />
+<UpdateAvailableModal />
 
 <style>
   #layout {

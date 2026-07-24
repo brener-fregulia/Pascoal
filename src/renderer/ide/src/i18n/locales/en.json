@@ -76,6 +76,20 @@
     "cancel": "Cancel",
     "close": "Close"
   },
+  "update": {
+    "title": "Update available",
+    "available_message": "A new version ({version}) is available. Would you like to update now?",
+    "checking": "Checking…",
+    "check_now": "Check for updates",
+    "up_to_date": "You're on the latest version.",
+    "downloading": "Downloading update…",
+    "ready": "Update installed. Restarting…",
+    "error": "Update failed. You can retry or download it manually.",
+    "now": "Update now",
+    "later": "Later",
+    "retry": "Retry",
+    "download_manually": "Download manually"
+  },
   "tabs": {
     "welcome": "Welcome",
     "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?"
