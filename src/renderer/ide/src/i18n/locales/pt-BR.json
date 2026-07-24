@@ -76,6 +76,20 @@
     "cancel": "Cancelar",
     "close": "Fechar"
   },
+  "update": {
+    "title": "Atualização disponível",
+    "available_message": "Uma nova versão ({version}) está disponível. Deseja atualizar agora?",
+    "checking": "Verificando…",
+    "check_now": "Verificar atualizações",
+    "up_to_date": "Você já está na versão mais recente.",
+    "downloading": "Baixando atualização…",
+    "ready": "Atualização instalada. Reiniciando…",
+    "error": "A atualização falhou. Você pode tentar novamente ou baixar manualmente.",
+    "now": "Atualizar agora",
+    "later": "Mais tarde",
+    "retry": "Tentar novamente",
+    "download_manually": "Baixar manualmente"
+  },
   "tabs": {
     "welcome": "Início",
     "unsaved_confirm": "\"{name}\" tem alterações não salvas. Fechar mesmo assim?"

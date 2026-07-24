@@ -76,6 +76,20 @@
     "cancel": "Anuluj",
     "close": "Zamknij"
   },
+  "update": {
+    "title": "Dostępna aktualizacja",
+    "available_message": "Dostępna jest nowa wersja ({version}). Czy chcesz zaktualizować teraz?",
+    "checking": "Sprawdzanie…",
+    "check_now": "Sprawdź aktualizacje",
+    "up_to_date": "Masz już najnowszą wersję.",
+    "downloading": "Pobieranie aktualizacji…",
+    "ready": "Aktualizacja zainstalowana. Ponowne uruchamianie…",
+    "error": "Aktualizacja nie powiodła się. Możesz spróbować ponownie lub pobrać ręcznie.",
+    "now": "Zaktualizuj teraz",
+    "later": "Później",
+    "retry": "Spróbuj ponownie",
+    "download_manually": "Pobierz ręcznie"
+  },
   "tabs": {
     "welcome": "Start",
     "unsaved_confirm": "\"{name}\" ma niezapisane zmiany. Czy mimo to zamknąć?"
