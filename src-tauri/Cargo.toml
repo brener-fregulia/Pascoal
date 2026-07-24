@@ -33,6 +33,6 @@ path = "tests/pascal_runner.rs"
 
 [profile.release]
 strip = true
-lto = "thin"
-codegen-units = 16
+lto = true
+codegen-units = 1
 opt-level = "s"
