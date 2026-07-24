@@ -91,23 +91,36 @@
       {$i18n('welcome.open_folder')}
     </button>
 
-    <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <Git size={16} />
-      {$i18n('welcome.new_project_git')}
-    </button>
+    {#if import.meta.env.DEV}
+      <button
+        class="welcome-action"
+        on:click={() => console.log('coming soon')}
+      >
+        <Git size={16} />
+        {$i18n('welcome.new_project_git')}
+      </button>
+    {/if}
 
     <hr class="divider" />
     <h2>{$i18n('welcome.section_walkthroughs')}</h2>
 
-    <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <Play size={16} />
-      {$i18n('welcome.open_playground')}
-    </button>
+    {#if import.meta.env.DEV}
+      <button
+        class="welcome-action"
+        on:click={() => console.log('coming soon')}
+      >
+        <Play size={16} />
+        {$i18n('welcome.open_playground')}
+      </button>
 
-    <button class="welcome-action" on:click={() => console.log('coming soon')}>
-      <Git size={16} />
-      {$i18n('welcome.configure_git')}
-    </button>
+      <button
+        class="welcome-action"
+        on:click={() => console.log('coming soon')}
+      >
+        <Git size={16} />
+        {$i18n('welcome.configure_git')}
+      </button>
+    {/if}
   </div>
 
   <div class="welcome-section">

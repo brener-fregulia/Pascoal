@@ -14,9 +14,11 @@
   $: items = [
     { id: 'explorer', label: $i18n('activity.explorer'), icon: Folder },
     { id: 'search', label: $i18n('activity.search'), icon: Search },
-    { id: 'git', label: $i18n('activity.git'), icon: Git },
     ...(import.meta.env.DEV
-      ? [{ id: 'playground', label: $i18n('activity.playground'), icon: Play }]
+      ? [
+          { id: 'git', label: $i18n('activity.git'), icon: Git },
+          { id: 'playground', label: $i18n('activity.playground'), icon: Play },
+        ]
       : []),
   ]
 
