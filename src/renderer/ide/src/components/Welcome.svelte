@@ -101,10 +101,10 @@
       </button>
     {/if}
 
-    <hr class="divider" />
-    <h2>{$i18n('welcome.section_walkthroughs')}</h2>
-
     {#if import.meta.env.DEV}
+      <hr class="divider" />
+      <h2>{$i18n('welcome.section_walkthroughs')}</h2>
+
       <button
         class="welcome-action"
         on:click={() => console.log('coming soon')}
