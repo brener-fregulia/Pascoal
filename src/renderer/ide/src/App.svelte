@@ -21,6 +21,10 @@
     themeStore.init()
     await appStore.init()
 
+    if (!import.meta.env.DEV) {
+      window.addEventListener('contextmenu', (e) => e.preventDefault())
+    }
+
     if (!window.__TAURI__) return
     const { listen } = await import('@tauri-apps/api/event')
 
