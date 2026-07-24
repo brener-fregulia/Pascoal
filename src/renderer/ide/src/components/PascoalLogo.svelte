@@ -1,10 +1,11 @@
 <script lang="ts">
   import { themeStore } from '../stores/theme'
+  import logoSrc from '../assets/pascoal-logo.svg'
   export let height: number = 32
 </script>
 
 <img
-  src="/src/assets/pascoal-logo.svg"
+  src={logoSrc}
   alt="Pascoal"
   {height}
   class="logo"
