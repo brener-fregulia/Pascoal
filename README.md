@@ -8,7 +8,7 @@
 
 ## What is Pascoal?
 
-Pascoal is a desktop Pascal IDE built with Tauri and Rust, designed to bring Pascal programming to a modern audience. Clean interface, real compilation via Free Pascal (FPC), an interactive program console, file explorer, cross-file search, and Git integration - all in one lightweight package.
+Pascoal is a desktop Pascal IDE built with Tauri and Rust, designed to bring Pascal programming to a modern audience. Clean interface, real compilation via Free Pascal (FPC), an interactive program console, file explorer, and cross-file search - all in one lightweight package.
 
 It was born as a rebellion against outdated tools like Pascalzim, with the goal of making Pascal approachable and fun again - without the weight of Electron or the clutter of legacy UIs.
 
@@ -20,7 +20,8 @@ It was born as a rebellion against outdated tools like Pascalzim, with the goal 
 - **Multi-tab editing** - open multiple files simultaneously
 - **File explorer** - open a folder and browse its Pascal files
 - **Find and replace** - VSCode-style floating widget with match highlighting, plus cross-file search across an open folder
-- **Git integration** - view status, stage/unstage, inspect diffs, commit, and initialize repositories, all from a dedicated panel
+- **Guided FPC installer** - detects if Free Pascal isn't installed and offers to install it automatically via winget, apt, pacman, dnf, or zypper
+- **Auto-update** - checks for new versions and installs them automatically, with a manual "check for updates" option
 - **Native OS menu** - File and Help menus integrated into the titlebar, with direct links to report bugs or request features on GitHub
 - **Three themes** - Dark, Light and Charcoal, with system detection
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
@@ -32,8 +33,7 @@ It was born as a rebellion against outdated tools like Pascalzim, with the goal 
 
 - [Rust](https://rustup.rs/) (stable)
 - [Node.js](https://nodejs.org/) >= 22
-- [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) installed and available in PATH
-- [Git](https://git-scm.com/) installed and available in PATH (required for the Git panel)
+- [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) - not required beforehand, Pascoal detects if it's missing and offers to install it for you
 - [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform
 
 ## Getting started
@@ -102,6 +102,7 @@ src-tauri/
     git.rs                  # Git status, stage, diff, commit, and init commands
     compiler.rs             # FPC compilation logic
     installer.rs            # FPC package manager detection and guided install
+    winproc.rs              # Suppress console window flashes on Windows
     process.rs              # Process state, run_with_pipes, run_with_pty
     tests/                  # Rust unit tests
   tauri.conf.json
@@ -132,11 +133,11 @@ scripts/
 
 - [x] Recent files (Welcome screen)
 - [x] Open Folder / Project
-- [x] Git integration
 - [x] Find and replace, cross-file search
 - [x] GitHub Actions CI/CD
-- [ ] Guided FPC installer (auto-install via winget/apt/pacman/dnf/zypper)
-- [ ] Version checker / updater
+- [x] Guided FPC installer (auto-install via winget/apt/pacman/dnf/zypper)
+- [x] Version checker / updater
+- [ ] Git integration (implemented, not enabled for the first release)
 - [ ] PTY terminal (PowerShell, bash, fish)
 - [ ] Detached terminal window for running Pascal programs
 - [ ] Settings persistence (editor font size, console position)
