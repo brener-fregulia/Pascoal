@@ -8,7 +8,7 @@
 
 ## Czym jest Pascoal?
 
-Pascoal to desktopowe IDE Pascala stworzone przy użyciu Tauri i Rusta, zaprojektowane z myślą o przybliżeniu programowania w Pascalu współczesnym użytkownikom. Czysty interfejs, prawdziwa kompilacja za pomocą Free Pascal Compiler (FPC), interaktywna konsola programu, eksplorator plików, wyszukiwanie w wielu plikach oraz integracja z Git — wszystko w jednym lekkim pakiecie.
+Pascoal to desktopowe IDE Pascala stworzone przy użyciu Tauri i Rusta, zaprojektowane z myślą o przybliżeniu programowania w Pascalu współczesnym użytkownikom. Czysty interfejs, prawdziwa kompilacja za pomocą Free Pascal Compiler (FPC), interaktywna konsola programu, eksplorator plików i wyszukiwanie w wielu plikach — wszystko w jednym lekkim pakiecie.
 
 Projekt powstał jako bunt przeciwko przestarzałym narzędziom, takim jak Pascalzim, z celem uczynienia Pascala ponownie przystępnym i przyjemnym w użyciu — bez ciężaru Electrona i bałaganu starych interfejsów.
 
@@ -19,21 +19,21 @@ Projekt powstał jako bunt przeciwko przestarzałym narzędziom, takim jak Pasca
 - **Interaktywna konsola** z oddzielnymi sekcjami dla kompilacji i wyjścia programu — `readln` działa
 - **Edycja w wielu kartach** — otwieraj wiele plików jednocześnie
 - **Eksplorator plików** — otwieraj foldery i przeglądaj pliki Pascala
-- **Znajdź i zamień** — pływający widget w stylu VS Code z podświetlaniem wyników oraz wyszukiwaniem we wszystkich plikach otwartego folderu
-- **Integracja z Git** — przegląd statusu, stage/unstage, podgląd diffów, commity i inicjalizacja repozytoriów z poziomu dedykowanego panelu
+- **Znajdź i zamień** — pływający widget w stylu VSCode z podświetlaniem wyników oraz wyszukiwaniem we wszystkich plikach otwartego folderu
+- **Kreator instalacji FPC** — wykrywa brak Free Pascala i oferuje jego automatyczną instalację przez winget, apt, pacman, dnf lub zypper
+- **Automatyczne aktualizacje** — sprawdza dostępność nowych wersji i instaluje je automatycznie, z opcją ręcznego sprawdzenia aktualizacji
 - **Natywne menu systemowe** — menu Plik i Pomoc zintegrowane z paskiem tytułu oraz bezpośrednie odnośniki do zgłaszania błędów i propozycji funkcji na GitHubie
 - **Trzy motywy** — Dark, Light i Charcoal z automatycznym wykrywaniem motywu systemowego
 - **Natywne kontrolki okna** dostosowane do platformy (traffic lights w macOS, styl Windows/Linux)
 - **Automatyczne zapisywanie przed uruchomieniem** — konfigurowalne
 - **Interfejs wielojęzyczny** — English, Português (BR), Español (Latinoamérica) i Polski z zapamiętywaniem wybranego języka
-- **Lekka aplikacja** — zużywa około 170 MB pamięci RAM w systemie Windows (WebView2), 270 MB w systemie Linux (WebKitGTK), a instalatory mają rozmiar około 5 MB.
+- **Lekka aplikacja** — zużywa około 170 MB pamięci RAM w systemie Windows (WebView2), 270 MB w systemie Linux (WebKitGTK), a instalatory mają rozmiar około 5 MB
 
 ## Wymagania
 
 - [Rust](https://rustup.rs/) (stable)
 - [Node.js](https://nodejs.org/) >= 22
-- [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) zainstalowany i dostępny w zmiennej PATH
-- [Git](https://git-scm.com/) zainstalowany i dostępny w zmiennej PATH (wymagany dla panelu Git)
+- [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) — nie trzeba instalować go wcześniej; Pascoal wykrywa jego brak i proponuje instalację
 - [Wymagania Tauri](https://tauri.app/start/prerequisites/) dla Twojej platformy
 
 ## Pierwsze kroki
@@ -88,34 +88,32 @@ npm run test:pascal   # testy integracyjne Pascala (wymagają FPC)
 ## Struktura projektu
 
 ```text
-src/
-  renderer/
-    ide/                    # Frontend Svelte + Vite
-      src/
-        components/         # Komponenty Svelte (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
-        icons/              # Komponenty ikon SVG
-        stores/             # Store'y Svelte (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
-        i18n/               # Pliki lokalizacji i store tłumaczeń
-        styles/             # Globalny CSS
+src/                       # Frontend Svelte + Vite
+  components/              # Komponenty Svelte (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
+  icons/                   # Komponenty ikon SVG
+  stores/                  # Store'y Svelte (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
+  i18n/                    # Pliki lokalizacji i store tłumaczeń
+  styles/                  # Globalny CSS
 src-tauri/
   src/
-    lib.rs                  # Konfiguracja aplikacji i rejestracja komend
-    env.rs                  # Wykrywanie FPC i katalog dokumentów
-    fs.rs                   # Komendy I/O plików, eksplorator folderów i wyszukiwanie w wielu plikach
-    git.rs                  # Komendy Git: status, stage, diff, commit i init
-    compiler.rs             # Logika kompilacji FPC
-    installer.rs            # Wykrywanie menedżera pakietów FPC i instalacja z przewodnikiem
-    process.rs              # Stan procesów, run_with_pipes, run_with_pty
-    tests/                  # Testy jednostkowe Rust
+    lib.rs                 # Konfiguracja aplikacji i rejestracja komend
+    env.rs                 # Wykrywanie FPC i katalog dokumentów
+    fs.rs                  # Komendy I/O plików, eksplorator folderów i wyszukiwanie w wielu plikach
+    git.rs                 # Komendy Git: status, stage, diff, commit i init
+    compiler.rs            # Logika kompilacji FPC
+    installer.rs           # Wykrywanie menedżera pakietów FPC i instalacja z przewodnikiem
+    winproc.rs             # Ukrywanie mignięć okien konsoli w systemie Windows
+    process.rs             # Stan procesów, run_with_pipes, run_with_pty
+    tests/                 # Testy jednostkowe Rust
   tauri.conf.json
   Cargo.toml
 tests/
-  frontend/                 # Testy Vitest
-  pascal/                   # Testy integracyjne Pascala i skrypty
+  frontend/                # Testy Vitest
+  pascal/                  # Testy integracyjne Pascala i skrypty
 docs/
-  readme/                   # Tłumaczenia README
+  readme/                  # Tłumaczenia README
 scripts/
-  set-version.cjs           # Skrypt aktualizacji wersji
+  set-version.cjs          # Skrypt aktualizacji wersji
 ```
 
 ## Stos technologiczny
@@ -135,10 +133,11 @@ scripts/
 
 - [x] Ostatnie pliki (ekran powitalny)
 - [x] Otwieranie folderu / projektu
-- [x] Integracja z Git
 - [x] Znajdź i zamień, wyszukiwanie w wielu plikach
 - [x] GitHub Actions CI/CD
-- [ ] Kreator instalacji FPC (automatyczna instalacja przez winget/apt/pacman/dnf/zypper)
+- [x] Kreator instalacji FPC (automatyczna instalacja przez winget/apt/pacman/dnf/zypper)
+- [x] Sprawdzanie wersji / aktualizator
+- [ ] Integracja z Git (zaimplementowana, ale niewłączona w pierwszym wydaniu)
 - [ ] Terminal PTY (PowerShell, bash, fish)
 - [ ] Oddzielne okno terminala do uruchamiania programów Pascala
 - [ ] Zapamiętywanie ustawień (rozmiar czcionki edytora, położenie konsoli)
@@ -148,7 +147,7 @@ scripts/
 
 ## Współtworzenie
 
-Wkład w projekt jest mile widziany. Zachęcamy do otwierania issues i pull requestów. Zgłoszenia błędów i propozycje nowych funkcji korzystają z ustrukturyzowanych formularzy GitHub Issue Forms, dostępnych bezpośrednio z menu Pomoc w aplikacji.
+Wkład w projekt jest mile widziany. Zachęcamy do otwierania issues i pull requestów. Zgłoszenia błędów i propozycje nowych funkcji korzystają z ustrukturyzowanych formularzy [GitHub Issue Forms](../../.github/ISSUE_TEMPLATE/), dostępnych bezpośrednio z menu Pomoc w aplikacji.
 
 ## Licencja
 
