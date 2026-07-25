@@ -88,15 +88,12 @@ npm run test:pascal   # Pascal integration tests (requires FPC)
 ## Project structure
 
 ```
-src/
-  renderer/
-    ide/                    # Svelte + Vite frontend
-      src/
-        components/         # Svelte components (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
-        icons/               # SVG icon components
-        stores/              # Svelte stores (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
-        i18n/                # Locale files and translation store
-        styles/              # Global CSS
+src/                       # Svelte + Vite frontend
+  components/              # Svelte components (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
+  icons/                   # SVG icon components
+  stores/                  # Svelte stores (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
+  i18n/                    # Locale files and translation store
+  styles/                  # Global CSS
 src-tauri/
   src/
     lib.rs                  # App setup and command registration
