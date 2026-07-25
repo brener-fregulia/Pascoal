@@ -10,13 +10,13 @@
     "strictNullChecks": true,
     "paths": {
       "@stores/*": [
-        "./src/stores/*"
+        "./stores/*"
       ]
     }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.svelte"
+    "**/*.ts",
+    "**/*.svelte"
   ],
   "exclude": [
     "node_modules",

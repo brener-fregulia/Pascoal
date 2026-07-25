@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [svelte()],
   resolve: {
     alias: {
-      '@stores': path.resolve(__dirname, 'src/stores'),
+      '@stores': path.resolve(__dirname, 'stores'),
     },
   },
   clearScreen: false,
@@ -23,7 +23,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['../../../tests/frontend/setup.ts'],
-    include: ['../../../tests/frontend/**/*.test.ts'],
+    setupFiles: ['../tests/frontend/setup.ts'],
+    include: ['../tests/frontend/**/*.test.ts'],
   },
 })

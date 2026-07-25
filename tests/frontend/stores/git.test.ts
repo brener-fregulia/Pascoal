@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { gitStore } from '../../../src/renderer/ide/src/stores/gitStore'
-import { explorerStore } from '../../../src/renderer/ide/src/stores/explorerStore'
+import { gitStore } from '../../../src/stores/gitStore'
+import { explorerStore } from '../../../src/stores/explorerStore'
 
 function state() {
     return get(gitStore)

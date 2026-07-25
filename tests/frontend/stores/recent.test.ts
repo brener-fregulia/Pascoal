@@ -3,7 +3,7 @@ import { get } from 'svelte/store'
 import {
   recentStore,
   type RecentFile,
-} from '../../../src/renderer/ide/src/stores/recent'
+} from '../../../src/stores/recent'
 
 function state(): RecentFile[] {
   return get(recentStore) as RecentFile[]
@@ -160,48 +160,48 @@ describe('recentStore', () => {
     it('removes entries whose files do not exist', async () => {
       recentStore.add('/home/user/exists.pas')
       recentStore.add('/home/user/missing.pas')
-      ;(window as any).__TAURI__ = {
-        core: {
-          invoke: vi.fn((_cmd: string, args: { path: string }) =>
-            Promise.resolve(args.path.includes('exists')),
-          ),
-        },
-      } as any
+        ; (window as any).__TAURI__ = {
+          core: {
+            invoke: vi.fn((_cmd: string, args: { path: string }) =>
+              Promise.resolve(args.path.includes('exists')),
+            ),
+          },
+        } as any
 
       await recentStore.validate()
 
       expect(state()).toHaveLength(1)
       expect(state()[0].filePath).toBe('/home/user/exists.pas')
-      ;(window as any).__TAURI__ = undefined as any
+        ; (window as any).__TAURI__ = undefined as any
     })
 
     it('keeps entries when file_exists returns true', async () => {
       recentStore.add('/home/user/a.pas')
       recentStore.add('/home/user/b.pas')
-      ;(window as any).__TAURI__ = {
-        core: {
-          invoke: vi.fn(() => Promise.resolve(true)),
-        },
-      } as any
+        ; (window as any).__TAURI__ = {
+          core: {
+            invoke: vi.fn(() => Promise.resolve(true)),
+          },
+        } as any
 
       await recentStore.validate()
 
       expect(state()).toHaveLength(2)
-      ;(window as any).__TAURI__ = undefined as any
+        ; (window as any).__TAURI__ = undefined as any
     })
 
     it('removes entries when file_exists invoke throws', async () => {
       recentStore.add('/home/user/a.pas')
-      ;(window as any).__TAURI__ = {
-        core: {
-          invoke: vi.fn(() => Promise.reject(new Error('not found'))),
-        },
-      } as any
+        ; (window as any).__TAURI__ = {
+          core: {
+            invoke: vi.fn(() => Promise.reject(new Error('not found'))),
+          },
+        } as any
 
       await recentStore.validate()
 
       expect(state()).toHaveLength(0)
-      ;(window as any).__TAURI__ = undefined as any
+        ; (window as any).__TAURI__ = undefined as any
     })
   })
 })

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { get } from 'svelte/store'
-import { themeStore } from '../../../src/renderer/ide/src/stores/theme'
+import { themeStore } from '../../../src/stores/theme'
 
 type Theme = 'dark' | 'light' | 'charcoal'
 

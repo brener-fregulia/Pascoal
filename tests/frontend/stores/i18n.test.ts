@@ -6,7 +6,7 @@ import {
   t,
   LOCALE_OPTIONS,
   type Locale,
-} from '../../../src/renderer/ide/src/i18n'
+} from '../../../src/i18n'
 describe('localeStore', () => {
   beforeEach(() => {
     localStorage.clear()

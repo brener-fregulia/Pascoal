@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { tabStore, type Tab } from '../../../src/renderer/ide/src/stores/tabs'
+import { tabStore, type Tab } from '../../../src/stores/tabs'
 
 interface TabState {
   tabs: Tab[]
