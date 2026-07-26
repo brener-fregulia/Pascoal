@@ -7,12 +7,12 @@ const version = process.argv[2]
 
 if (!version) {
     console.error('Usage: node scripts/set-version.js <version>')
-    console.error('Example: node scripts/set-version.js 0.9.0')
+    console.error('Example: node scripts/set-version.js 2026.1.0')
     process.exit(1)
 }
 
-if (!/^\d+\.\d+\.\d+$/.test(version)) {
-    console.error('Version must follow semver format: X.Y.Z')
+if (!/^\d{4}\.\d+\.\d+$/.test(version)) {
+    console.error('Version must follow YEAR.FEAT.PATCH format: e.g. 2026.1.0')
     process.exit(1)
 }
 
