@@ -12,6 +12,15 @@ Pascoal é uma IDE desktop para Pascal desenvolvida com Tauri e Rust, criada par
 
 Ele nasceu como uma rebelião contra ferramentas ultrapassadas como o Pascalzim, com o objetivo de tornar Pascal acessível e divertido novamente — sem o peso do Electron nem a bagunça de interfaces legadas.
 
+## Download
+
+Baixe o instalador mais recente para a sua plataforma na [página de Releases](https://github.com/brener-fregulia/Pascoal/releases/latest):
+
+- **Windows** — `Pascoal_x.x.x_x64-setup.exe`
+- **Linux** — `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) ou `.AppImage` (qualquer distro)
+
+> **Aviso do SmartScreen no Windows:** o instalador do Pascoal ainda não é assinado digitalmente, então o Windows pode exibir "O Windows protegeu o computador" na primeira execução. Isso é normal para aplicativos novos e não assinados — clique em **Mais informações** → **Executar assim mesmo** para prosseguir. O aviso desaparece com o tempo, conforme mais pessoas baixam e executam o Pascoal.
+
 ## Funcionalidades
 
 - **Editor moderno** com CodeMirror 6, destaque de sintaxe para Pascal e temas reativos
