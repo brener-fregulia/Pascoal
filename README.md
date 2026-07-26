@@ -12,6 +12,15 @@ Pascoal is a desktop Pascal IDE built with Tauri and Rust, designed to bring Pas
 
 It was born as a rebellion against outdated tools like Pascalzim, with the goal of making Pascal approachable and fun again - without the weight of Electron or the clutter of legacy UIs.
 
+## Download
+
+Grab the latest installer for your platform from the [Releases page](https://github.com/brener-fregulia/Pascoal/releases/latest):
+
+- **Windows** - `Pascoal_x.x.x_x64-setup.exe`
+- **Linux** - `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE), or `.AppImage` (any distro)
+
+> **Windows SmartScreen warning:** Pascoal's installer isn't code-signed yet, so Windows may show "Windows protected your PC" the first time you run it. This is normal for new, unsigned applications - click **More info** → **Run anyway** to proceed. The warning fades away over time as more people download and run Pascoal.
+
 ## Features
 
 - **Modern editor** powered by CodeMirror 6 with Pascal syntax highlighting and reactive theming
