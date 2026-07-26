@@ -15,10 +15,10 @@ jobs:
         platform: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -36,7 +36,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
+        with:
+          version: "v0.10.0"
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
