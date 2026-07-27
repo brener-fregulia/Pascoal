@@ -36,7 +36,7 @@ Grab the latest installer for your platform from the [Releases page](https://git
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
 - **Auto-save before run** - configurable
 - **Internationalized UI** - English, Português (BR), Español (Latinoamérica), and Polski, with persisted locale selection
-- **Lightweight** - ~170MB RAM on Windows (WebView2), ~270MB on Linux (WebKitGTK), ~5MB installers
+- **Lightweight** - ~170MB RAM on Windows (WebView2), ~270MB on Linux (WebKitGTK), small installers
 
 ## Requirements
 
