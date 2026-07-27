@@ -106,3 +106,48 @@ body {
 .cm-pascal-builtin {
   color: #61AFEF !important;
 }
+
+/* ── Tree-sitter based highlighting (pascal-treesitter.ts) ────── */
+
+.cm-ts-keyword {
+  color: var(--accent) !important;
+  font-weight: 500;
+}
+
+.cm-ts-string {
+  color: var(--success) !important;
+}
+
+.cm-ts-number {
+  color: #E5A84A !important;
+}
+
+.cm-ts-comment {
+  color: var(--text-dim) !important;
+  font-style: italic;
+}
+
+.cm-ts-operator {
+  color: var(--text) !important;
+}
+
+.cm-ts-punctuation {
+  color: var(--text-dim) !important;
+}
+
+.cm-ts-constant {
+  color: #E5A84A !important;
+}
+
+.cm-ts-type {
+  color: var(--accent2) !important;
+  font-style: italic;
+}
+
+.cm-ts-function {
+  color: #61AFEF !important;
+}
+
+.cm-ts-variable {
+  color: var(--text) !important;
+}
