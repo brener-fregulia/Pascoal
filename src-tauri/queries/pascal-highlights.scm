@@ -333,13 +333,11 @@
 ;(defaultValue ((identifier) @constant
 ; (#match? @constant "^[A-Z][A-Z0-9_]+$|^[a-z]{1,2}[A-Z].+$")))
 
-; -- Use scoping information for additional highlighting. THIS NEED TO BE LAST.
-; FIXME: Right now this is buggy, because in case of something like this:
-;   procedure (x: integer);
-;   begin
-;     a.x;
-;   end;
-; The x in a.x would be highlighted as a parameter. Not what we want! We have to
-; come up with a more specific rule. Only the left-most identifier should be
-; matched.
-(identifier)      @identifier
+; NOTE: We intentionally do NOT have a catch-all (identifier) @identifier rule
+; here. tree-sitter-highlight resolves multiple patterns matching the exact
+; same node by keeping the LAST one that matched (see HighlightIter::next in
+; the tree-sitter-highlight crate). A catch-all at the end of the file would
+; always win over the more specific @type/@function/@variable rules above,
+; silently discarding them. Plain identifiers with no more specific capture
+; simply get no highlight span, which is fine: the frontend has no CSS class
+; for "identifier" anyway and falls back to the default text color.
