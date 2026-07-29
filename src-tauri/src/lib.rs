@@ -1,10 +1,12 @@
+mod application;
+mod commands;
 mod compiler;
 mod env;
 mod fs;
 mod git;
 mod installer;
+mod language;
 mod process;
-mod syntax;
 mod winproc;
 
 use env::{detect_fpc, get_documents_dir};
@@ -82,7 +84,7 @@ pub fn run() {
             process::send_input,
             installer::detect_installer,
             installer::install_fpc,
-            syntax::highlight_pascal,
+            commands::language_commands::highlight_pascal,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")

@@ -1,6 +1,6 @@
 use tree_sitter_highlight::{Highlight, HighlightConfiguration, HighlightEvent, Highlighter};
 
-const HIGHLIGHTS_QUERY: &str = include_str!("../queries/pascal-highlights.scm");
+const HIGHLIGHTS_QUERY: &str = include_str!("./pascal-highlights.scm");
 
 const HIGHLIGHT_NAMES: &[&str] = &[
     "keyword",
@@ -27,8 +27,10 @@ pub struct HighlightSpan {
     pub kind: String,
 }
 
-#[tauri::command]
-pub fn highlight_pascal(source: String) -> Result<Vec<HighlightSpan>, String> {
+/// Runs Tree-sitter highlighting over Pascal source and returns the
+/// resolved spans. Pure function - no Tauri state, no IPC concerns.
+/// The Tauri command boundary lives in `commands::language_commands`.
+pub fn highlight(source: &str) -> Result<Vec<HighlightSpan>, String> {
     let mut config = HighlightConfiguration::new(
         tree_sitter_pascal::LANGUAGE.into(),
         "pascal",
