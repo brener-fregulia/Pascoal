@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
-import { tabStore } from './tabs'
+import { tabStore } from '../stores/tabs'
 import { consoleStore, clearConsoleSignal } from './console'
-import { settingsStore } from './settings'
+import { settingsStore } from '../stores/settings'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export async function runActiveFile() {

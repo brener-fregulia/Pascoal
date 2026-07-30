@@ -2,12 +2,12 @@
   import Welcome from './Welcome.svelte'
   import TabBar from '../shared/TabBar.svelte'
   import Editor from './Editor.svelte'
-  import Console from './Console.svelte'
+  import Console from '../toolchain/Console.svelte'
   import FileTree from './FileTree.svelte'
   import SearchPanel from './SearchPanel.svelte'
   import GitPanel from './GitPanel.svelte'
   import { tabStore } from '../stores/tabs'
-  import { consoleStore } from '../stores/console'
+  import { consoleStore } from '../toolchain/console'
 
   export let activePanel: string | null
 

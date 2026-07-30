@@ -6,7 +6,7 @@
   import { themeStore } from '../shared/theme'
   import { explorerStore } from '../stores/explorerStore'
   import { pendingJumpLine } from '../stores/searchStore'
-  import { runActiveFile } from '../stores/runner'
+  import { runActiveFile } from '../toolchain/runner'
   import { themeCompartment } from '../stores/editor-extensions'
   import { buildPascoalTheme } from '../stores/editor-theme'
   import { i18n } from '../i18n'

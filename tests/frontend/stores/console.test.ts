@@ -5,7 +5,7 @@ import {
   clearConsoleSignal,
   type BuildStatus,
   type ConsolePosition,
-} from '../../../src/stores/console'
+} from '../../../src/toolchain/console'
 
 interface ConsoleState {
   visible: boolean

@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { i18n } from '../i18n'
   import { appStore } from '../stores/app'
-  import { fpcInstallStore } from '../stores/fpcInstall'
+  import { fpcInstallStore } from '../toolchain/fpcInstall'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   const DOWNLOAD_URL = 'https://www.freepascal.org/download.html'

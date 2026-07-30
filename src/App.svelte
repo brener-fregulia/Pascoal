@@ -11,7 +11,7 @@
   import { themeStore } from './shared/theme'
   import { tabStore } from './stores/tabs'
   import { explorerStore } from './stores/explorerStore'
-  import { fpcInstallStore } from './stores/fpcInstall'
+  import { fpcInstallStore } from './toolchain/fpcInstall'
   import { updateStore } from './stores/updateStore'
   import { isTauriAvailable, invoke } from './integrations/tauri/client'
 

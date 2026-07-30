@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
-  import { consoleStore, clearConsoleSignal } from '../stores/console'
+  import { consoleStore, clearConsoleSignal } from './console'
   import { i18n } from '../i18n'
   import PanelHeader from '../shared/PanelHeader.svelte'
   import IconButton from '../shared/IconButton.svelte'
