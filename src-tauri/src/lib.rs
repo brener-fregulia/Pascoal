@@ -6,13 +6,12 @@ mod fs;
 mod git;
 mod installer;
 mod language;
-mod process;
 mod state;
 mod toolchain;
 mod winproc;
 
 use env::{detect_fpc, get_documents_dir};
-use process::ProcessState;
+use state::ProcessState;
 
 // ── Structs ───────────────────────────────────────────────────────────────────
 
@@ -82,8 +81,8 @@ pub fn run() {
             git::git_init,
             git::git_check_identity,
             git::git_set_identity,
-            process::compile_and_run,
-            process::send_input,
+            commands::process_commands::compile_and_run,
+            commands::process_commands::send_input,
             installer::detect_installer,
             installer::install_fpc,
             commands::language_commands::highlight_pascal,
