@@ -1,4 +1,4 @@
-use crate::compiler::compile;
+use crate::toolchain::compiler::compile;
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {

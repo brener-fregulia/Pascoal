@@ -1,5 +1,5 @@
 use crate::application::run_program;
-use crate::compiler::CompileResult;
+use crate::toolchain::compiler::CompileResult;
 
 #[tauri::command]
 pub async fn compile_and_run(app: tauri::AppHandle, code: String) -> CompileResult {

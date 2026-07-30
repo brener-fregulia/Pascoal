@@ -1,6 +1,5 @@
 mod application;
 mod commands;
-mod compiler;
 mod infrastructure;
 mod installer;
 mod language;

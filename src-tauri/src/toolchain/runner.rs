@@ -1,7 +1,6 @@
-use tauri::Emitter;
-
-use crate::compiler::CompileResult;
 use crate::state::ProcessState;
+use crate::toolchain::compiler::CompileResult;
+use tauri::Emitter;
 
 pub async fn run_with_pipes(
     app: &tauri::AppHandle,
