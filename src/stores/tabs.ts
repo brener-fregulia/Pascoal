@@ -3,6 +3,7 @@ import { EditorState } from '@codemirror/state'
 import { pascalExtensions } from './editor-extensions'
 import { t } from '../i18n'
 import { ask } from '@tauri-apps/plugin-dialog'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 let tabCounter = 0
 
@@ -47,11 +48,11 @@ function createTabStore() {
 
     while (
       existingNames.includes(candidate) ||
-      (window.__TAURI__ &&
+      (isTauriAvailable() &&
         window.__documentsDir &&
-        (await (window.__TAURI__.core.invoke('file_exists', {
+        (await invoke<boolean>('file_exists', {
           path: `${window.__documentsDir}/${candidate}`,
-        }) as Promise<boolean>)))
+        })))
     ) {
       n++
       candidate = `untitled-${n}.pas`
@@ -128,7 +129,7 @@ function createTabStore() {
     if (!tab) return false
 
     if (tab.isDirty) {
-      const confirmed = window.__TAURI__
+      const confirmed = isTauriAvailable()
         ? await ask(t('tabs.unsaved_confirm', { name: tab.fileName }), { title: 'Pascoal', kind: 'warning' })
         : window.confirm(t('tabs.unsaved_confirm', { name: tab.fileName }))
       if (!confirmed) return false
