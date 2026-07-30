@@ -10,6 +10,7 @@
   import Git from '../icons/Git.svelte'
   import Play from '../icons/Play.svelte'
   import X from '../icons/X.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
@@ -23,11 +24,9 @@
   }
 
   async function handleOpenFile() {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      const result = (await window.__TAURI__.core.invoke('open_file')) as
-        | [string, string]
-        | null
+      const result = await invoke<[string, string] | null>('open_file')
       if (result) {
         const [filePath, content] = result
         const tab = await tabStore.openFile(filePath, content)
@@ -40,17 +39,17 @@
   }
 
   async function handleOpenFolder() {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const { emit } = await import('@tauri-apps/api/event')
     await emit('menu-open-folder')
   }
 
   async function openRecent(entry: RecentFile) {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      const content = (await window.__TAURI__.core.invoke('read_file', {
+      const content = await invoke<string>('read_file', {
         path: entry.filePath,
-      })) as string
+      })
       const tab = await tabStore.openFile(entry.filePath, content)
       tabStore.activate(tab.id)
       recentStore.add(entry.filePath)
