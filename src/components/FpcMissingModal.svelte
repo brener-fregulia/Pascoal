@@ -3,6 +3,7 @@
   import { i18n } from '../i18n'
   import { appStore } from '../stores/app'
   import { fpcInstallStore } from '../stores/fpcInstall'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   const DOWNLOAD_URL = 'https://www.freepascal.org/download.html'
 
@@ -13,7 +14,7 @@
   let unlistenError: (() => void) | null = null
 
   onMount(async () => {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const { listen } = await import('@tauri-apps/api/event')
 
     unlistenOutput = await listen<string>('fpc-install-output', (e) => {
@@ -50,9 +51,9 @@
   }
 
   async function handleDownload() {
-    if (window.__TAURI__) {
+    if (isTauriAvailable()) {
       try {
-        await window.__TAURI__.core.invoke('open_url', { url: DOWNLOAD_URL })
+        await invoke('open_url', { url: DOWNLOAD_URL })
         return
       } catch {
         // fall through to window.open
