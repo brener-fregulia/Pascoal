@@ -1,4 +1,4 @@
-use crate::fs::list_folder_tree;
+use crate::project::files::list_folder_tree;
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -16,7 +16,7 @@ fn tree_includes_all_file_types() {
     fs::write(dir.join(".env"), "").unwrap();
     fs::write(dir.join("readme.txt"), "").unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
 
     let names: Vec<&str> = nodes.iter().map(|n| n.name.as_str()).collect();
     assert!(names.contains(&"main.pas"));
@@ -31,7 +31,7 @@ fn tree_lists_directories_before_files() {
     fs::write(dir.join("zzz.pas"), "").unwrap();
     fs::create_dir(dir.join("aaa_folder")).unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
 
     assert!(nodes[0].is_directory);
     assert_eq!(nodes[0].name, "aaa_folder");
@@ -45,7 +45,7 @@ fn tree_recurses_into_subfolders() {
     fs::create_dir(&sub).unwrap();
     fs::write(sub.join("main.pas"), "").unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
 
     assert_eq!(nodes.len(), 1);
     assert!(nodes[0].is_directory);
@@ -61,7 +61,7 @@ fn tree_excludes_git_directory() {
     fs::write(dir.join(".git").join("HEAD"), "").unwrap();
     fs::write(dir.join("main.pas"), "").unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
 
     let names: Vec<&str> = nodes.iter().map(|n| n.name.as_str()).collect();
     assert!(!names.contains(&".git"));
@@ -75,7 +75,7 @@ fn tree_relative_path_is_correct_for_nested_file() {
     fs::create_dir(&sub).unwrap();
     fs::write(sub.join("main.pas"), "").unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
     let children = nodes[0].children.as_ref().unwrap();
 
     let expected = std::path::Path::new("src").join("main.pas");
@@ -85,13 +85,13 @@ fn tree_relative_path_is_correct_for_nested_file() {
 #[test]
 fn tree_returns_empty_for_empty_folder() {
     let dir = tmp_dir("empty");
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
     assert_eq!(nodes.len(), 0);
 }
 
 #[test]
 fn tree_returns_empty_for_invalid_path() {
-    let nodes = list_folder_tree("/nonexistent/path/xyz".to_string());
+    let nodes = list_folder_tree("/nonexistent/path/xyz");
     assert_eq!(nodes.len(), 0);
 }
 
@@ -100,7 +100,7 @@ fn empty_subfolder_has_empty_children_not_none() {
     let dir = tmp_dir("empty_subfolder");
     fs::create_dir(dir.join("empty_dir")).unwrap();
 
-    let nodes = list_folder_tree(dir.to_string_lossy().to_string());
+    let nodes = list_folder_tree(&dir.to_string_lossy());
 
     assert!(nodes[0].is_directory);
     assert_eq!(nodes[0].children.as_ref().unwrap().len(), 0);

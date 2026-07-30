@@ -1,4 +1,4 @@
-use crate::fs::search_in_folder;
+use crate::project::search::search_in_folder;
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -17,11 +17,7 @@ fn finds_matches_in_single_file() {
     )
     .unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 1);
     assert_eq!(results[0].file_name, "main.pas");
@@ -34,11 +30,7 @@ fn finds_matches_across_multiple_files() {
     fs::write(dir.join("main.pas"), "writeln('a');\n").unwrap();
     fs::write(dir.join("utils.pas"), "writeln('b');\nwriteln('c');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 3);
 }
@@ -50,11 +42,7 @@ fn finds_matches_in_subfolders() {
     fs::create_dir(&sub).unwrap();
     fs::write(sub.join("utils.pas"), "writeln('nested');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 1);
     assert_eq!(results[0].file_name, "utils.pas");
@@ -65,11 +53,7 @@ fn returns_empty_for_no_matches() {
     let dir = tmp_dir("no_matches");
     fs::write(dir.join("main.pas"), "program Main;\nbegin\nend.\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "nonexistent_term".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "nonexistent_term", false);
 
     assert_eq!(results.len(), 0);
 }
@@ -79,7 +63,7 @@ fn returns_empty_for_empty_query() {
     let dir = tmp_dir("empty_query");
     fs::write(dir.join("main.pas"), "writeln('a');\n").unwrap();
 
-    let results = search_in_folder(dir.to_string_lossy().to_string(), "".to_string(), false);
+    let results = search_in_folder(&dir.to_string_lossy(), "", false);
 
     assert_eq!(results.len(), 0);
 }
@@ -89,11 +73,7 @@ fn case_insensitive_by_default() {
     let dir = tmp_dir("case_insensitive");
     fs::write(dir.join("main.pas"), "WriteLn('a');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 1);
 }
@@ -103,11 +83,7 @@ fn case_sensitive_when_enabled() {
     let dir = tmp_dir("case_sensitive");
     fs::write(dir.join("main.pas"), "WriteLn('a');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        true,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", true);
 
     assert_eq!(results.len(), 0);
 }
@@ -117,11 +93,7 @@ fn ignores_non_pas_files() {
     let dir = tmp_dir("ignore_non_pas");
     fs::write(dir.join("notes.txt"), "writeln this is not pascal\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 0);
 }
@@ -133,11 +105,7 @@ fn ignores_git_directory() {
     fs::create_dir(&git_dir).unwrap();
     fs::write(git_dir.join("fake.pas"), "writeln('should not match');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 0);
 }
@@ -147,11 +115,7 @@ fn returns_correct_column_position() {
     let dir = tmp_dir("column_position");
     fs::write(dir.join("main.pas"), "  writeln('a');\n").unwrap();
 
-    let results = search_in_folder(
-        dir.to_string_lossy().to_string(),
-        "writeln".to_string(),
-        false,
-    );
+    let results = search_in_folder(&dir.to_string_lossy(), "writeln", false);
 
     assert_eq!(results.len(), 1);
     assert_eq!(results[0].column, 2);

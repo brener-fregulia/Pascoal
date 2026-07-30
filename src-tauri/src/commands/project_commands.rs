@@ -1,0 +1,58 @@
+use crate::application::{manage_files, manage_workspace};
+use crate::infrastructure::filesystem;
+use crate::project::files::{ExplorerNode, OpenFolderResult, SaveResult};
+use crate::project::search::SearchMatch;
+
+#[tauri::command]
+pub async fn open_file(app: tauri::AppHandle) -> Option<(String, String)> {
+    manage_files::open_file(app).await
+}
+
+#[tauri::command]
+pub async fn save_file(content: String, file_path: String) -> Result<SaveResult, String> {
+    manage_files::save_file(content, file_path)
+}
+
+#[tauri::command]
+pub async fn save_file_as(
+    app: tauri::AppHandle,
+    content: String,
+    suggested_name: String,
+    folder_path: Option<String>,
+) -> Option<SaveResult> {
+    manage_files::save_file_as(app, content, suggested_name, folder_path).await
+}
+
+#[tauri::command]
+pub fn file_exists(path: String) -> bool {
+    manage_files::file_exists(path)
+}
+
+#[tauri::command]
+pub fn read_file(path: String) -> Result<String, String> {
+    manage_files::read_file(path)
+}
+
+#[tauri::command]
+pub fn open_url(url: String) {
+    filesystem::open_url(&url)
+}
+
+#[tauri::command]
+pub async fn open_folder(app: tauri::AppHandle) -> Option<OpenFolderResult> {
+    manage_workspace::open_folder(app).await
+}
+
+#[tauri::command]
+pub fn list_folder_tree(folder_path: String) -> Vec<ExplorerNode> {
+    manage_workspace::list_folder_tree(folder_path)
+}
+
+#[tauri::command]
+pub fn search_in_folder(
+    folder_path: String,
+    query: String,
+    case_sensitive: bool,
+) -> Vec<SearchMatch> {
+    manage_workspace::search_in_folder(folder_path, query, case_sensitive)
+}

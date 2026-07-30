@@ -1,7 +1,7 @@
 use tauri::Emitter;
 
 use crate::compiler::{compile, get_tmp_dir, CompileResult};
-use crate::fs::write_file;
+use crate::infrastructure::filesystem::write_file;
 use crate::state::ProcessState;
 use crate::toolchain::runner::{run_with_pipes, run_with_pty};
 

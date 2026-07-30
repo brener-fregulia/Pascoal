@@ -2,10 +2,11 @@ mod application;
 mod commands;
 mod compiler;
 mod env;
-mod fs;
 mod git;
+mod infrastructure;
 mod installer;
 mod language;
+mod project;
 mod state;
 mod toolchain;
 mod winproc;
@@ -62,15 +63,15 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             get_app_info,
-            fs::open_file,
-            fs::save_file,
-            fs::save_file_as,
-            fs::file_exists,
-            fs::read_file,
-            fs::open_folder,
-            fs::list_folder_tree,
-            fs::open_url,
-            fs::search_in_folder,
+            commands::project_commands::open_file,
+            commands::project_commands::save_file,
+            commands::project_commands::save_file_as,
+            commands::project_commands::file_exists,
+            commands::project_commands::read_file,
+            commands::project_commands::open_folder,
+            commands::project_commands::list_folder_tree,
+            commands::project_commands::open_url,
+            commands::project_commands::search_in_folder,
             git::git_status,
             git::git_diff,
             git::git_stage,
