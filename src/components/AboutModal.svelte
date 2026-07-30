@@ -3,6 +3,7 @@
   import { i18n } from '../i18n'
   import { updateStore } from '../stores/updateStore'
   import PascoalLogo from './PascoalLogo.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let { open = $bindable(false) }: { open: boolean } = $props()
 
@@ -20,9 +21,9 @@
   }
 
   async function openRepo() {
-    if (window.__TAURI__) {
+    if (isTauriAvailable()) {
       try {
-        await window.__TAURI__.core.invoke('open_url', { url: REPO })
+        await invoke('open_url', { url: REPO })
         return
       } catch {
         // fall through to window.open
