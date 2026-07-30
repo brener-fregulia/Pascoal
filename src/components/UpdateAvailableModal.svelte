@@ -1,6 +1,7 @@
 <script lang="ts">
   import { i18n } from '../i18n'
   import { updateStore } from '../stores/updateStore'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   const RELEASES_URL = 'https://github.com/brener-fregulia/Pascoal/releases'
 
@@ -20,9 +21,9 @@
   }
 
   async function handleDownloadManually() {
-    if (window.__TAURI__) {
+    if (isTauriAvailable()) {
       try {
-        await window.__TAURI__.core.invoke('open_url', { url: RELEASES_URL })
+        await invoke('open_url', { url: RELEASES_URL })
         return
       } catch {
         // fall through to window.open
