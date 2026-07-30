@@ -2,9 +2,10 @@ import { get } from 'svelte/store'
 import { tabStore } from './tabs'
 import { consoleStore, clearConsoleSignal } from './console'
 import { settingsStore } from './settings'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export async function runActiveFile() {
-  if (!window.__TAURI__) return
+  if (!isTauriAvailable()) return
 
   const tab = tabStore.getActive()
   if (!tab) {
@@ -19,7 +20,7 @@ export async function runActiveFile() {
   if (settings.autoSaveBeforeRun) {
     if (tab.filePath) {
       try {
-        await window.__TAURI__.core.invoke('save_file', {
+        await invoke('save_file', {
           content,
           filePath: tab.filePath,
         })
@@ -55,7 +56,7 @@ export async function runActiveFile() {
   await new Promise((resolve) => setTimeout(resolve, 50))
 
   try {
-    await window.__TAURI__.core.invoke('compile_and_run', { code: content })
+    await invoke('compile_and_run', { code: content })
   } catch (e) {
     console.error('compile_and_run failed:', e)
     consoleStore.setRunning(false)
