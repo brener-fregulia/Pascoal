@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export type FpcInstallStatus = 'idle' | 'installing' | 'success' | 'error'
 
@@ -27,11 +28,9 @@ function createFpcInstallStore() {
     }
 
     async function detectPackageManager() {
-        if (!window.__TAURI__) return
+        if (!isTauriAvailable()) return
         try {
-            const pm = (await window.__TAURI__.core.invoke(
-                'detect_installer',
-            )) as string | null
+            const pm = await invoke<string | null>('detect_installer')
             update((s) => ({ ...s, packageManager: pm }))
         } catch (e) {
             console.error('detect_installer failed:', e)
@@ -39,10 +38,10 @@ function createFpcInstallStore() {
     }
 
     async function install() {
-        if (!window.__TAURI__) return
+        if (!isTauriAvailable()) return
         update((s) => ({ ...s, status: 'installing', output: '' }))
         try {
-            await window.__TAURI__.core.invoke('install_fpc')
+            await invoke('install_fpc')
         } catch (e) {
             update((s) => ({
                 ...s,
