@@ -3,6 +3,7 @@
   import { gitStore, type GitFileStatus } from '../stores/gitStore'
   import { explorerStore } from '../stores/explorerStore'
   import { i18n } from '../i18n'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let expandedKey = $state<string | null>(null)
   let diffText = $state<string>('')
@@ -70,14 +71,14 @@
     expandedKey = key
     diffText = ''
 
-    if (!folder || !window.__TAURI__) return
+    if (!folder || !isTauriAvailable()) return
     diffLoading = true
     try {
-      diffText = (await window.__TAURI__.core.invoke('git_diff', {
+      diffText = await invoke<string>('git_diff', {
         folderPath: folder.path,
         filePath: path,
         staged: isStaged,
-      })) as string
+      })
     } catch (e) {
       diffText = String(e)
     } finally {
