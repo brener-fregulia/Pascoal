@@ -12,7 +12,7 @@
   import { tabStore } from './stores/tabs'
   import { explorerStore } from './project/explorerStore'
   import { fpcInstallStore } from './toolchain/fpcInstall'
-  import { updateStore } from './stores/updateStore'
+  import { updateStore } from './integrations/updater/updateStore'
   import { isTauriAvailable, invoke } from './integrations/tauri/client'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`

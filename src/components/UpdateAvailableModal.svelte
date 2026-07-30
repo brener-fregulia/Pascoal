@@ -1,6 +1,6 @@
 <script lang="ts">
   import { i18n } from '../i18n'
-  import { updateStore } from '../stores/updateStore'
+  import { updateStore } from '../integrations/updater/updateStore'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   const RELEASES_URL = 'https://github.com/brener-fregulia/Pascoal/releases'
