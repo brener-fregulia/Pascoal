@@ -7,7 +7,6 @@ mod language;
 mod project;
 mod state;
 mod toolchain;
-mod winproc;
 
 use infrastructure::environment::{detect_fpc, get_documents_dir};
 use state::ProcessState;

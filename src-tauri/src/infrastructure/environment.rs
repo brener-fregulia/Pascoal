@@ -1,7 +1,7 @@
 use tauri::Manager;
 
 pub fn detect_fpc() -> (bool, Option<String>) {
-    let output = crate::winproc::no_window(std::process::Command::new("fpc"))
+    let output = crate::infrastructure::platform::no_window(std::process::Command::new("fpc"))
         .arg("-iV")
         .output();
 

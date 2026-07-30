@@ -12,24 +12,25 @@ pub async fn run_with_pipes(
     use std::process::Stdio;
     use tauri::Manager;
 
-    let mut child = match crate::winproc::no_window(std::process::Command::new(exe_file))
-        .current_dir(tmp_dir)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-    {
-        Ok(c) => c,
-        Err(e) => {
-            app.emit("console-program-error", format!("Spawn error: {}\n", e))
-                .ok();
-            app.emit("console-exit", 1i32).ok();
-            return CompileResult {
-                success: false,
-                output: e.to_string(),
-            };
-        }
-    };
+    let mut child =
+        match crate::infrastructure::platform::no_window(std::process::Command::new(exe_file))
+            .current_dir(tmp_dir)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+        {
+            Ok(c) => c,
+            Err(e) => {
+                app.emit("console-program-error", format!("Spawn error: {}\n", e))
+                    .ok();
+                app.emit("console-exit", 1i32).ok();
+                return CompileResult {
+                    success: false,
+                    output: e.to_string(),
+                };
+            }
+        };
 
     if let Some(stdin) = child.stdin.take() {
         let binding = app.state::<ProcessState>();

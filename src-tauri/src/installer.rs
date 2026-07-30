@@ -8,7 +8,7 @@ fn command_exists(cmd: &str) -> bool {
     } else {
         "which"
     };
-    crate::winproc::no_window(std::process::Command::new(checker))
+    crate::infrastructure::platform::no_window(std::process::Command::new(checker))
         .arg(cmd)
         .output()
         .map(|o| o.status.success())
@@ -74,7 +74,7 @@ fn run_install(app: tauri::AppHandle, program: &'static str, args: &'static [&'s
     use std::io::Read;
     use std::process::Stdio;
 
-    let child = crate::winproc::no_window(std::process::Command::new(program))
+    let child = crate::infrastructure::platform::no_window(std::process::Command::new(program))
         .args(args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
