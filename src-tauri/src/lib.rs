@@ -1,7 +1,6 @@
 mod application;
 mod commands;
 mod compiler;
-mod env;
 mod infrastructure;
 mod installer;
 mod language;
@@ -10,7 +9,7 @@ mod state;
 mod toolchain;
 mod winproc;
 
-use env::{detect_fpc, get_documents_dir};
+use infrastructure::environment::{detect_fpc, get_documents_dir};
 use state::ProcessState;
 
 // ── Structs ───────────────────────────────────────────────────────────────────

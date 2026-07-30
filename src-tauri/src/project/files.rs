@@ -1,4 +1,4 @@
-use crate::env::get_documents_dir;
+use crate::infrastructure::environment::get_documents_dir;
 use crate::infrastructure::filesystem::{check_file_exists, write_file};
 use crate::project::IGNORED_DIRS;
 
