@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 interface AppInfo {
   name: string
@@ -18,7 +19,7 @@ function createAppStore() {
   const { subscribe, set } = writable<AppState>({ info: null, loading: true })
 
   async function init() {
-    if (!window.__TAURI__) {
+    if (!isTauriAvailable()) {
       set({
         info: {
           name: 'Pascoal',
@@ -42,9 +43,7 @@ function createAppStore() {
         platform: string
         documents_dir: string
       }
-      const raw = (await window.__TAURI__.core.invoke(
-        'get_app_info',
-      )) as RawAppInfo
+      const raw = await invoke<RawAppInfo>('get_app_info')
 
       const info: AppInfo = {
         name: raw.name,
