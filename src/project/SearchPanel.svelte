@@ -1,7 +1,7 @@
 <script lang="ts">
   import { searchStore, pendingJumpLine } from './searchStore'
   import { explorerStore } from './explorerStore'
-  import { tabStore } from '../stores/tabs'
+  import { tabStore } from '../editor/tabs'
   import { i18n } from '../i18n'
   import File from '../icons/File.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'

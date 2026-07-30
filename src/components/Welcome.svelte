@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { tabStore } from '../stores/tabs'
+  import { tabStore } from '../editor/tabs'
   import { recentStore, type RecentFile } from '../project/recent'
   import { explorerStore } from '../project/explorerStore'
   import { i18n } from '../i18n'

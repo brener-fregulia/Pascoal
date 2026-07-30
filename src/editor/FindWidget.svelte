@@ -14,7 +14,7 @@
     setMatchDecorations,
     matchMark,
     selectedMatchMark,
-  } from '../stores/search-highlight'
+  } from './search-highlight'
   import { i18n } from '../i18n'
 
   let {

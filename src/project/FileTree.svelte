@@ -1,6 +1,6 @@
 <script lang="ts">
   import { explorerStore, type ExplorerNode } from './explorerStore'
-  import { tabStore } from '../stores/tabs'
+  import { tabStore } from '../editor/tabs'
   import { i18n } from '../i18n'
   import FileTreeNode from './FileTreeNode.svelte'
   import Folder from '../icons/Folder.svelte'

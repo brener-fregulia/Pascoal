@@ -1,5 +1,5 @@
 import { get } from 'svelte/store'
-import { tabStore } from '../stores/tabs'
+import { tabStore } from '../editor/tabs'
 import { consoleStore, clearConsoleSignal } from './console'
 import { settingsStore } from '../stores/settings'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tabStore } from '../stores/tabs'
+  import { tabStore } from '../editor/tabs'
   import { i18n } from '../i18n'
   import Tab from './Tab.svelte'
   import Home from '../icons/Home.svelte'

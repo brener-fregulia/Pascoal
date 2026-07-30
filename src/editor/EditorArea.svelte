@@ -1,12 +1,12 @@
 <script lang="ts">
-  import Welcome from './Welcome.svelte'
+  import Welcome from '../components/Welcome.svelte'
   import TabBar from '../shared/TabBar.svelte'
   import Editor from './Editor.svelte'
   import Console from '../toolchain/Console.svelte'
   import FileTree from '../project/FileTree.svelte'
   import SearchPanel from '../project/SearchPanel.svelte'
   import GitPanel from '../integrations/git/GitPanel.svelte'
-  import { tabStore } from '../stores/tabs'
+  import { tabStore } from './tabs'
   import { consoleStore } from '../toolchain/console'
 
   export let activePanel: string | null
