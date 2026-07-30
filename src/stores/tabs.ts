@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store'
 import { EditorState } from '@codemirror/state'
 import { pascalExtensions } from './editor-extensions'
-import { pascalTreeSitterHighlight } from './pascal-treesitter'
+import { pascalTreeSitterHighlight } from '../language/pascal/pascal-treesitter'
 import { t } from '../i18n'
 import { ask } from '@tauri-apps/plugin-dialog'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'

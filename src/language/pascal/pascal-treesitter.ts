@@ -6,7 +6,7 @@ import {
     type DecorationSet,
 } from '@codemirror/view'
 import { StateEffect, StateField, RangeSetBuilder } from '@codemirror/state'
-import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+import { isTauriAvailable, invoke } from '../../integrations/tauri/client'
 
 interface HighlightSpan {
     start: number
