@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store'
 import { explorerStore } from './explorerStore'
 import { t } from '../i18n'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export interface GitFileStatus {
     path: string
@@ -60,7 +61,7 @@ function createGitStore() {
     async function refresh() {
         const folder = folderPath()
 
-        if (!folder || !window.__TAURI__) {
+        if (!folder || !isTauriAvailable()) {
             update(s => ({ ...INITIAL, commitMessage: s.commitMessage }))
             return
         }
@@ -68,14 +69,12 @@ function createGitStore() {
         update(s => ({ ...s, loading: true, error: null }))
 
         try {
-            const result = await window.__TAURI__.core.invoke('git_status', {
-                folderPath: folder,
-            }) as {
+            const result = await invoke<{
                 isRepo: boolean
                 branch: string | null
                 staged: GitFileStatus[]
                 unstaged: GitFileStatus[]
-            }
+            }>('git_status', { folderPath: folder })
             update(s => ({ ...s, ...result, loading: false }))
         } catch (e) {
             update(s => ({ ...s, loading: false, error: errMsg(e) }))
@@ -84,9 +83,9 @@ function createGitStore() {
 
     async function stage(path: string) {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return
+        if (!folder || !isTauriAvailable()) return
         try {
-            await window.__TAURI__.core.invoke('git_stage', { folderPath: folder, filePath: path })
+            await invoke('git_stage', { folderPath: folder, filePath: path })
             await refresh()
         } catch (e) {
             update(s => ({ ...s, error: errMsg(e) }))
@@ -95,9 +94,9 @@ function createGitStore() {
 
     async function unstage(path: string) {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return
+        if (!folder || !isTauriAvailable()) return
         try {
-            await window.__TAURI__.core.invoke('git_unstage', { folderPath: folder, filePath: path })
+            await invoke('git_unstage', { folderPath: folder, filePath: path })
             await refresh()
         } catch (e) {
             update(s => ({ ...s, error: errMsg(e) }))
@@ -106,9 +105,9 @@ function createGitStore() {
 
     async function stageAll() {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return
+        if (!folder || !isTauriAvailable()) return
         try {
-            await window.__TAURI__.core.invoke('git_stage_all', { folderPath: folder })
+            await invoke('git_stage_all', { folderPath: folder })
             await refresh()
         } catch (e) {
             update(s => ({ ...s, error: errMsg(e) }))
@@ -117,9 +116,9 @@ function createGitStore() {
 
     async function unstageAll() {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return
+        if (!folder || !isTauriAvailable()) return
         try {
-            await window.__TAURI__.core.invoke('git_unstage_all', { folderPath: folder })
+            await invoke('git_unstage_all', { folderPath: folder })
             await refresh()
         } catch (e) {
             update(s => ({ ...s, error: errMsg(e) }))
@@ -129,14 +128,15 @@ function createGitStore() {
     async function commit(): Promise<boolean> {
         const folder = folderPath()
         const message = get({ subscribe }).commitMessage
-        if (!folder || !window.__TAURI__ || !message.trim()) return false
+        if (!folder || !isTauriAvailable() || !message.trim()) return false
 
         // Check identity before attempting the commit — surfaces a clear
         // inline form instead of a raw git error about missing user.name/email.
         try {
-            const identity = await window.__TAURI__.core.invoke('git_check_identity', {
-                folderPath: folder,
-            }) as { name: string | null; email: string | null }
+            const identity = await invoke<{ name: string | null; email: string | null }>(
+                'git_check_identity',
+                { folderPath: folder },
+            )
 
             if (!identity.name || !identity.email) {
                 update(s => ({ ...s, needsIdentity: true }))
@@ -148,7 +148,7 @@ function createGitStore() {
         }
 
         try {
-            await window.__TAURI__.core.invoke('git_commit', { folderPath: folder, message })
+            await invoke('git_commit', { folderPath: folder, message })
             update(s => ({ ...s, commitMessage: '', needsIdentity: false, error: null }))
             showNotice('success', t('git.commit_success'))
             await refresh()
@@ -163,10 +163,10 @@ function createGitStore() {
 
     async function configureIdentity(name: string, email: string, global: boolean): Promise<boolean> {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return false
+        if (!folder || !isTauriAvailable()) return false
 
         try {
-            await window.__TAURI__.core.invoke('git_set_identity', {
+            await invoke('git_set_identity', {
                 folderPath: folder,
                 name,
                 email,
@@ -184,9 +184,9 @@ function createGitStore() {
 
     async function initRepo() {
         const folder = folderPath()
-        if (!folder || !window.__TAURI__) return
+        if (!folder || !isTauriAvailable()) return
         try {
-            await window.__TAURI__.core.invoke('git_init', { folderPath: folder })
+            await invoke('git_init', { folderPath: folder })
             await refresh()
         } catch (e) {
             update(s => ({ ...s, error: errMsg(e) }))
