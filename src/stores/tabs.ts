@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store'
 import { EditorState } from '@codemirror/state'
 import { pascalExtensions } from './editor-extensions'
+import { pascalTreeSitterHighlight } from './pascal-treesitter'
 import { t } from '../i18n'
 import { ask } from '@tauri-apps/plugin-dialog'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'
@@ -35,10 +36,9 @@ function createTabStore() {
   function makeEditorState(content: string, tabId: string): EditorState {
     return EditorState.create({
       doc: content,
-      extensions: pascalExtensions(() => markDirty(tabId)),
+      extensions: pascalExtensions(() => markDirty(tabId), pascalTreeSitterHighlight),
     })
   }
-
   async function newTab(content: string): Promise<Tab> {
     const state = getState()
     const existingNames = state.tabs.map((t) => t.fileName)

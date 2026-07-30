@@ -1,17 +1,16 @@
 import { keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, EditorView } from '@codemirror/view'
-import { EditorState, Compartment } from '@codemirror/state'
+import { EditorState, Compartment, type Extension } from '@codemirror/state'
 import { defaultKeymap, historyKeymap, history, indentWithTab } from '@codemirror/commands'
 import { StreamLanguage, indentOnInput, bracketMatching } from '@codemirror/language'
 import { search } from '@codemirror/search'
 import { pascal } from '@codemirror/legacy-modes/mode/pascal'
 import { buildPascoalTheme, pascalDecoratorPlugins } from './editor-theme'
 import { matchHighlightField } from './search-highlight'
-import { pascalTreeSitterHighlight } from './pascal-treesitter'
 
 // Shared compartment - allows swapping theme without destroying editor state
 export const themeCompartment = new Compartment()
 
-export function pascalExtensions(onDocChange: () => void) {
+export function pascalExtensions(onDocChange: () => void, highlightExtensions: Extension[] = []) {
   return [
     lineNumbers(),
     highlightActiveLine(),
@@ -33,7 +32,7 @@ export function pascalExtensions(onDocChange: () => void) {
       indentWithTab,
     ]),
     ...pascalDecoratorPlugins,
-    ...pascalTreeSitterHighlight,
+    ...highlightExtensions,
     themeCompartment.of(buildPascoalTheme()),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
