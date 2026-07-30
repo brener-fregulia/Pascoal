@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store'
 import { explorerStore } from './explorerStore'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export interface SearchMatch {
     filePath: string
@@ -32,7 +33,7 @@ function createSearchStore() {
             return
         }
 
-        if (!folder || !window.__TAURI__) {
+        if (!folder || !isTauriAvailable()) {
             update(s => ({ ...s, query, results: [] }))
             return
         }
@@ -42,11 +43,11 @@ function createSearchStore() {
         const caseSensitive = get({ subscribe }).caseSensitive
 
         try {
-            const results = await window.__TAURI__.core.invoke('search_in_folder', {
+            const results = await invoke<SearchMatch[]>('search_in_folder', {
                 folderPath: folder.path,
                 query,
                 caseSensitive,
-            }) as SearchMatch[]
+            })
 
             update(s => ({ ...s, results, loading: false }))
         } catch (e) {
