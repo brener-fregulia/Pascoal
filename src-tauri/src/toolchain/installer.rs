@@ -31,7 +31,7 @@ pub fn detect_package_manager() -> Option<&'static str> {
     None
 }
 
-fn install_command(pm: &str) -> Option<(&'static str, &'static [&'static str])> {
+pub fn install_command(pm: &str) -> Option<(&'static str, &'static [&'static str])> {
     match pm {
         "winget" => Some((
             "winget",
@@ -52,25 +52,11 @@ fn install_command(pm: &str) -> Option<(&'static str, &'static [&'static str])> 
     }
 }
 
-// ── Commands ──────────────────────────────────────────────────────────────────
+// ── Execution ─────────────────────────────────────────────────────────────────
 
-#[tauri::command]
-pub fn detect_installer() -> Option<String> {
-    detect_package_manager().map(|s| s.to_string())
-}
-
-#[tauri::command]
-pub fn install_fpc(app: tauri::AppHandle) -> Result<(), String> {
-    let pm = detect_package_manager().ok_or_else(|| "no_package_manager".to_string())?;
-    let (program, args) =
-        install_command(pm).ok_or_else(|| "unsupported_package_manager".to_string())?;
-
-    std::thread::spawn(move || run_install(app, program, args));
-
-    Ok(())
-}
-
-fn run_install(app: tauri::AppHandle, program: &'static str, args: &'static [&'static str]) {
+/// Runs the install command and emits fpc-install-* progress events.
+/// Blocking - callers run this on a background thread.
+pub fn run_install(app: tauri::AppHandle, program: &'static str, args: &'static [&'static str]) {
     use std::io::Read;
     use std::process::Stdio;
 

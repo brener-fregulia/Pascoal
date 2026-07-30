@@ -1,7 +1,6 @@
 mod application;
 mod commands;
 mod infrastructure;
-mod installer;
 mod language;
 mod project;
 mod state;
@@ -80,8 +79,8 @@ pub fn run() {
             commands::git_commands::git_set_identity,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
-            installer::detect_installer,
-            installer::install_fpc,
+            commands::installer_commands::detect_installer,
+            commands::installer_commands::install_fpc,
             commands::language_commands::highlight_pascal,
         ])
         .run(tauri::generate_context!())
