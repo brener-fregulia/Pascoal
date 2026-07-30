@@ -13,6 +13,7 @@
   import IconButton from './IconButton.svelte'
   import FindWidget from './FindWidget.svelte'
   import Play from '../icons/Play.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let editorEl: HTMLDivElement
   let view = $state<EditorView | null>(null)
@@ -123,11 +124,11 @@
 
   async function save() {
     const tab = tabStore.getActive()
-    if (!tab || !window.__TAURI__) return
+    if (!tab || !isTauriAvailable()) return
     const content = getContent()
     if (tab.filePath) {
       try {
-        await window.__TAURI__.core.invoke('save_file', {
+        await invoke('save_file', {
           content,
           filePath: tab.filePath,
         })
@@ -142,15 +143,15 @@
 
   async function saveAs() {
     const tab = tabStore.getActive()
-    if (!tab || !window.__TAURI__) return
+    if (!tab || !isTauriAvailable()) return
     const content = getContent()
     const folderPath = get(explorerStore).folder?.path ?? null
     try {
-      const result = (await window.__TAURI__.core.invoke('save_file_as', {
+      const result = await invoke<{ path: string } | null>('save_file_as', {
         content,
         suggestedName: tab.fileName,
         folderPath,
-      })) as { path: string } | null
+      })
       if (result) {
         tabStore.updateFilePath(tab.id, result.path)
         tabStore.markClean(tab.id)
