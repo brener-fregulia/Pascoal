@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export interface ExplorerNode {
     name: string
@@ -29,15 +30,15 @@ function createExplorerStore() {
     })
 
     async function openFolder(): Promise<boolean> {
-        if (!window.__TAURI__) return false
+        if (!isTauriAvailable()) return false
 
         update(s => ({ ...s, loading: true, error: null }))
 
         try {
-            const result = await window.__TAURI__.core.invoke('open_folder') as {
+            const result = await invoke<{
                 folder: ExplorerFolder
                 tree: ExplorerNode[]
-            } | null
+            } | null>('open_folder')
 
             if (!result) {
                 update(s => ({ ...s, loading: false }))
@@ -62,14 +63,14 @@ function createExplorerStore() {
 
     async function refresh(): Promise<void> {
         const state = get({ subscribe })
-        if (!state.folder || !window.__TAURI__) return
+        if (!state.folder || !isTauriAvailable()) return
 
         update(s => ({ ...s, loading: true, error: null }))
 
         try {
-            const result = await window.__TAURI__.core.invoke('list_folder_tree', {
+            const result = await invoke<ExplorerNode[]>('list_folder_tree', {
                 folderPath: state.folder.path,
-            }) as ExplorerNode[]
+            })
 
             update(s => ({ ...s, tree: result, loading: false }))
         } catch (e) {
