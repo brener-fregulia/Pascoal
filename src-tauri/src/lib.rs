@@ -7,6 +7,8 @@ mod git;
 mod installer;
 mod language;
 mod process;
+mod state;
+mod toolchain;
 mod winproc;
 
 use env::{detect_fpc, get_documents_dir};
