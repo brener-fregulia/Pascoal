@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store'
-import { explorerStore } from '../project/explorerStore'
-import { t } from '../i18n'
-import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+import { explorerStore } from '../../project/explorerStore'
+import { t } from '../../i18n'
+import { isTauriAvailable, invoke } from '../tauri/client'
 
 export interface GitFileStatus {
     path: string

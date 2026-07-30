@@ -5,7 +5,7 @@
   import Console from '../toolchain/Console.svelte'
   import FileTree from '../project/FileTree.svelte'
   import SearchPanel from '../project/SearchPanel.svelte'
-  import GitPanel from './GitPanel.svelte'
+  import GitPanel from '../integrations/git/GitPanel.svelte'
   import { tabStore } from '../stores/tabs'
   import { consoleStore } from '../toolchain/console'
 

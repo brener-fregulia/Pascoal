@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { gitStore, type GitFileStatus } from '../stores/gitStore'
-  import { explorerStore } from '../project/explorerStore'
-  import { i18n } from '../i18n'
-  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+  import { gitStore, type GitFileStatus } from './gitStore'
+  import { explorerStore } from '../../project/explorerStore'
+  import { i18n } from '../../i18n'
+  import { isTauriAvailable, invoke } from '../tauri/client'
 
   let expandedKey = $state<string | null>(null)
   let diffText = $state<string>('')
