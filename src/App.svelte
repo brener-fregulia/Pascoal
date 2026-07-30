@@ -13,6 +13,7 @@
   import { explorerStore } from './stores/explorerStore'
   import { fpcInstallStore } from './stores/fpcInstall'
   import { updateStore } from './stores/updateStore'
+  import { isTauriAvailable, invoke } from './integrations/tauri/client'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
@@ -28,7 +29,7 @@
       updateStore.checkForUpdate(true)
     }
 
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const { listen } = await import('@tauri-apps/api/event')
 
     await listen('menu-new-file', async () => {
@@ -38,9 +39,7 @@
 
     await listen('menu-open-file', async () => {
       try {
-        const result = (await window.__TAURI__.core.invoke('open_file')) as
-          | [string, string]
-          | null
+        const result = await invoke<[string, string] | null>('open_file')
         if (result) {
           const [filePath, content] = result
           const tab = await tabStore.openFile(filePath, content)
