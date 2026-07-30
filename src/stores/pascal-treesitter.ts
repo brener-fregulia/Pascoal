@@ -6,6 +6,7 @@ import {
     type DecorationSet,
 } from '@codemirror/view'
 import { StateEffect, StateField, RangeSetBuilder } from '@codemirror/state'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 interface HighlightSpan {
     start: number
@@ -72,13 +73,11 @@ const pascalHighlightField = StateField.define<DecorationSet>({
 })
 
 async function requestHighlight(view: EditorView) {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const source = view.state.doc.toString()
 
     try {
-        const spans = (await window.__TAURI__.core.invoke('highlight_pascal', {
-            source,
-        })) as HighlightSpan[]
+        const spans = await invoke<HighlightSpan[]>('highlight_pascal', { source })
 
         // Bail out if the document already moved on while we were waiting
         if (view.state.doc.toString() !== source) return
