@@ -3,7 +3,7 @@ import { get } from 'svelte/store'
 import {
   recentStore,
   type RecentFile,
-} from '../../../src/stores/recent'
+} from '../../../src/project/recent'
 
 function state(): RecentFile[] {
   return get(recentStore) as RecentFile[]

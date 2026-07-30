@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ExplorerNode } from '../stores/explorerStore'
+  import type { ExplorerNode } from './explorerStore'
   import FileTreeNode from './FileTreeNode.svelte'
   import File from '../icons/File.svelte'
   import Folder from '../icons/Folder.svelte'

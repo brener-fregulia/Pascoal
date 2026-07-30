@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { searchStore, pendingJumpLine } from '../stores/searchStore'
-  import { explorerStore } from '../stores/explorerStore'
+  import { searchStore, pendingJumpLine } from './searchStore'
+  import { explorerStore } from './explorerStore'
   import { tabStore } from '../stores/tabs'
   import { i18n } from '../i18n'
   import File from '../icons/File.svelte'

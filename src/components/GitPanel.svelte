@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { gitStore, type GitFileStatus } from '../stores/gitStore'
-  import { explorerStore } from '../stores/explorerStore'
+  import { explorerStore } from '../project/explorerStore'
   import { i18n } from '../i18n'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
