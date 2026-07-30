@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { themeStore } from '../stores/theme'
+  import { themeStore } from '../shared/theme'
   import { i18n } from '../i18n'
-  import IconButton from './IconButton.svelte'
+  import IconButton from '../shared/IconButton.svelte'
   import Folder from '../icons/Folder.svelte'
   import Search from '../icons/Search.svelte'
   import Git from '../icons/Git.svelte'

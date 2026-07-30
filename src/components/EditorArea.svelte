@@ -1,6 +1,6 @@
 <script lang="ts">
   import Welcome from './Welcome.svelte'
-  import TabBar from './TabBar.svelte'
+  import TabBar from '../shared/TabBar.svelte'
   import Editor from './Editor.svelte'
   import Console from './Console.svelte'
   import FileTree from './FileTree.svelte'

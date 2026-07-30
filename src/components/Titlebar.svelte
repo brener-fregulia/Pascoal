@@ -1,7 +1,7 @@
 <script lang="ts">
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
-  import PascoalLogo from './PascoalLogo.svelte'
+  import PascoalLogo from '../shared/PascoalLogo.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   $: platform = $appStore.info?.platform ?? 'linux'

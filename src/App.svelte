@@ -8,7 +8,7 @@
   import FpcMissingModal from './components/FpcMissingModal.svelte'
   import UpdateAvailableModal from './components/UpdateAvailableModal.svelte'
   import { appStore } from './stores/app'
-  import { themeStore } from './stores/theme'
+  import { themeStore } from './shared/theme'
   import { tabStore } from './stores/tabs'
   import { explorerStore } from './stores/explorerStore'
   import { fpcInstallStore } from './stores/fpcInstall'

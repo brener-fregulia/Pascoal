@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { themeStore } from '../stores/theme'
+  import { themeStore } from './theme'
   import logoSrc from '../assets/pascoal-logo.svg'
   export let height: number = 32
 </script>

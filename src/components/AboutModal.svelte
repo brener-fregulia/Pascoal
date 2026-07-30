@@ -2,7 +2,7 @@
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
   import { updateStore } from '../stores/updateStore'
-  import PascoalLogo from './PascoalLogo.svelte'
+  import PascoalLogo from '../shared/PascoalLogo.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let { open = $bindable(false) }: { open: boolean } = $props()

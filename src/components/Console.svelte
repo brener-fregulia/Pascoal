@@ -2,8 +2,8 @@
   import { onMount, onDestroy } from 'svelte'
   import { consoleStore, clearConsoleSignal } from '../stores/console'
   import { i18n } from '../i18n'
-  import PanelHeader from './PanelHeader.svelte'
-  import IconButton from './IconButton.svelte'
+  import PanelHeader from '../shared/PanelHeader.svelte'
+  import IconButton from '../shared/IconButton.svelte'
   import X from '../icons/X.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
