@@ -2,6 +2,7 @@
   import { appStore } from '../stores/app'
   import { i18n } from '../i18n'
   import PascoalLogo from './PascoalLogo.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   $: platform = $appStore.info?.platform ?? 'linux'
   $: isMac = platform === 'macos'
@@ -69,15 +70,13 @@
   async function handleItem(item: MenuItem) {
     closeMenus()
     if (item.type === 'action') {
-      if (!window.__TAURI__) return
+      if (!isTauriAvailable()) return
       const { emit } = await import('@tauri-apps/api/event')
       await emit(item.event)
     } else if (item.type === 'link') {
-      window.__TAURI__
-        ? await import('@tauri-apps/api/event').then(() =>
-            window.__TAURI__.core
-              .invoke('open_url', { url: item.url })
-              .catch(() => window.open(item.url)),
+      isTauriAvailable()
+        ? await invoke('open_url', { url: item.url }).catch(() =>
+            window.open(item.url),
           )
         : window.open(item.url)
     }
@@ -88,15 +87,16 @@
   }
 
   async function close() {
-    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().close()
+    if (isTauriAvailable()) window.__TAURI__.window.getCurrentWindow().close()
   }
 
   async function minimize() {
-    if (window.__TAURI__) window.__TAURI__.window.getCurrentWindow().minimize()
+    if (isTauriAvailable())
+      window.__TAURI__.window.getCurrentWindow().minimize()
   }
 
   async function maximize() {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const win = window.__TAURI__.window.getCurrentWindow()
     const isMax = await win.isMaximized()
     isMax ? win.unmaximize() : win.maximize()
