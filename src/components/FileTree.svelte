@@ -4,6 +4,7 @@
   import { i18n } from '../i18n'
   import FileTreeNode from './FileTreeNode.svelte'
   import Folder from '../icons/Folder.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let expandedPaths = $state(new Set<string>())
 
@@ -24,11 +25,11 @@
   }
 
   async function openFile(node: ExplorerNode) {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      const content = (await window.__TAURI__.core.invoke('read_file', {
+      const content = await invoke<string>('read_file', {
         path: node.path,
-      })) as string
+      })
       const tab = await tabStore.openFile(node.path, content)
       tabStore.activate(tab.id)
     } catch (e) {

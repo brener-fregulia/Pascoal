@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export interface RecentFile {
   filePath: string
@@ -39,14 +40,14 @@ function createRecentStore() {
 
   /** Call once on app init — removes entries whose files no longer exist on disk. */
   async function validate() {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     const current = get({ subscribe })
     const results = await Promise.all(
       current.map(async (entry) => {
         try {
-          const exists = (await window.__TAURI__.core.invoke('file_exists', {
+          const exists = await invoke<boolean>('file_exists', {
             path: entry.filePath,
-          })) as boolean
+          })
           return exists ? entry : null
         } catch {
           return null

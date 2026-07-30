@@ -5,6 +5,7 @@
   import PanelHeader from './PanelHeader.svelte'
   import IconButton from './IconButton.svelte'
   import X from '../icons/X.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let programEl: HTMLDivElement
   let term: any = null
@@ -46,7 +47,7 @@
       fitAddon.fit()
 
       term.onData((data: string) => {
-        if (window.__TAURI__ && isRunning) {
+        if (isTauriAvailable() && isRunning) {
           if (data === '\r') {
             term.write('\r\n')
           } else if (data === '\x7f') {
@@ -54,13 +55,13 @@
           } else {
             term.write(data)
           }
-          window.__TAURI__.core.invoke('send_input', {
+          invoke('send_input', {
             data: data === '\r' ? '\n' : data,
           })
         }
       })
 
-      if (window.__TAURI__) {
+      if (isTauriAvailable()) {
         const { listen } = await import('@tauri-apps/api/event')
 
         unlistenBuild = await listen<string>(

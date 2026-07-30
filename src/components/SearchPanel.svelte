@@ -4,6 +4,7 @@
   import { tabStore } from '../stores/tabs'
   import { i18n } from '../i18n'
   import File from '../icons/File.svelte'
+  import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let queryInput = ''
   let debounceTimer: ReturnType<typeof setTimeout>
@@ -39,11 +40,11 @@
   }
 
   async function openMatch(filePath: string, lineNumber: number) {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      const content = (await window.__TAURI__.core.invoke('read_file', {
+      const content = await invoke<string>('read_file', {
         path: filePath,
-      })) as string
+      })
       const tab = await tabStore.openFile(filePath, content)
       tabStore.activate(tab.id)
       pendingJumpLine.set(lineNumber)

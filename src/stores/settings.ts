@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store'
+import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
 export interface Settings {
   autoSaveBeforeRun: boolean
@@ -30,9 +31,9 @@ function createSettingsStore() {
   const { subscribe, update, set } = writable<Settings>(DEFAULTS)
 
   async function load() {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      const raw = await window.__TAURI__.core.invoke<string>('load_settings')
+      const raw = await invoke<string>('load_settings')
       const parsed = JSON.parse(raw)
       set({ ...DEFAULTS, ...parsed })
     } catch {
@@ -41,9 +42,9 @@ function createSettingsStore() {
   }
 
   async function save(settings: Settings) {
-    if (!window.__TAURI__) return
+    if (!isTauriAvailable()) return
     try {
-      await window.__TAURI__.core.invoke('save_settings', {
+      await invoke('save_settings', {
         content: JSON.stringify(settings, null, 2),
       })
     } catch (e) {
