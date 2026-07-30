@@ -2,7 +2,6 @@ mod application;
 mod commands;
 mod compiler;
 mod env;
-mod git;
 mod infrastructure;
 mod installer;
 mod language;
@@ -72,16 +71,16 @@ pub fn run() {
             commands::project_commands::list_folder_tree,
             commands::project_commands::open_url,
             commands::project_commands::search_in_folder,
-            git::git_status,
-            git::git_diff,
-            git::git_stage,
-            git::git_unstage,
-            git::git_stage_all,
-            git::git_unstage_all,
-            git::git_commit,
-            git::git_init,
-            git::git_check_identity,
-            git::git_set_identity,
+            commands::git_commands::git_status,
+            commands::git_commands::git_diff,
+            commands::git_commands::git_stage,
+            commands::git_commands::git_unstage,
+            commands::git_commands::git_stage_all,
+            commands::git_commands::git_unstage_all,
+            commands::git_commands::git_commit,
+            commands::git_commands::git_init,
+            commands::git_commands::git_check_identity,
+            commands::git_commands::git_set_identity,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
             installer::detect_installer,

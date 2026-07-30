@@ -47,9 +47,8 @@ fn status_code_to_label(code: char) -> Option<&'static str> {
     }
 }
 
-#[tauri::command]
-pub fn git_status(folder_path: String) -> GitStatusResult {
-    let is_repo = run_git(&folder_path, &["rev-parse", "--is-inside-work-tree"])
+pub fn status(folder_path: &str) -> GitStatusResult {
+    let is_repo = run_git(folder_path, &["rev-parse", "--is-inside-work-tree"])
         .map(|s| s.trim() == "true")
         .unwrap_or(false);
 
@@ -62,7 +61,7 @@ pub fn git_status(folder_path: String) -> GitStatusResult {
         };
     }
 
-    let branch = run_git(&folder_path, &["branch", "--show-current"])
+    let branch = run_git(folder_path, &["branch", "--show-current"])
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
@@ -70,7 +69,7 @@ pub fn git_status(folder_path: String) -> GitStatusResult {
     let mut staged = Vec::new();
     let mut unstaged = Vec::new();
 
-    if let Ok(output) = run_git(&folder_path, &["status", "--porcelain=v1"]) {
+    if let Ok(output) = run_git(folder_path, &["status", "--porcelain=v1"]) {
         for line in output.lines() {
             if line.len() < 4 {
                 continue;
@@ -112,61 +111,54 @@ pub fn git_status(folder_path: String) -> GitStatusResult {
     }
 }
 
-#[tauri::command]
-pub fn git_diff(folder_path: String, file_path: String, staged: bool) -> Result<String, String> {
+pub fn diff(folder_path: &str, file_path: &str, staged: bool) -> Result<String, String> {
     let mut args = vec!["diff"];
     if staged {
         args.push("--cached");
     }
     args.push("--");
-    args.push(&file_path);
-    run_git(&folder_path, &args)
+    args.push(file_path);
+    run_git(folder_path, &args)
 }
 
-#[tauri::command]
-pub fn git_stage(folder_path: String, file_path: String) -> Result<(), String> {
-    run_git(&folder_path, &["add", "--", &file_path]).map(|_| ())
+pub fn stage(folder_path: &str, file_path: &str) -> Result<(), String> {
+    run_git(folder_path, &["add", "--", file_path]).map(|_| ())
 }
 
-#[tauri::command]
-pub fn git_unstage(folder_path: String, file_path: String) -> Result<(), String> {
-    let has_head = run_git(&folder_path, &["rev-parse", "--verify", "HEAD"]).is_ok();
+pub fn unstage(folder_path: &str, file_path: &str) -> Result<(), String> {
+    let has_head = run_git(folder_path, &["rev-parse", "--verify", "HEAD"]).is_ok();
 
     if has_head {
-        run_git(&folder_path, &["restore", "--staged", "--", &file_path]).map(|_| ())
+        run_git(folder_path, &["restore", "--staged", "--", file_path]).map(|_| ())
     } else {
         // No commits yet - nothing to "restore" from, just unstage via reset
-        run_git(&folder_path, &["rm", "--cached", "--", &file_path]).map(|_| ())
+        run_git(folder_path, &["rm", "--cached", "--", file_path]).map(|_| ())
     }
 }
 
-#[tauri::command]
-pub fn git_stage_all(folder_path: String) -> Result<(), String> {
-    run_git(&folder_path, &["add", "-A"]).map(|_| ())
+pub fn stage_all(folder_path: &str) -> Result<(), String> {
+    run_git(folder_path, &["add", "-A"]).map(|_| ())
 }
 
-#[tauri::command]
-pub fn git_unstage_all(folder_path: String) -> Result<(), String> {
-    let has_head = run_git(&folder_path, &["rev-parse", "--verify", "HEAD"]).is_ok();
+pub fn unstage_all(folder_path: &str) -> Result<(), String> {
+    let has_head = run_git(folder_path, &["rev-parse", "--verify", "HEAD"]).is_ok();
 
     if has_head {
-        run_git(&folder_path, &["restore", "--staged", "."]).map(|_| ())
+        run_git(folder_path, &["restore", "--staged", "."]).map(|_| ())
     } else {
-        run_git(&folder_path, &["rm", "--cached", "-r", "."]).map(|_| ())
+        run_git(folder_path, &["rm", "--cached", "-r", "."]).map(|_| ())
     }
 }
 
-#[tauri::command]
-pub fn git_commit(folder_path: String, message: String) -> Result<(), String> {
+pub fn commit(folder_path: &str, message: &str) -> Result<(), String> {
     if message.trim().is_empty() {
         return Err("Commit message cannot be empty".to_string());
     }
-    run_git(&folder_path, &["commit", "-m", &message]).map(|_| ())
+    run_git(folder_path, &["commit", "-m", message]).map(|_| ())
 }
 
-#[tauri::command]
-pub fn git_init(folder_path: String) -> Result<(), String> {
-    run_git(&folder_path, &["init"]).map(|_| ())
+pub fn init(folder_path: &str) -> Result<(), String> {
+    run_git(folder_path, &["init"]).map(|_| ())
 }
 
 #[derive(serde::Serialize)]
@@ -179,14 +171,13 @@ pub struct GitIdentity {
 /// Reads the *effective* user.name/user.email - git config already
 /// resolves local (--local) over global (--global) when no scope flag
 /// is given, so this reflects exactly what `git commit` would use.
-#[tauri::command]
-pub fn git_check_identity(folder_path: String) -> GitIdentity {
-    let name = run_git(&folder_path, &["config", "user.name"])
+pub fn check_identity(folder_path: &str) -> GitIdentity {
+    let name = run_git(folder_path, &["config", "user.name"])
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
 
-    let email = run_git(&folder_path, &["config", "user.email"])
+    let email = run_git(folder_path, &["config", "user.email"])
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
@@ -194,15 +185,14 @@ pub fn git_check_identity(folder_path: String) -> GitIdentity {
     GitIdentity { name, email }
 }
 
-#[tauri::command]
-pub fn git_set_identity(
-    folder_path: String,
-    name: String,
-    email: String,
+pub fn set_identity(
+    folder_path: &str,
+    name: &str,
+    email: &str,
     global: bool,
 ) -> Result<(), String> {
     let scope_flag = if global { "--global" } else { "--local" };
-    run_git(&folder_path, &["config", scope_flag, "user.name", &name])?;
-    run_git(&folder_path, &["config", scope_flag, "user.email", &email])?;
+    run_git(folder_path, &["config", scope_flag, "user.name", name])?;
+    run_git(folder_path, &["config", scope_flag, "user.email", email])?;
     Ok(())
 }
