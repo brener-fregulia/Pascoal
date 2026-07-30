@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { appStore } from '../stores/app'
+  import { appStore } from './app'
   import { themeStore } from '../shared/theme'
   import { fpcInstallStore } from '../toolchain/fpcInstall'
   import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'

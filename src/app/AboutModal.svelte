@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { appStore } from '../stores/app'
+  import { appStore } from './app'
   import { i18n } from '../i18n'
   import { updateStore } from '../integrations/updater/updateStore'
   import PascoalLogo from '../shared/PascoalLogo.svelte'

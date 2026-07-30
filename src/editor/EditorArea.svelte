@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Welcome from '../components/Welcome.svelte'
+  import Welcome from '../app/Welcome.svelte'
   import TabBar from '../shared/TabBar.svelte'
   import Editor from './Editor.svelte'
   import Console from '../toolchain/Console.svelte'

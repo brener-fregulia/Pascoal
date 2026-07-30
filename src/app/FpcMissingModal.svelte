@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte'
   import { i18n } from '../i18n'
-  import { appStore } from '../stores/app'
+  import { appStore } from './app'
   import { fpcInstallStore } from '../toolchain/fpcInstall'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 

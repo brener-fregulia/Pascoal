@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { appStore } from '../stores/app'
+  import { appStore } from './app'
   import { i18n } from '../i18n'
   import PascoalLogo from '../shared/PascoalLogo.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
