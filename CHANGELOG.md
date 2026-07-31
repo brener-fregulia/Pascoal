@@ -7,6 +7,21 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 
 ## [Unreleased]
 
+## [2026.2.0]
+
+### Added
+- In-app "What's new" note shown once after an update, with a link to
+  the full changelog. Reachable anytime from Help → Release Notes.
+- `CHANGELOG.md` itself, following Keep a Changelog - now powers the
+  GitHub release description automatically.
+
+### Changed
+- Tagged releases now fail before building if `CHANGELOG.md` has no
+  entry for that version, instead of publishing with a placeholder
+  description.
+- README (all four languages) updated to reflect the new domain-based
+  project structure.
+
 ## [2026.1.1]
 
 ### Fixed
@@ -26,6 +41,7 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 - Automatic updates via a signed updater.
 - CodeMirror-based Pascal editor with a build/run console.
 
-[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.1...HEAD
+[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.0...HEAD
+[2026.2.0]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.1...v2026.2.0
 [2026.1.1]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.0...v2026.1.1
 [2026.1.0]: https://github.com/brener-fregulia/Pascoal/releases/tag/v2026.1.0

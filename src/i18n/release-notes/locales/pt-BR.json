@@ -1,4 +1,5 @@
 {
     "2026.1.0": "O Pascoal chegou! Esta primeira versão traz um instalador guiado do Free Pascal, atualizações automáticas e um editor Pascal pensado para aprender.",
-    "2026.1.1": "Realce de sintaxe melhorado: tipos, funções e variáveis agora são reconhecidos corretamente, com um parser de Pascal de verdade."
+    "2026.1.1": "Realce de sintaxe melhorado: tipos, funções e variáveis agora são reconhecidos corretamente, com um parser de Pascal de verdade.",
+    "2026.2.0": "Agora você vê um resumo do que mudou logo após cada atualização — e pode conferir de novo quando quiser em Ajuda > Notas da Versão."
 }
