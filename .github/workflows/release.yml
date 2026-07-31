@@ -55,6 +55,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+          shared-key: "pascoal-rust"
+          save-if: false
 
       - name: Install dependencies
         run: npm ci
