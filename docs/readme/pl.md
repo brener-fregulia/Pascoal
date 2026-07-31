@@ -31,7 +31,7 @@ Pobierz najnowszy instalator dla swojej platformy ze [strony Releases](https://g
 - **Znajdź i zamień** — pływający widget w stylu VSCode z podświetlaniem wyników oraz wyszukiwaniem we wszystkich plikach otwartego folderu
 - **Kreator instalacji FPC** — wykrywa brak Free Pascala i oferuje jego automatyczną instalację przez winget, apt, pacman, dnf lub zypper
 - **Automatyczne aktualizacje** — sprawdza dostępność nowych wersji i instaluje je automatycznie, z opcją ręcznego sprawdzenia aktualizacji
-- **Nowości** — krótka notatka w aplikacji po każdej aktualizacji, z linkiem do pełnego [changeloga](../../CHANGELOG.md)
+- **Nowości** — krótka notatka w aplikacji po każdej aktualizacji, z pełną, przetłumaczoną historią wersji dostępną w aplikacji (Pomoc → Historia Wersji) i linkiem do pełnego, technicznego [changeloga](../../CHANGELOG.md)
 - **Natywne menu systemowe** — menu Plik i Pomoc zintegrowane z paskiem tytułu oraz bezpośrednie odnośniki do zgłaszania błędów i propozycji funkcji na GitHubie
 - **Trzy motywy** — Dark, Light i Charcoal z automatycznym wykrywaniem motywu systemowego
 - **Natywne kontrolki okna** dostosowane do platformy (traffic lights w macOS, styl Windows/Linux)

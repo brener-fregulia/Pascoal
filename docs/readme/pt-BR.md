@@ -31,7 +31,7 @@ Baixe o instalador mais recente para a sua plataforma na [página de Releases](h
 - **Buscar e substituir** — widget flutuante no estilo VSCode com destaque de ocorrências, além de busca entre arquivos em uma pasta aberta
 - **Instalador guiado do FPC** — detecta quando o Free Pascal não está instalado e oferece instalação automática via winget, apt, pacman, dnf ou zypper
 - **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de "verificar atualizações"
-- **Novidades** — uma nota curta no app após cada atualização, com link pro [changelog](../../CHANGELOG.md) completo
+- **Novidades** — uma nota curta no app após cada atualização, com histórico completo e traduzido navegável dentro do app (Ajuda → Histórico de Versões) e um link pro [changelog](../../CHANGELOG.md) técnico completo
 - **Menu nativo do sistema** — menus Arquivo e Ajuda integrados à barra de título, com links diretos para reportar bugs ou solicitar funcionalidades no GitHub
 - **Três temas** — Escuro, Claro e Charcoal, com detecção do sistema
 - **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)

@@ -31,7 +31,7 @@ Grab the latest installer for your platform from the [Releases page](https://git
 - **Find and replace** - VSCode-style floating widget with match highlighting, plus cross-file search across an open folder
 - **Guided FPC installer** - detects if Free Pascal isn't installed and offers to install it automatically via winget, apt, pacman, dnf, or zypper
 - **Auto-update** - checks for new versions and installs them automatically, with a manual "check for updates" option
-- **What's new** - a short in-app note after every update, with a link to the full [changelog](CHANGELOG.md)
+- **What's new** - a short in-app note after every update, with a full, translated version history browsable in-app (Help → Version History) and a link to the full technical [changelog](CHANGELOG.md)
 - **Native OS menu** - File and Help menus integrated into the titlebar, with direct links to report bugs or request features on GitHub
 - **Three themes** - Dark, Light and Charcoal, with system detection
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
