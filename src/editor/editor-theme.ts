@@ -5,8 +5,6 @@ import {
   ViewUpdate,
 } from '@codemirror/view'
 import { RangeSetBuilder } from '@codemirror/state'
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { tags as t } from '@lezer/highlight'
 
 // Read a CSS variable from the document root at call time
 function v(name: string): string {
@@ -230,30 +228,22 @@ export function buildPascoalTheme() {
     { dark: bg < '#888' },
   )
 
-  const highlightStyle = HighlightStyle.define([
-    { tag: t.keyword, color: accent, fontWeight: '500' },
-    { tag: t.string, color: success },
-    { tag: t.character, color: success },
-    { tag: t.number, color: NUMBER_COLOR },
-    { tag: t.integer, color: NUMBER_COLOR },
-    { tag: t.float, color: NUMBER_COLOR },
-    { tag: t.comment, color: textDim, fontStyle: 'italic' },
-    { tag: t.lineComment, color: textDim, fontStyle: 'italic' },
-    { tag: t.blockComment, color: textDim, fontStyle: 'italic' },
-    { tag: t.operator, color: text },
-    { tag: t.compareOperator, color: text },
-    { tag: t.arithmeticOperator, color: text },
-    { tag: t.function(t.variableName), color: BUILTIN_COLOR },
-    { tag: t.definition(t.variableName), color: text },
-    { tag: t.variableName, color: text },
-    { tag: t.propertyName, color: text },
-    { tag: t.name, color: text },
-    { tag: t.constant(t.name), color: NUMBER_COLOR },
-    { tag: t.punctuation, color: textDim },
-    { tag: t.bracket, color: textDim },
-    { tag: t.meta, color: textDim, fontStyle: 'italic' },
-    { tag: t.invalid, color: error, textDecoration: 'underline' },
-  ])
-
-  return [editorTheme, syntaxHighlighting(highlightStyle)]
+  // No syntaxHighlighting() here anymore. We spent this whole debugging
+  // session proving, category by category (keyword, type, string, comment,
+  // meta/pp directives...), that any color left in the legacy StreamLanguage
+  // Pascal mode's HighlightStyle leaks through and wins over Tree-sitter's
+  // cm-ts-*/cm-pascal-* marks - CodeMirror nests decorations from different
+  // extensions rather than merging them onto one span, and for `color`
+  // (an inherited property) the innermost span's own value always wins,
+  // regardless of !important on its ancestors. Tree-sitter now correctly
+  // covers every category the legacy layer used to color, so instead of
+  // fighting the nesting order we just stopped feeding it colors at all.
+  // StreamLanguage.define(pascal) itself stays wired in editor-extensions.ts
+  // for indentOnInput/bracketMatching - only its visual highlighting is gone.
+  //
+  // Trade-off: `npm run dev:ide` (frontend-only preview, no Tauri backend)
+  // never runs Tree-sitter, so Pascal files show no syntax highlighting at
+  // all in that mode now. Accepted deliberately - cargo tauri dev is the
+  // primary dev workflow.
+  return [editorTheme]
 }

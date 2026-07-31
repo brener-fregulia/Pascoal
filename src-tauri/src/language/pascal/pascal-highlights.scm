@@ -39,10 +39,6 @@
 	(kObjcclass)
 	(kObjccategory)
 	(kObjcprotocol)
-	(kArray)
-	(kFile)
-	(kString)
-	(kSet)
 	(kOf)
 	(kHelper)
 	(kPacked)
@@ -139,6 +135,15 @@
 	(kWith)
 	(kGoto)
 ] @keyword
+
+; -- Builtin type keywords (grammar-reserved words, not typeref identifiers,
+; but visually they should read as types like Integer/Boolean do)
+[
+	(kArray)
+	(kFile)
+	(kString)
+	(kSet)
+] @type
 
 ; -- Punctuation & operators
 
