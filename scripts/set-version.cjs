@@ -2,6 +2,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const { execSync } = require('child_process')
 
 const version = process.argv[2]
 
@@ -69,6 +70,23 @@ for (const { file, update } of files) {
 
 if (success) {
     console.log(`\nVersion set to ${version}`)
+
+    // Clean the pascoal crate's build cache after every version bump - the
+    // target/ dir grows very large from accumulated incremental debug
+    // builds across a dev session, and a fresh version tag is a natural
+    // checkpoint to clear it. Best-effort: a failure here (e.g. cargo not
+    // on PATH, or a build currently holding a file lock) should not block
+    // the version bump itself.
+    try {
+        console.log('\nCleaning pascoal build cache...')
+        execSync('cargo clean -p pascoal', {
+            cwd: path.join(root, 'src-tauri'),
+            stdio: 'inherit',
+        })
+    } catch (err) {
+        console.warn(`\nWarning: cargo clean -p pascoal failed: ${err.message}`)
+        console.warn('You may want to run it manually.')
+    }
 } else {
     console.error('\nSome files could not be updated.')
     process.exit(1)
