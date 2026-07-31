@@ -25,5 +25,11 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['../tests/frontend/setup.ts'],
     include: ['../tests/frontend/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['**/*.{ts,svelte}'],
+      exclude: ['main.ts', 'vite.config.ts', '**/*.d.ts', 'icons/**'],
+    },
   },
 })
