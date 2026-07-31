@@ -23,7 +23,7 @@ Grab the latest installer for your platform from the [Releases page](https://git
 
 ## Features
 
-- **Modern editor** powered by CodeMirror 6 with Pascal syntax highlighting and reactive theming
+- **Modern editor** powered by CodeMirror 6, with structural Pascal syntax highlighting via a real Tree-sitter grammar (not regex-based guessing) and reactive theming
 - **Real compilation** via Free Pascal Compiler (FPC)
 - **Interactive console** with separate build and program output zones - `readln` works
 - **Multi-tab editing** - open multiple files simultaneously
@@ -31,6 +31,7 @@ Grab the latest installer for your platform from the [Releases page](https://git
 - **Find and replace** - VSCode-style floating widget with match highlighting, plus cross-file search across an open folder
 - **Guided FPC installer** - detects if Free Pascal isn't installed and offers to install it automatically via winget, apt, pacman, dnf, or zypper
 - **Auto-update** - checks for new versions and installs them automatically, with a manual "check for updates" option
+- **What's new** - a short in-app note after every update, with a link to the full [changelog](CHANGELOG.md)
 - **Native OS menu** - File and Help menus integrated into the titlebar, with direct links to report bugs or request features on GitHub
 - **Three themes** - Dark, Light and Charcoal, with system detection
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
@@ -97,32 +98,51 @@ npm run test:pascal   # Pascal integration tests (requires FPC)
 ## Project structure
 
 ```
-src/                       # Svelte + Vite frontend
-  components/              # Svelte components (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
-  icons/                   # SVG icon components
-  stores/                  # Svelte stores (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
-  i18n/                    # Locale files and translation store
-  styles/                  # Global CSS
+src/                        # Svelte + Vite frontend, organized by domain
+  app/                       # Shell (Titlebar, ActivityBar, Statusbar), dialogs (About, FpcMissing,
+                              # UpdateAvailable, WhatsNew), Welcome screen, app/settings state
+  editor/                    # CodeMirror integration, tab/session state, Editor/EditorArea/FindWidget
+  language/pascal/           # Frontend side of Tree-sitter highlighting (client + decorations)
+  project/                   # File explorer and cross-file search
+  toolchain/                 # Compile/run orchestration, build console, FPC install UI
+  integrations/
+    tauri/                    # Single point of contact with the Tauri IPC bridge
+    git/                       # Git panel and store
+    updater/                   # Auto-update store
+  shared/                    # Cross-domain components (IconButton, PanelHeader, Tab, TabBar) and theme
+  icons/                     # SVG icon components
+  i18n/                      # Locale files, translation store, release-notes/ (lazy-loaded changelog blurbs)
+  styles/                    # Global CSS
 src-tauri/
   src/
-    lib.rs                  # App setup and command registration
-    env.rs                  # FPC detection and documents directory
-    fs.rs                   # File I/O, folder explorer, and cross-file search commands
-    git.rs                  # Git status, stage, diff, commit, and init commands
-    compiler.rs             # FPC compilation logic
-    installer.rs            # FPC package manager detection and guided install
-    winproc.rs              # Suppress console window flashes on Windows
-    process.rs              # Process state, run_with_pipes, run_with_pty
-    tests/                  # Rust unit tests
+    lib.rs                    # App setup and command registration only
+    commands/                 # Thin Tauri command adapters
+    application/              # Use cases (analyze_document, run_program, manage_files,
+                                # manage_workspace, install_toolchain)
+    language/pascal/          # Tree-sitter highlighting and its vendored query file
+    project/                  # Explorer, file open/save, cross-file search
+    toolchain/
+      compiler/                 # FPC compilation
+      installer.rs               # Package manager detection and guided install
+      runner.rs                  # Process execution (pipes/PTY)
+    infrastructure/            # filesystem, git, environment, platform - OS-level primitives
+    state/                     # Shared app state (ProcessState)
+    tests/                     # Rust unit tests
+  tests/
+    pascal_runner.rs           # Pascal integration tests (compiles/runs real fixtures, requires FPC)
   tauri.conf.json
   Cargo.toml
 tests/
-  frontend/                 # Vitest tests
-  pascal/                   # Pascal integration tests and scripts
+  frontend/                  # Vitest tests
+  pascal/                    # Pascal integration test fixtures (.pas + specs.json) -
+                              # read by src-tauri/tests/pascal_runner.rs
 docs/
-  readme/                   # README translations
+  readme/                    # README translations
 scripts/
-  set-version.cjs           # Version bump script
+  set-version.cjs            # Version bump script (also cleans the Rust build cache, warns if
+                              # CHANGELOG.md has no entry for the new version yet)
+  extract-changelog.cjs      # Extracts a CHANGELOG.md section for the release workflow
+CHANGELOG.md                 # Keep a Changelog format, becomes the GitHub release body
 ```
 
 ## Tech stack
@@ -146,11 +166,13 @@ scripts/
 - [x] GitHub Actions CI/CD
 - [x] Guided FPC installer (auto-install via winget/apt/pacman/dnf/zypper)
 - [x] Version checker / updater
+- [x] Pascal Tree-sitter grammar (structural syntax highlighting)
+- [x] In-app changelog / release notes
 - [ ] Git integration (implemented, not enabled for the first release)
 - [ ] PTY terminal (PowerShell, bash, fish)
 - [ ] Detached terminal window for running Pascal programs
 - [ ] Settings persistence (editor font size, console position)
-- [ ] Pascal Tree-sitter grammar (full syntax highlighting, indent guides, code outline)
+- [ ] Tree-sitter indent guides and code outline
 - [ ] Playground mode
 - [ ] Challenge mode with test cases
 

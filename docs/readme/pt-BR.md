@@ -23,14 +23,15 @@ Baixe o instalador mais recente para a sua plataforma na [página de Releases](h
 
 ## Funcionalidades
 
-- **Editor moderno** com CodeMirror 6, destaque de sintaxe para Pascal e temas reativos
+- **Editor moderno** com CodeMirror 6, com destaque de sintaxe estrutural para Pascal via uma gramática Tree-sitter de verdade (não regex) e temas reativos
 - **Compilação real** via Free Pascal Compiler (FPC)
 - **Console interativo** com áreas separadas para build e saída do programa — `readln` funciona
 - **Edição em múltiplas abas** — abra vários arquivos simultaneamente
 - **Explorador de arquivos** — abra uma pasta e navegue pelos seus arquivos Pascal
 - **Buscar e substituir** — widget flutuante no estilo VSCode com destaque de ocorrências, além de busca entre arquivos em uma pasta aberta
 - **Instalador guiado do FPC** — detecta quando o Free Pascal não está instalado e oferece instalação automática via winget, apt, pacman, dnf ou zypper
-- **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de “verificar atualizações”
+- **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de "verificar atualizações"
+- **Novidades** — uma nota curta no app após cada atualização, com link pro [changelog](../../CHANGELOG.md) completo
 - **Menu nativo do sistema** — menus Arquivo e Ajuda integrados à barra de título, com links diretos para reportar bugs ou solicitar funcionalidades no GitHub
 - **Três temas** — Escuro, Claro e Charcoal, com detecção do sistema
 - **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
@@ -97,32 +98,50 @@ npm run test:pascal   # testes de integração em Pascal (requer FPC)
 ## Estrutura do projeto
 
 ```text
-src/                       # Frontend Svelte + Vite
-  components/              # Componentes Svelte (Titlebar, TabBar, Editor, Console, FileTree, SearchPanel, GitPanel, FindWidget, AboutModal...)
-  icons/                   # Componentes de ícones SVG
-  stores/                  # Stores do Svelte (tabs, theme, console, runner, settings, explorerStore, searchStore, gitStore...)
-  i18n/                    # Arquivos de locale e store de traduções
-  styles/                  # CSS global
+src/                       # Frontend Svelte + Vite, organizado por domínio
+  app/                       # Shell (Titlebar, ActivityBar, Statusbar), diálogos (About, FpcMissing,
+                              # UpdateAvailable, WhatsNew), tela de boas-vindas, estado do app/settings
+  editor/                    # Integração com CodeMirror, estado de abas/sessão, Editor/EditorArea/FindWidget
+  language/pascal/           # Lado frontend do highlighting via Tree-sitter (client + decorações)
+  project/                   # Explorador de arquivos e busca entre arquivos
+  toolchain/                 # Orquestração de compilar/rodar, console de build, UI de instalação do FPC
+  integrations/
+    tauri/                    # Ponto único de contato com a ponte de IPC do Tauri
+    git/                       # Painel e store do Git
+    updater/                   # Store de auto-atualização
+  shared/                    # Componentes cross-domínio (IconButton, PanelHeader, Tab, TabBar) e tema
+  icons/                     # Componentes de ícones SVG
+  i18n/                      # Arquivos de locale, store de traduções, release-notes/ (blurbs de changelog, lazy-loaded)
+  styles/                    # CSS global
 src-tauri/
   src/
-    lib.rs                 # Configuração do app e registro de comandos
-    env.rs                 # Detecção do FPC e diretório de documentos
-    fs.rs                  # Comandos de I/O de arquivos, explorador de pastas e busca entre arquivos
-    git.rs                 # Comandos de status, stage, diff, commit e init do Git
-    compiler.rs            # Lógica de compilação com FPC
-    installer.rs           # Detecção do gerenciador de pacotes do FPC e instalação guiada
-    winproc.rs             # Suprime flashes de janelas de console no Windows
-    process.rs             # Estado de processos, run_with_pipes, run_with_pty
-    tests/                 # Testes unitários em Rust
+    lib.rs                    # Só configuração do app e registro de comandos
+    commands/                 # Adaptadores finos dos comandos Tauri
+    application/              # Casos de uso (analyze_document, run_program, manage_files,
+                                # manage_workspace, install_toolchain)
+    language/pascal/          # Highlighting via Tree-sitter e sua query vendorizada
+    project/                  # Explorer, abrir/salvar arquivo, busca entre arquivos
+    toolchain/
+      compiler/                 # Compilação via FPC
+      installer.rs               # Detecção de gerenciador de pacotes e instalação guiada
+      runner.rs                  # Execução de processos (pipes/PTY)
+    infrastructure/            # filesystem, git, environment, platform - primitivas de SO
+    state/                     # Estado compartilhado do app (ProcessState)
+    tests/                     # Testes unitários em Rust
+  tests/
+    pascal_runner.rs           # Testes de integração Pascal (compila/roda fixtures reais, requer FPC)
   tauri.conf.json
   Cargo.toml
 tests/
-  frontend/                # Testes com Vitest
-  pascal/                  # Testes de integração em Pascal e scripts
+  frontend/                  # Testes com Vitest
+  pascal/                    # Fixtures de teste de integração Pascal (.pas + specs.json)
 docs/
-  readme/                  # Traduções do README
+  readme/                    # Traduções do README
 scripts/
-  set-version.cjs          # Script de bump de versão
+  set-version.cjs            # Script de bump de versão (também limpa o cache de build do Rust,
+                              # avisa se faltar entrada no CHANGELOG.md pra versão nova)
+  extract-changelog.cjs      # Extrai uma seção do CHANGELOG.md pro fluxo de release
+CHANGELOG.md                 # Formato Keep a Changelog, vira o corpo da release no GitHub
 ```
 
 ## Stack de tecnologias
@@ -146,11 +165,13 @@ scripts/
 - [x] CI/CD com GitHub Actions
 - [x] Instalador guiado do FPC (instalação automática via winget/apt/pacman/dnf/zypper)
 - [x] Verificador de versão / atualizador
+- [x] Gramática Pascal com Tree-sitter (destaque de sintaxe estrutural)
+- [x] Changelog / notas de versão no app
 - [ ] Integração com Git (implementada, mas não habilitada na primeira versão)
 - [ ] Terminal PTY (PowerShell, bash, fish)
 - [ ] Janela de terminal destacada para executar programas em Pascal
 - [ ] Persistência de configurações (tamanho da fonte do editor, posição do console)
-- [ ] Gramática Pascal com Tree-sitter (destaque de sintaxe completo, guias de indentação, outline de código)
+- [ ] Guias de indentação e outline de código via Tree-sitter
 - [ ] Modo Playground
 - [ ] Modo Challenge com casos de teste
 
