@@ -7,6 +7,23 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 
 ## [Unreleased]
 
+## [2026.2.1]
+
+### Added
+- In-app version history (Help → Version History) - browse every past
+  release's notes, not just the latest one.
+
+### Changed
+- Update notification now shows the same translated, curated note used
+  in "What's new" instead of the raw GitHub release body, falling back
+  to it only when a version has no translated note.
+
+### Fixed
+- CI and release workflows now grant the `actions: write` permission,
+  so sccache and rust-cache can actually persist between runs instead
+  of silently failing to write and recompiling everything from scratch
+  every time.
+
 ## [2026.2.0]
 
 ### Added
@@ -41,7 +58,8 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 - Automatic updates via a signed updater.
 - CodeMirror-based Pascal editor with a build/run console.
 
-[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.0...HEAD
+[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.1...HEAD
+[2026.2.1]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.0...v2026.2.1
 [2026.2.0]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.1...v2026.2.0
 [2026.1.1]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.0...v2026.1.1
 [2026.1.0]: https://github.com/brener-fregulia/Pascoal/releases/tag/v2026.1.0

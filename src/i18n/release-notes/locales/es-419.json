@@ -1,5 +1,6 @@
 {
     "2026.1.0": "¡Pascoal ya está aquí! Esta primera versión incluye un instalador guiado de Free Pascal, actualizaciones automáticas y un editor de Pascal pensado para aprender.",
     "2026.1.1": "Resaltado de sintaxis mejorado: los tipos, funciones y variables ahora se reconocen correctamente, con un analizador de Pascal real.",
-    "2026.2.0": "Ahora verás un resumen breve de las novedades justo después de cada actualización, y puedes volver a verlo cuando quieras desde Ayuda > Notas de la Versión."
+    "2026.2.0": "Ahora verás un resumen breve de las novedades justo después de cada actualización, y puedes volver a verlo cuando quieras desde Ayuda > Notas de la Versión.",
+    "2026.2.1": "Ahora puedes explorar el historial completo de versiones desde Ayuda > Historial de Versiones, y las notificaciones de actualización muestran las mismas notas amigables de 'Qué hay de nuevo'."
 }
