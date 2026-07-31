@@ -56,6 +56,11 @@
       labelKey: 'titlebar.release_notes',
       event: 'menu-release-notes',
     },
+    {
+      type: 'action',
+      labelKey: 'titlebar.version_history',
+      event: 'menu-version-history',
+    },
     { type: 'action', labelKey: 'titlebar.about_pascoal', event: 'menu-about' },
   ]
 

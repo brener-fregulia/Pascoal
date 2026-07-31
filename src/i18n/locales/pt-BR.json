@@ -58,6 +58,7 @@
     "request_feature": "Solicitar um Recurso",
     "view_on_github": "Ver no GitHub",
     "release_notes": "Notas da Versão",
+    "version_history": "Histórico de Versões",
     "about_pascoal": "Sobre o Pascoal"
   },
   "statusbar": {
@@ -94,7 +95,14 @@
   "whats_new": {
     "title": "O que há de novo",
     "close": "Entendi",
+    "view_history": "Histórico de versões",
     "view_changelog": "Ver changelog completo"
+  },
+  "version_history": {
+    "title": "Histórico de Versões",
+    "close": "Fechar",
+    "loading": "Carregando…",
+    "empty": "Ainda não há notas de versão."
   },
   "tabs": {
     "welcome": "Início",

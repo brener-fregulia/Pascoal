@@ -8,6 +8,7 @@
   import FpcMissingModal from './app/FpcMissingModal.svelte'
   import UpdateAvailableModal from './app/UpdateAvailableModal.svelte'
   import WhatsNewModal from './app/WhatsNewModal.svelte'
+  import VersionHistoryModal from './app/VersionHistoryModal.svelte'
   import { appStore } from './app/app'
   import { whatsNewStore } from './app/whatsNew'
   import { themeStore } from './shared/theme'
@@ -21,6 +22,7 @@
 
   let activePanel = $state<string | null>(null)
   let showAbout = $state(false)
+  let showVersionHistory = $state(false)
 
   onMount(async () => {
     themeStore.init()
@@ -86,6 +88,10 @@
     await listen('menu-release-notes', () => {
       whatsNewStore.showCurrent()
     })
+
+    await listen('menu-version-history', () => {
+      showVersionHistory = true
+    })
   })
 
   $effect(() => {
@@ -111,7 +117,8 @@
 <AboutModal bind:open={showAbout} />
 <FpcMissingModal />
 <UpdateAvailableModal />
-<WhatsNewModal />
+<WhatsNewModal onViewHistory={() => (showVersionHistory = true)} />
+<VersionHistoryModal bind:open={showVersionHistory} />
 
 <style>
   #layout {

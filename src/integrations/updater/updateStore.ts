@@ -1,5 +1,7 @@
-import { writable } from 'svelte/store'
+import { writable, get } from 'svelte/store'
 import type { Update } from '@tauri-apps/plugin-updater'
+import { localeStore } from '../../i18n'
+import { loadReleaseNote } from '../../i18n/release-notes'
 
 export type UpdateStatus =
     | 'idle'
@@ -37,11 +39,15 @@ function createUpdateStore() {
             const result = await check()
             if (result) {
                 pending = result
+                const translatedNote = await loadReleaseNote(
+                    get(localeStore),
+                    result.version,
+                )
                 update((s) => ({
                     ...s,
                     status: 'available',
                     version: result.version,
-                    notes: result.body ?? null,
+                    notes: translatedNote ?? result.body ?? null,
                 }))
             } else {
                 update((s) => ({ ...s, status: silent ? 'idle' : 'up-to-date' }))

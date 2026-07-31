@@ -58,6 +58,7 @@
     "request_feature": "Request a Feature",
     "view_on_github": "View on GitHub",
     "release_notes": "Release Notes",
+    "version_history": "Version History",
     "about_pascoal": "About Pascoal"
   },
   "statusbar": {
@@ -94,7 +95,14 @@
   "whats_new": {
     "title": "What's new",
     "close": "Got it",
+    "view_history": "Version history",
     "view_changelog": "View full changelog"
+  },
+  "version_history": {
+    "title": "Version History",
+    "close": "Close",
+    "loading": "Loading…",
+    "empty": "No release notes yet."
   },
   "tabs": {
     "welcome": "Welcome",

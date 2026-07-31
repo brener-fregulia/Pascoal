@@ -61,7 +61,7 @@
           {$i18n('update.available_message', { version: state.version ?? '' })}
         </p>
         {#if state.notes}
-          <pre class="upd-notes">{state.notes}</pre>
+          <p class="upd-notes">{state.notes}</p>
         {/if}
       {:else if state.status === 'downloading'}
         <div class="upd-downloading-row">
@@ -181,13 +181,13 @@
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 5px;
-    padding: 8px;
+    padding: 10px 12px;
     margin: 8px 0 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    line-height: 1.6;
     color: var(--text-dim);
     text-align: left;
-    white-space: pre-wrap;
     word-break: break-word;
   }
 

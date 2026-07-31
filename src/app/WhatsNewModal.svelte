@@ -3,6 +3,8 @@
   import { whatsNewStore } from './whatsNew'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
+  let { onViewHistory }: { onViewHistory: () => void } = $props()
+
   const RELEASES_URL = 'https://github.com/brener-fregulia/Pascoal/releases'
 
   let state = $derived($whatsNewStore)
@@ -25,6 +27,11 @@
       }
     }
     window.open(RELEASES_URL)
+  }
+
+  function handleViewHistory() {
+    whatsNewStore.dismiss()
+    onViewHistory()
   }
 </script>
 
@@ -54,6 +61,9 @@
       <div class="wn-actions">
         <button class="wn-btn wn-btn-primary" onclick={close}>
           {$i18n('whats_new.close')}
+        </button>
+        <button class="wn-btn wn-btn-ghost" onclick={handleViewHistory}>
+          {$i18n('whats_new.view_history')}
         </button>
         <button class="wn-btn wn-btn-ghost" onclick={handleViewChangelog}>
           {$i18n('whats_new.view_changelog')}
