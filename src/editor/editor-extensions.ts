@@ -4,7 +4,7 @@ import { defaultKeymap, historyKeymap, history, indentWithTab } from '@codemirro
 import { StreamLanguage, indentOnInput, bracketMatching } from '@codemirror/language'
 import { search } from '@codemirror/search'
 import { pascal } from '@codemirror/legacy-modes/mode/pascal'
-import { buildPascoalTheme, pascalDecoratorPlugins } from './editor-theme'
+import { buildPascoalTheme } from './editor-theme'
 import { matchHighlightField } from './search-highlight'
 
 // Shared compartment - allows swapping theme without destroying editor state
@@ -31,7 +31,6 @@ export function pascalExtensions(onDocChange: () => void, highlightExtensions: E
       ...historyKeymap,
       indentWithTab,
     ]),
-    ...pascalDecoratorPlugins,
     ...highlightExtensions,
     themeCompartment.of(buildPascoalTheme()),
     EditorView.updateListener.of((update) => {

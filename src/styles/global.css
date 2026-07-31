@@ -96,17 +96,6 @@ body {
   background: var(--text-dim);
 }
 
-/* ── Editor decorator tokens ───────────────────────────────── */
-
-.cm-pascal-type {
-  color: var(--accent2) !important;
-  font-style: italic;
-}
-
-.cm-pascal-builtin {
-  color: #61AFEF !important;
-}
-
 /* ── Tree-sitter based highlighting (pascal-treesitter.ts) ────── */
 
 .cm-ts-keyword {
