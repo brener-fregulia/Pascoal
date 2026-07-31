@@ -57,6 +57,7 @@
     "report_pascal_compiler_issue": "Zgłoś problem z Pascalem / kompilatorem",
     "request_feature": "Poproś o funkcję",
     "view_on_github": "Zobacz na GitHubie",
+    "release_notes": "Informacje o Wersji",
     "about_pascoal": "O Pascoal"
   },
   "statusbar": {
@@ -89,6 +90,11 @@
     "later": "Później",
     "retry": "Spróbuj ponownie",
     "download_manually": "Pobierz ręcznie"
+  },
+  "whats_new": {
+    "title": "Co nowego",
+    "close": "Rozumiem",
+    "view_changelog": "Zobacz pełny changelog"
   },
   "tabs": {
     "welcome": "Start",

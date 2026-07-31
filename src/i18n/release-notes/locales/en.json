@@ -1,0 +1,4 @@
+{
+    "2026.1.0": "Pascoal is here! This first release includes a guided Free Pascal installer, automatic updates, and a Pascal editor built for learning.",
+    "2026.1.1": "Improved syntax highlighting: types, functions, and variables are now recognized correctly, powered by a real Pascal parser."
+}

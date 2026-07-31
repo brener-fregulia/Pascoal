@@ -51,6 +51,11 @@
     { type: 'separator' },
     { type: 'link', labelKey: 'titlebar.view_on_github', url: REPO },
     { type: 'separator' },
+    {
+      type: 'action',
+      labelKey: 'titlebar.release_notes',
+      event: 'menu-release-notes',
+    },
     { type: 'action', labelKey: 'titlebar.about_pascoal', event: 'menu-about' },
   ]
 

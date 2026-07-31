@@ -23,6 +23,16 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Extract changelog section
+        id: changelog
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          BODY=$(node scripts/extract-changelog.cjs "$VERSION")
+          echo "body<<CHANGELOG_EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "CHANGELOG_EOF" >> "$GITHUB_OUTPUT"
+
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-latest'
         run: |
@@ -59,6 +69,6 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Pascoal ${{ github.ref_name }}'
-          releaseBody: 'See the assets below to download and install this version.'
+          releaseBody: ${{ steps.changelog.outputs.body }}
           releaseDraft: false
           prerelease: false

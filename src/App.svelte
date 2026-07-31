@@ -7,7 +7,9 @@
   import AboutModal from './app/AboutModal.svelte'
   import FpcMissingModal from './app/FpcMissingModal.svelte'
   import UpdateAvailableModal from './app/UpdateAvailableModal.svelte'
+  import WhatsNewModal from './app/WhatsNewModal.svelte'
   import { appStore } from './app/app'
+  import { whatsNewStore } from './app/whatsNew'
   import { themeStore } from './shared/theme'
   import { tabStore } from './editor/tabs'
   import { explorerStore } from './project/explorerStore'
@@ -23,6 +25,7 @@
   onMount(async () => {
     themeStore.init()
     await appStore.init()
+    await whatsNewStore.checkAfterUpdate()
 
     if (!import.meta.env.DEV) {
       window.addEventListener('contextmenu', (e) => e.preventDefault())
@@ -79,6 +82,10 @@
     await listen('menu-about', () => {
       showAbout = true
     })
+
+    await listen('menu-release-notes', () => {
+      whatsNewStore.showCurrent()
+    })
   })
 
   $effect(() => {
@@ -104,6 +111,7 @@
 <AboutModal bind:open={showAbout} />
 <FpcMissingModal />
 <UpdateAvailableModal />
+<WhatsNewModal />
 
 <style>
   #layout {

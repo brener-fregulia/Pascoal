@@ -68,8 +68,45 @@ for (const { file, update } of files) {
     }
 }
 
+// 256-color ANSI orange - the basic 8-color palette has no true orange
+// (yellow is the closest), but modern terminals (Windows Terminal, VS
+// Code, most Linux terminals) support this fine.
+const ORANGE = '\x1b[38;5;208m'
+const RESET = '\x1b[0m'
+
+function warnOrange(message) {
+    console.warn(`${ORANGE}${message}${RESET}`)
+}
+
 if (success) {
     console.log(`\nVersion set to ${version}`)
+
+    // Soft reminder, not a hard gate - the CHANGELOG.md entry usually gets
+    // written around the same time as the version bump, but not always
+    // before it. The real guardrail lives in release.yml (which fails the
+    // build if the tag has no matching entry); this is just a nudge so
+    // you don't reach that failure by surprise after already tagging.
+    const changelogPath = path.join(root, 'CHANGELOG.md')
+    try {
+        const changelog = fs.readFileSync(changelogPath, 'utf-8')
+        const hasEntry = new RegExp(
+            `^## \\[${version.replace(/\./g, '\\.')}\\]`,
+            'm',
+        ).test(changelog)
+        if (!hasEntry) {
+            warnOrange(
+                `\nReminder: CHANGELOG.md has no "## [${version}]" section yet.`,
+            )
+            warnOrange(
+                'Add one before tagging - the release build will fail without it.',
+            )
+        }
+    } catch {
+        warnOrange(
+            '\nReminder: could not check CHANGELOG.md (file missing?). ' +
+            'Add a version entry before tagging.',
+        )
+    }
 
     // Clean the pascoal crate's build cache after every version bump - the
     // target/ dir grows very large from accumulated incremental debug
