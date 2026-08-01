@@ -11,6 +11,13 @@ export default defineConfig({
     alias: {
       '@stores': path.resolve(__dirname, 'stores'),
     },
+    // Forces Vite to resolve the `svelte` package via its browser build
+    // instead of the server/SSR one when running under Vitest - without
+    // this, @testing-library/svelte's mount() hits Svelte's SSR entry
+    // point and fails with "mount(...) is not available on the server".
+    // Only applied when VITEST is set (Vitest sets this env var itself),
+    // so normal `vite dev`/`vite build` are unaffected.
+    ...(process.env.VITEST ? { conditions: ['browser'] } : {}),
   },
   clearScreen: false,
   server: {

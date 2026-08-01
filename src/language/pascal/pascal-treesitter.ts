@@ -43,7 +43,7 @@ function markFor(kind: string): Decoration | null {
     return markCache[kind]
 }
 
-function buildDecorations(docLength: number, spans: HighlightSpan[]): DecorationSet {
+export function buildDecorations(docLength: number, spans: HighlightSpan[]): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>()
     const sorted = [...spans].sort((a, b) => a.start - b.start)
 
