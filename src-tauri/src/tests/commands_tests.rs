@@ -112,3 +112,77 @@ fn detect_installer_command_does_not_panic() {
     let result = std::panic::catch_unwind(detect_installer);
     assert!(result.is_ok());
 }
+
+use crate::commands::git_commands::{
+    git_check_identity, git_diff, git_set_identity, git_stage_all, git_unstage, git_unstage_all,
+};
+
+#[test]
+fn git_diff_command_returns_diff_for_staged_file() {
+    let dir = tmp_dir("git_diff");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+    fs::write(dir.join("main.pas"), "program Test;").unwrap();
+    git_stage(dir.to_string_lossy().to_string(), "main.pas".to_string()).unwrap();
+
+    let result = git_diff(
+        dir.to_string_lossy().to_string(),
+        "main.pas".to_string(),
+        true,
+    );
+
+    assert!(result.is_ok());
+}
+
+#[test]
+fn git_unstage_command_moves_file_back() {
+    let dir = tmp_dir("git_unstage");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+    fs::write(dir.join("main.pas"), "x").unwrap();
+    git_stage(dir.to_string_lossy().to_string(), "main.pas".to_string()).unwrap();
+
+    let result = git_unstage(dir.to_string_lossy().to_string(), "main.pas".to_string());
+    assert!(result.is_ok());
+
+    let status = git_status(dir.to_string_lossy().to_string());
+    assert_eq!(status.staged.len(), 0);
+}
+
+#[test]
+fn git_stage_all_and_unstage_all_commands() {
+    let dir = tmp_dir("git_stage_all");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+    fs::write(dir.join("a.pas"), "x").unwrap();
+    fs::write(dir.join("b.pas"), "x").unwrap();
+
+    let stage_result = git_stage_all(dir.to_string_lossy().to_string());
+    assert!(stage_result.is_ok());
+    assert_eq!(
+        git_status(dir.to_string_lossy().to_string()).staged.len(),
+        2
+    );
+
+    let unstage_result = git_unstage_all(dir.to_string_lossy().to_string());
+    assert!(unstage_result.is_ok());
+    assert_eq!(
+        git_status(dir.to_string_lossy().to_string()).staged.len(),
+        0
+    );
+}
+
+#[test]
+fn git_set_identity_and_check_identity_commands_round_trip() {
+    let dir = tmp_dir("git_identity");
+    git_init(dir.to_string_lossy().to_string()).unwrap();
+
+    let set_result = git_set_identity(
+        dir.to_string_lossy().to_string(),
+        "Test User".to_string(),
+        "test@example.com".to_string(),
+        false,
+    );
+    assert!(set_result.is_ok());
+
+    let identity = git_check_identity(dir.to_string_lossy().to_string());
+    assert_eq!(identity.name.as_deref(), Some("Test User"));
+    assert_eq!(identity.email.as_deref(), Some("test@example.com"));
+}
