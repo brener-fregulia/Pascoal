@@ -1,6 +1,12 @@
+mod commands_tests;
 mod compile_tests;
 mod explorer_tests;
 mod file_tests;
 mod fpc_tests;
 mod git_tests;
+mod highlighting_tests;
+mod installer_tests;
+mod manage_files_tests;
+mod manage_workspace_tests;
+mod process_state_tests;
 mod search_tests;
