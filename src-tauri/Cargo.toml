@@ -28,9 +28,18 @@ portable-pty = "0.9.0"
 tree-sitter = "0.25"
 tree-sitter-pascal = "0.10.2"
 tree-sitter-highlight = "0.25"
+tauri-plugin-wdio-webdriver = { version = "1", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt", "macros"] }
+
+# Only present in builds explicitly compiled with --features e2e (see the
+# `e2e` npm script). This starts a WebDriver control server inside the app
+# for WebdriverIO's Tauri service - it must never ship in a real release
+# build, which is exactly what making it optional + feature-gated ensures:
+# `cargo tauri build` (used by release.yml) never enables it.
+[features]
+e2e = ["dep:tauri-plugin-wdio-webdriver"]
 
 [[test]]
 name = "pascal_runner"

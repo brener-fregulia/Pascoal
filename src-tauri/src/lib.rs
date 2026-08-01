@@ -54,6 +54,10 @@ pub fn run() {
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.handle().plugin(tauri_plugin_process::init())?;
+
+            #[cfg(feature = "e2e")]
+            app.handle().plugin(tauri_plugin_wdio_webdriver::init())?;
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
