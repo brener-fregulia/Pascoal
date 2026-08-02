@@ -4,8 +4,6 @@ import { settingsStore, type Settings } from '../../../src/app/settings'
 
 const DEFAULTS: Settings = {
     autoSaveBeforeRun: true,
-    terminal: { position: 'bottom', docked: true, height: 240, width: 400 },
-    editor: { fontSize: 13 },
 }
 
 describe('settingsStore', () => {

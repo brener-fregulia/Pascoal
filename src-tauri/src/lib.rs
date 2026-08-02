@@ -86,6 +86,8 @@ pub fn run() {
             commands::installer_commands::detect_installer,
             commands::installer_commands::install_fpc,
             commands::language_commands::highlight_pascal,
+            commands::settings_commands::load_settings,
+            commands::settings_commands::save_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")
