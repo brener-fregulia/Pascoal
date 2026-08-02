@@ -4,6 +4,7 @@
   import IconButton from '../shared/IconButton.svelte'
   import X from '../icons/X.svelte'
   import ThemesSettings from './ThemesSettings.svelte'
+  import LanguageSettings from './LanguageSettings.svelte'
 
   export let onClose: () => void
 
@@ -69,6 +70,8 @@
     <div id="settings-content">
       {#if activeLeaf === 'themes'}
         <ThemesSettings />
+      {:else if activeLeaf === 'language'}
+        <LanguageSettings />
       {:else}
         <p class="placeholder">{$i18n('settings.coming_soon')}</p>
       {/if}
