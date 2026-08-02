@@ -10,3 +10,4 @@ mod manage_files_tests;
 mod manage_workspace_tests;
 mod process_state_tests;
 mod search_tests;
+mod settings_tests;
