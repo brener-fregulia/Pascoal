@@ -16,6 +16,7 @@
     "dialog:allow-save",
     "dialog:allow-ask",
     "updater:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "wdio-webdriver:default"
   ]
 }
