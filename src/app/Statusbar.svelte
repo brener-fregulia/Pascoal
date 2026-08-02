@@ -58,13 +58,7 @@
 
   <div class="spacer"></div>
 
-  <button
-    class="status-btn"
-    on:click={() => themeStore.cycle()}
-    title="Cycle theme"
-  >
-    {themeLabel}
-  </button>
+  <span>{themeLabel}</span>
 
   <span class="sep">|</span>
 

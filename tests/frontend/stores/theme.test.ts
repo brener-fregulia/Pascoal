@@ -1,60 +1,46 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { get } from 'svelte/store'
 import { themeStore } from '../../../src/shared/theme'
+import { settingsStore } from '../../../src/settings/settingsStore'
 
-type Theme = 'dark' | 'light' | 'charcoal'
-
-interface ThemeState {
-  current: Theme
-}
-
-function state(): ThemeState {
-  return get(themeStore) as ThemeState
+function current() {
+  return get(themeStore).current
 }
 
 describe('themeStore', () => {
   beforeEach(() => {
     localStorage.clear()
+    settingsStore.updateSetting('theme', null)
     document.documentElement.removeAttribute('data-theme')
   })
 
   it('starts with dark theme by default', () => {
     themeStore.init()
-    expect(state().current).toBe('dark')
+    expect(current()).toBe('dark')
   })
 
-  it('restores saved theme from localStorage', () => {
-    localStorage.setItem('pascoal-theme', 'charcoal')
+  it('restores the theme already saved in settings', () => {
+    settingsStore.updateSetting('theme', 'charcoal')
     themeStore.init()
-    expect(state().current).toBe('charcoal')
+    expect(current()).toBe('charcoal')
   })
 
-  it('ignores invalid saved theme', () => {
+  it('migrates a legacy localStorage theme into settings on first init', () => {
+    localStorage.setItem('pascoal-theme', 'light')
+    themeStore.init()
+    expect(current()).toBe('light')
+    expect(get(settingsStore).theme).toBe('light')
+    expect(localStorage.getItem('pascoal-theme')).toBeNull()
+  })
+
+  it('ignores an invalid legacy value', () => {
     localStorage.setItem('pascoal-theme', 'invalid-theme')
     themeStore.init()
-    expect(state().current).toBe('dark')
+    expect(current()).toBe('dark')
   })
 
-  it('cycles dark -> light -> charcoal -> dark', () => {
-    themeStore.apply('dark')
-    themeStore.cycle()
-    expect(state().current).toBe('light')
-
-    themeStore.cycle()
-    expect(state().current).toBe('charcoal')
-
-    themeStore.cycle()
-    expect(state().current).toBe('dark')
-  })
-
-  it('persists theme to localStorage on apply', () => {
+  it('persists theme to settings on apply', () => {
     themeStore.apply('charcoal')
-    expect(localStorage.getItem('pascoal-theme')).toBe('charcoal')
-  })
-
-  it('persists theme to localStorage on cycle', () => {
-    themeStore.apply('dark')
-    themeStore.cycle()
-    expect(localStorage.getItem('pascoal-theme')).toBe('light')
+    expect(get(settingsStore).theme).toBe('charcoal')
   })
 })

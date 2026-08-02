@@ -28,6 +28,19 @@
   --font-ui: 'Inter', sans-serif;
 }
 
+[data-theme="dark"] {
+  --bg: #0D0D0D;
+  --sidebar: #111118;
+  --panel: #16161F;
+  --border: #2A2A3A;
+  --accent: #E94560;
+  --accent2: #A8DADC;
+  --text: #F0F0F0;
+  --text-dim: #7A7A9A;
+  --success: #4CAF82;
+  --error: #E94560;
+}
+
 [data-theme="light"] {
   --bg: #FFFFFF;
   --sidebar: #F0F0F5;

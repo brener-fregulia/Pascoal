@@ -39,7 +39,6 @@
     "search": "Search",
     "git": "Git",
     "playground": "Playground",
-    "toggle_theme": "Toggle theme",
     "settings": "Settings"
   },
   "settings": {
@@ -49,7 +48,11 @@
     "category_language": "Language",
     "category_git": "Git",
     "category_toolchain": "Toolchain",
-    "coming_soon": "Coming soon."
+    "coming_soon": "Coming soon.",
+    "section_themes": "Themes",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "theme_charcoal": "Charcoal"
   },
   "titlebar": {
     "close": "Close",

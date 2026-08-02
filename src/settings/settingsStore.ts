@@ -1,12 +1,15 @@
 import { writable } from 'svelte/store'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+import type { Theme } from '../shared/theme'
 
 export interface Settings {
   autoSaveBeforeRun: boolean
+  theme: Theme | null
 }
 
 const DEFAULTS: Settings = {
   autoSaveBeforeRun: true,
+  theme: null,
 }
 
 function createSettingsStore() {

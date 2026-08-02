@@ -3,6 +3,7 @@
   import PanelHeader from '../shared/PanelHeader.svelte'
   import IconButton from '../shared/IconButton.svelte'
   import X from '../icons/X.svelte'
+  import AppearanceSettings from './AppearanceSettings.svelte'
 
   export let onClose: () => void
 
@@ -43,7 +44,11 @@
     </nav>
 
     <div id="settings-content">
-      <p class="placeholder">{$i18n('settings.coming_soon')}</p>
+      {#if activeCategory === 'appearance'}
+        <AppearanceSettings />
+      {:else}
+        <p class="placeholder">{$i18n('settings.coming_soon')}</p>
+      {/if}
     </div>
   </div>
 </div>

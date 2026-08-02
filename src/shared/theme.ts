@@ -1,63 +1,55 @@
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
+import { settingsStore } from '../settings/settingsStore'
 
-type Theme = 'dark' | 'light' | 'charcoal'
+export type Theme = 'dark' | 'light' | 'charcoal'
 
 const THEMES: Theme[] = ['dark', 'light', 'charcoal']
-const STORAGE_KEY = 'pascoal-theme'
+const LEGACY_STORAGE_KEY = 'pascoal-theme'
+
+function detectSystem(): Theme {
+  return window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark'
+}
+
+/** One-time bridge from the old localStorage-only theme (pre settings
+ *  panel) into the settings store. Clears the legacy key either way,
+ *  returning null when there was nothing valid to migrate. */
+function migrateLegacy(): Theme | null {
+  try {
+    const saved = localStorage.getItem(LEGACY_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_STORAGE_KEY)
+    return THEMES.includes(saved as Theme) ? (saved as Theme) : null
+  } catch {
+    return null
+  }
+}
 
 function createThemeStore() {
-  const { subscribe, update, set } = writable<{ current: Theme }>({
+  const { subscribe, set } = writable<{ current: Theme }>({
     current: 'dark',
   })
 
-  function detectSystem(): Theme {
-    return window.matchMedia('(prefers-color-scheme: light)').matches
-      ? 'light'
-      : 'dark'
-  }
-
-  function getSaved(): Theme | null {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      return THEMES.includes(saved as Theme) ? (saved as Theme) : null
-    } catch {
-      return null
-    }
-  }
-
   function apply(theme: Theme) {
-    try {
-      localStorage.setItem(STORAGE_KEY, theme)
-    } catch {
-      /* ignore */
-    }
+    settingsStore.updateSetting('theme', theme)
     set({ current: theme })
   }
 
   function init() {
-    const theme = getSaved() ?? detectSystem()
+    const stored = get(settingsStore).theme
+    const theme = stored ?? migrateLegacy() ?? detectSystem()
     apply(theme)
 
     window
       .matchMedia('(prefers-color-scheme: light)')
       .addEventListener('change', (e) => {
-        if (!getSaved()) apply(e.matches ? 'light' : 'dark')
+        if (get(settingsStore).theme === null) {
+          apply(e.matches ? 'light' : 'dark')
+        }
       })
   }
 
-  function cycle() {
-    update((state) => {
-      const next = THEMES[(THEMES.indexOf(state.current) + 1) % THEMES.length]
-      try {
-        localStorage.setItem(STORAGE_KEY, next)
-      } catch {
-        /* ignore */
-      }
-      return { current: next }
-    })
-  }
-
-  return { subscribe, init, apply, cycle }
+  return { subscribe, init, apply }
 }
 
 export const themeStore = createThemeStore()

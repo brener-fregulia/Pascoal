@@ -18,14 +18,8 @@ describe('Statusbar', () => {
     })
 
     it('shows the current theme name, capitalized', () => {
-        const { getByTitle } = render(Statusbar)
-        expect(getByTitle('Cycle theme')).toHaveTextContent('Dark')
-    })
-
-    it('cycles the theme when the theme button is clicked', async () => {
-        const { getByTitle } = render(Statusbar)
-        await fireEvent.click(getByTitle('Cycle theme'))
-        expect(getByTitle('Cycle theme')).toHaveTextContent('Light')
+        const { getByText } = render(Statusbar)
+        expect(getByText('Dark')).toBeInTheDocument()
     })
 
     it('opens the FPC install modal when the FPC button is clicked', async () => {

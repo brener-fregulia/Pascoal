@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { themeStore } from '../shared/theme'
   import { i18n } from '../i18n'
   import IconButton from '../shared/IconButton.svelte'
   import Folder from '../icons/Folder.svelte'
   import Search from '../icons/Search.svelte'
   import Git from '../icons/Git.svelte'
   import Play from '../icons/Play.svelte'
-  import Sun from '../icons/Sun.svelte'
   import Settings from '../icons/Settings.svelte'
 
   export let activePanel: string | null
@@ -42,13 +40,6 @@
   {/each}
 
   <div class="spacer"></div>
-
-  <IconButton
-    label={$i18n('activity.toggle_theme')}
-    on:click={() => themeStore.cycle()}
-  >
-    <Sun size={20} />
-  </IconButton>
 
   {#if import.meta.env.DEV}
     <IconButton

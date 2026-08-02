@@ -13,13 +13,6 @@ describe('ActivityBar', () => {
         expect(getByLabelText('Search')).toBeInTheDocument()
     })
 
-    it('renders the theme toggle button', () => {
-        const { getByLabelText } = render(ActivityBar, {
-            props: { activePanel: null },
-        })
-        expect(getByLabelText('Toggle theme')).toBeInTheDocument()
-    })
-
     it('marks the active panel button as active', () => {
         const { getByLabelText } = render(ActivityBar, {
             props: { activePanel: 'explorer' },
