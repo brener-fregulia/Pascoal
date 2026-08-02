@@ -196,3 +196,48 @@ pub fn set_identity(
     run_git(folder_path, &["config", scope_flag, "user.email", email])?;
     Ok(())
 }
+
+/// Reads the global (per-user) git identity, independent of any
+/// folder or repository.
+pub fn check_global_identity() -> GitIdentity {
+    let cwd = std::env::temp_dir();
+    let cwd = cwd.to_str().unwrap_or(".");
+
+    let name = run_git(cwd, &["config", "--global", "user.name"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    let email = run_git(cwd, &["config", "--global", "user.email"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    GitIdentity { name, email }
+}
+
+/// Reads the local (per-repository) identity only, without falling
+/// back to the global value the way `check_identity` does.
+pub fn check_local_identity(folder_path: &str) -> GitIdentity {
+    let name = run_git(folder_path, &["config", "--local", "user.name"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    let email = run_git(folder_path, &["config", "--local", "user.email"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    GitIdentity { name, email }
+}
+
+/// Writes the global (per-user) identity, independent of any folder.
+pub fn set_global_identity(name: &str, email: &str) -> Result<(), String> {
+    let cwd = std::env::temp_dir();
+    let cwd = cwd.to_str().unwrap_or(".");
+
+    run_git(cwd, &["config", "--global", "user.name", name])?;
+    run_git(cwd, &["config", "--global", "user.email", email])?;
+    Ok(())
+}

@@ -52,7 +52,11 @@
     "section_themes": "Motywy",
     "theme_dark": "Ciemny",
     "theme_light": "Jasny",
-    "theme_charcoal": "Grafitowy"
+    "theme_charcoal": "Grafitowy",
+    "git_scope_user": "Użytkownik",
+    "git_name": "Imię i nazwisko",
+    "git_email": "E-mail",
+    "git_workspace_hint": "Otwórz folder projektu, aby ustawić tożsamość specyficzną dla projektu."
   },
   "titlebar": {
     "close": "Zamknij",

@@ -54,3 +54,18 @@ pub fn git_set_identity(
 ) -> Result<(), String> {
     git::set_identity(&folder_path, &name, &email, global)
 }
+
+#[tauri::command]
+pub fn git_check_global_identity() -> git::GitIdentity {
+    git::check_global_identity()
+}
+
+#[tauri::command]
+pub fn git_check_local_identity(folder_path: String) -> git::GitIdentity {
+    git::check_local_identity(&folder_path)
+}
+
+#[tauri::command]
+pub fn git_set_global_identity(name: String, email: String) -> Result<(), String> {
+    git::set_global_identity(&name, &email)
+}

@@ -52,7 +52,11 @@
     "section_themes": "Temas",
     "theme_dark": "Escuro",
     "theme_light": "Claro",
-    "theme_charcoal": "Carvão"
+    "theme_charcoal": "Carvão",
+    "git_scope_user": "Usuário",
+    "git_name": "Nome",
+    "git_email": "Email",
+    "git_workspace_hint": "Abra uma pasta de projeto para configurar uma identidade específica do projeto."
   },
   "titlebar": {
     "close": "Fechar",

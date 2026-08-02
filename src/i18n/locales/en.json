@@ -52,7 +52,11 @@
     "section_themes": "Themes",
     "theme_dark": "Dark",
     "theme_light": "Light",
-    "theme_charcoal": "Charcoal"
+    "theme_charcoal": "Charcoal",
+    "git_scope_user": "User",
+    "git_name": "Name",
+    "git_email": "Email",
+    "git_workspace_hint": "Open a project folder to set a project-specific identity."
   },
   "titlebar": {
     "close": "Close",
