@@ -3,20 +3,35 @@
   import PanelHeader from '../shared/PanelHeader.svelte'
   import IconButton from '../shared/IconButton.svelte'
   import X from '../icons/X.svelte'
-  import AppearanceSettings from './AppearanceSettings.svelte'
+  import ThemesSettings from './ThemesSettings.svelte'
 
   export let onClose: () => void
 
-  type Category = 'appearance' | 'language' | 'git' | 'toolchain'
+  type Leaf = 'themes' | 'language' | 'git' | 'toolchain'
 
-  const categories: { id: Category; labelKey: string }[] = [
-    { id: 'appearance', labelKey: 'settings.category_appearance' },
-    { id: 'language', labelKey: 'settings.category_language' },
-    { id: 'git', labelKey: 'settings.category_git' },
-    { id: 'toolchain', labelKey: 'settings.category_toolchain' },
+  interface NavItem {
+    id: Leaf
+    labelKey: string
+  }
+
+  interface NavGroup {
+    groupLabelKey?: string
+    items: NavItem[]
+  }
+
+  const nav: NavGroup[] = [
+    {
+      groupLabelKey: 'settings.group_general',
+      items: [
+        { id: 'themes', labelKey: 'settings.section_themes' },
+        { id: 'language', labelKey: 'settings.category_language' },
+      ],
+    },
+    { items: [{ id: 'git', labelKey: 'settings.category_git' }] },
+    { items: [{ id: 'toolchain', labelKey: 'settings.category_toolchain' }] },
   ]
 
-  let activeCategory: Category = 'appearance'
+  let activeLeaf: Leaf = 'themes'
 </script>
 
 <div id="settings-view">
@@ -32,20 +47,28 @@
 
   <div id="settings-body">
     <nav id="settings-nav">
-      {#each categories as category}
-        <button
-          class="nav-item"
-          class:active={activeCategory === category.id}
-          on:click={() => (activeCategory = category.id)}
-        >
-          {$i18n(category.labelKey)}
-        </button>
+      {#each nav as group}
+        <div class="nav-group">
+          {#if group.groupLabelKey}
+            <div class="nav-group-label">{$i18n(group.groupLabelKey)}</div>
+          {/if}
+          {#each group.items as item}
+            <button
+              class="nav-item"
+              class:indented={!!group.groupLabelKey}
+              class:active={activeLeaf === item.id}
+              on:click={() => (activeLeaf = item.id)}
+            >
+              {$i18n(item.labelKey)}
+            </button>
+          {/each}
+        </div>
       {/each}
     </nav>
 
     <div id="settings-content">
-      {#if activeCategory === 'appearance'}
-        <AppearanceSettings />
+      {#if activeLeaf === 'themes'}
+        <ThemesSettings />
       {:else}
         <p class="placeholder">{$i18n('settings.coming_soon')}</p>
       {/if}
@@ -75,7 +98,23 @@
     padding: 12px 8px;
     display: flex;
     flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+  }
+
+  .nav-group {
+    display: flex;
+    flex-direction: column;
     gap: 2px;
+  }
+
+  .nav-group-label {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
   }
 
   .nav-item {
@@ -88,6 +127,10 @@
     font-family: var(--font-ui);
     font-size: 13px;
     cursor: pointer;
+  }
+
+  .nav-item.indented {
+    padding-left: 20px;
   }
 
   .nav-item:hover {

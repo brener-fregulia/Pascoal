@@ -44,7 +44,7 @@
   "settings": {
     "title": "Settings",
     "close": "Close",
-    "category_appearance": "Appearance",
+    "group_general": "General",
     "category_language": "Language",
     "category_git": "Git",
     "category_toolchain": "Toolchain",
