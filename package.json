@@ -7,6 +7,7 @@
   "scripts": {
     "dev:ide": "cd src && npx vite",
     "build:ide": "cd src && npx vite build",
+    "build:e2e": "cd src-tauri && cargo tauri build --debug --no-bundle --features e2e --config tauri.e2e.conf.json",
     "set-version": "node scripts/set-version.cjs",
     "test:frontend": "cd src && npx vitest run",
     "test:frontend:watch": "cd src && npx vitest",

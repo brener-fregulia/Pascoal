@@ -1,0 +1,18 @@
+{
+    "app": {
+        "security": {
+            "capabilities": [
+                "default",
+                {
+                    "identifier": "e2e",
+                    "windows": [
+                        "main"
+                    ],
+                    "permissions": [
+                        "wdio-webdriver:default"
+                    ]
+                }
+            ]
+        }
+    }
+}
