@@ -42,6 +42,15 @@
     "toggle_theme": "Toggle theme",
     "settings": "Settings"
   },
+  "settings": {
+    "title": "Settings",
+    "close": "Close",
+    "category_appearance": "Appearance",
+    "category_language": "Language",
+    "category_git": "Git",
+    "category_toolchain": "Toolchain",
+    "coming_soon": "Coming soon."
+  },
   "titlebar": {
     "close": "Close",
     "minimize": "Minimize",

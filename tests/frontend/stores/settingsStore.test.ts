@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { settingsStore, type Settings } from '../../../src/app/settings'
+import { settingsStore, type Settings } from '../../../src/settings/settingsStore'
 
 const DEFAULTS: Settings = {
     autoSaveBeforeRun: true,

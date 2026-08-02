@@ -51,7 +51,12 @@
   </IconButton>
 
   {#if import.meta.env.DEV}
-    <IconButton label={$i18n('activity.settings')}>
+    <IconButton
+      label={$i18n('activity.settings')}
+      active={activePanel === 'settings'}
+      on:click={() =>
+        (activePanel = activePanel === 'settings' ? null : 'settings')}
+    >
       <Settings size={20} />
     </IconButton>
   {/if}

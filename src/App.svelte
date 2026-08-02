@@ -3,6 +3,7 @@
   import Titlebar from './app/Titlebar.svelte'
   import ActivityBar from './app/ActivityBar.svelte'
   import EditorArea from './editor/EditorArea.svelte'
+  import SettingsView from './settings/SettingsView.svelte'
   import Statusbar from './app/Statusbar.svelte'
   import AboutModal from './app/AboutModal.svelte'
   import FpcMissingModal from './app/FpcMissingModal.svelte'
@@ -109,7 +110,11 @@
   <Titlebar />
   <div id="main">
     <ActivityBar bind:activePanel />
-    <EditorArea {activePanel} />
+    {#if activePanel === 'settings'}
+      <SettingsView onClose={() => (activePanel = null)} />
+    {:else}
+      <EditorArea {activePanel} />
+    {/if}
   </div>
   <Statusbar />
 </div>

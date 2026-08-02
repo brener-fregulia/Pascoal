@@ -42,6 +42,15 @@
     "toggle_theme": "Zmień motyw",
     "settings": "Ustawienia"
   },
+  "settings": {
+    "title": "Ustawienia",
+    "close": "Zamknij",
+    "category_appearance": "Wygląd",
+    "category_language": "Język",
+    "category_git": "Git",
+    "category_toolchain": "Toolchain",
+    "coming_soon": "Wkrótce."
+  },
   "titlebar": {
     "close": "Zamknij",
     "minimize": "Minimalizuj",
