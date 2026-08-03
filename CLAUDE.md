@@ -2,259 +2,153 @@
 
 @AGENTS.md
 
-## Claude Code role
+## Role
 
-Claude Code is the primary implementation and technical analysis agent for Pascoal.
+Claude Code is the primary tool for technical analysis, implementation, testing, investigation, and review in Pascoal.
 
-Use the repository as the source of truth. Inspect the relevant implementation, tests, configuration, scripts, workflows, and documentation before proposing or applying changes.
-
-Do not rely on previous chat context when the repository can provide the required information.
+Use the repository as the source of truth. Do not rely on previous conversation context when the current repository can provide the required information.
 
 ## Context discipline
 
 Keep the active context focused on the current task.
 
-Do not inspect the entire repository for every request. Start from the task description and inspect only the files and documentation needed to understand the affected behavior.
+* Start from the task description and the closest relevant files.
+* Prefer targeted searches over broad repository exploration.
+* Inspect related code, tests, configuration, and documentation only when needed.
+* Expand the investigation when dependencies or architectural boundaries require it.
+* Do not repeatedly read unchanged files without a concrete reason.
+* Do not load complete directories or large documents merely for general context.
 
-Expand the investigation only when:
+Detailed procedures should remain in skills and project documentation rather than this file.
 
-* the current implementation depends on another area;
-* an architectural boundary must be confirmed;
-* tests reveal related behavior;
-* the requested change is explicitly cross-cutting;
-* repository documentation points to additional required context.
+## Before changing files
 
-Prefer targeted searches and file reads over loading large directories or unrelated documentation.
+For substantial or cross-cutting work:
 
-Do not repeatedly read files already examined during the same task unless they may have changed or a specific detail must be verified.
+1. confirm the requested objective;
+2. inspect the current implementation and nearby tests;
+3. identify the affected layers;
+4. present a concise, repository-specific plan;
+5. identify material risks or ambiguities;
+6. wait for approval when the task is planning-only or approval was requested.
 
-## Before editing
+Small and explicit corrections may be applied directly when no separate planning stage was requested.
 
-For any substantial change:
-
-1. restate the understood objective;
-2. identify the relevant existing behavior;
-3. inspect nearby implementation and tests;
-4. present a concise implementation plan;
-5. identify any material ambiguity or cross-platform risk;
-6. wait for approval when the user requested a planning stage.
-
-Small, explicit, low-risk corrections may be applied directly when no separate planning stage was requested.
-
-Do not begin implementation during a planning-only task.
-
-## Task boundaries
-
-Follow the stage separation defined in `AGENTS.md`.
-
-In particular:
-
-* implementation tasks must not silently add documentation, translations, changelog entries, release notes, or version bumps;
-* testing tasks must focus on tests for an existing implementation;
-* review tasks are read-only unless corrections are explicitly requested;
-* release preparation must never create tags, push, or publish releases;
-* no task grants implicit permission for Git write operations.
-
-When a useful improvement falls outside the current scope, report it separately instead of implementing it.
+Never implement during a planning-only task.
 
 ## Repository navigation
 
 Use the current repository structure rather than memorized paths.
 
-Before using a command:
+When locating behavior, search using concrete identifiers such as:
 
-* verify it in `package.json`, Cargo configuration, workflow files, scripts, or relevant documentation;
-* confirm whether required external tools are available;
-* consider whether the command behaves consistently on Windows and Linux.
+* symbols;
+* component names;
+* Tauri commands;
+* translation keys;
+* test descriptions;
+* visible application text;
+* configuration values.
 
-When locating functionality:
+Follow imports and call sites only as far as necessary to understand the affected behavior.
 
-* search by symbol, command name, translation key, event, Tauri command, test description, or visible behavior;
-* inspect the closest existing implementation before designing a new abstraction;
-* follow imports and call sites only as far as necessary to establish the behavior.
+Before executing a command, verify it in the current repository configuration.
 
-Do not assume a file belongs to a layer solely from its name.
+## Skills
 
-## Delegation
+Use a project skill under `.claude/skills/` when its procedure matches the task.
 
-Use specialized subagents when they provide useful context isolation or domain expertise.
+Skills may define workflows for:
 
-Typical delegation targets include:
-
-* frontend and Svelte work;
-* Rust and Tauri work;
-* tests and coverage;
-* technical review;
+* feature planning;
+* implementation;
+* testing;
+* review;
 * documentation;
-* translation and i18n;
+* translation;
+* coverage analysis;
 * release preparation.
+
+Follow each skill's scope, allowed files, prohibited files, validations, and response format.
+
+A skill does not override `AGENTS.md`, especially its Git and safety rules.
+
+When no matching skill exists, follow `AGENTS.md` and the relevant project documentation directly. Do not invent or claim to have executed an unavailable skill.
+
+## Subagents
+
+Use specialized subagents when delegation provides useful domain expertise or keeps temporary exploration out of the main context.
 
 Delegate a bounded objective with:
 
 * the expected result;
-* relevant files or starting points;
-* files or areas that must not be changed;
+* relevant starting points;
+* scope restrictions;
 * required validations;
-* expected response format.
+* expected output.
 
-Do not delegate the same responsibility to multiple agents without a concrete reason.
+Do not delegate the same work to multiple agents without a concrete reason.
 
 The main agent remains responsible for:
 
 * coordinating the task;
-* resolving conflicts between findings;
-* maintaining scope;
+* preserving scope;
+* resolving conflicting findings;
 * validating the combined result;
 * presenting the final response.
 
-Do not use subagents merely to create more activity or duplicate analysis.
+## Editing
 
-## Skills
-
-Use project skills under `.claude/skills/` when a matching reusable procedure exists.
-
-Skills define task workflows such as:
-
-* planning a feature;
-* implementing an approved change;
-* adding tests;
-* reviewing changes;
-* updating documentation;
-* updating translations;
-* analyzing coverage;
-* preparing a release.
-
-Follow the skill's declared:
-
-* purpose;
-* expected inputs;
-* allowed files;
-* prohibited files;
-* validation steps;
-* final response format.
-
-A skill does not override the Git restrictions or scope rules in `AGENTS.md`.
-
-When no appropriate skill exists, follow `AGENTS.md` and the relevant documentation directly. Do not invent a skill name or pretend that an unavailable procedure was executed.
-
-## Plans
-
-Plans should be concrete and repository-specific.
-
-A useful implementation plan identifies:
-
-* current behavior;
-* files or layers likely to change;
-* intended data or control flow;
-* platform-specific considerations;
-* tests or validations;
-* explicit non-goals.
-
-Avoid generic steps such as:
-
-* update the code;
-* add error handling;
-* test the feature;
-* update as needed.
-
-Do not include documentation, translations, changelog, or release work in an implementation plan unless the current task explicitly includes those stages.
-
-## Editing behavior
-
-Before creating a new file or abstraction, inspect whether an equivalent pattern already exists.
+Before introducing a new abstraction or file, inspect the closest existing pattern.
 
 When editing:
 
-* preserve the existing style of the surrounding code;
+* preserve surrounding conventions;
 * keep diffs focused;
-* avoid unrelated formatting changes;
-* do not rewrite working code solely for preference;
-* do not add compatibility layers without a demonstrated need;
-* do not add speculative extension points;
-* do not suppress warnings or tests to make validation pass;
-* do not replace explicit project conventions with generic best practices.
+* avoid unrelated formatting;
+* avoid speculative extension points;
+* do not rewrite working code solely by preference;
+* do not suppress warnings or weaken tests;
+* do not modify generated output when its source can be changed;
+* do not expand the task into documentation, tests, translations, or release work unless requested.
 
-If generated files must change, modify their source or generator when possible.
+Detailed stage boundaries are defined in:
 
-## Frontend work
+```text
+docs/development/workflow.md
+```
 
-For frontend tasks, inspect the relevant:
+## Validation
 
-* Svelte components;
-* TypeScript modules;
-* stores and application state;
-* editor integrations;
-* styles;
-* accessibility behavior;
-* frontend tests;
-* i18n usage.
+Run the narrowest relevant validation first and expand only when the affected scope requires it.
 
-Preserve established Svelte, TypeScript, CodeMirror, component, state-management, and styling patterns.
+Testing guidance is defined in:
 
-Do not move operating-system or filesystem responsibilities into the frontend when they belong in the Tauri/Rust backend.
+```text
+docs/development/testing.md
+```
 
-Do not introduce visible text directly into components when the existing behavior requires localization.
+Do not claim a command passed unless it completed successfully.
 
-Translation updates remain a separate stage unless explicitly included.
-
-## Rust and Tauri work
-
-For Rust and Tauri tasks, inspect the relevant:
-
-* commands;
-* application services;
-* infrastructure adapters;
-* state;
-* filesystem and process integrations;
-* toolchain detection;
-* Git integration;
-* unit and integration tests.
-
-Keep Tauri commands focused on the application boundary.
-
-Place operating-system behavior in the appropriate backend layer and evaluate both Windows and Linux behavior.
-
-Do not assume shell commands, executable locations, path formats, environment variables, or process behavior without verification.
-
-Handle missing tools and operating-system errors explicitly when required by the existing behavior.
-
-## Testing
-
-Run the narrowest relevant validations first.
-
-Expand to broader validation when:
-
-* multiple layers changed;
-* shared behavior was modified;
-* a regression risk affects unrelated callers;
-* the task explicitly requests full validation;
-* release preparation requires it.
-
-Do not claim tests, builds, checks, or coverage passed unless they were executed successfully.
-
-When a command fails:
+When validation fails:
 
 1. inspect the actual error;
-2. determine whether it was caused by the change, the environment, or a pre-existing condition;
-3. avoid changing unrelated code merely to silence the failure;
-4. report unresolved failures clearly.
+2. determine whether it comes from the change, environment, or existing repository state;
+3. avoid unrelated changes intended only to silence the failure;
+4. report unresolved failures and remaining manual checks.
 
-Do not install missing system dependencies, modify global configuration, or alter the developer environment without explicit permission.
+Do not install system dependencies or modify global configuration without explicit permission.
 
-## Git safety
+## Git
 
 The Git policy in `AGENTS.md` is mandatory.
 
-Claude Code must not infer permission to commit, amend, push, pull, merge, rebase, switch branches, create branches, create tags, discard changes, or publish releases.
+Do not infer permission to commit, amend, push, pull, merge, rebase, switch branches, create branches, create tags, discard changes, or publish releases.
 
-Even when Claude Code identifies that a commit or tag is the natural next step, it must only suggest the corresponding Conventional Commit message or manual action.
-
-Never use permission-bypass options to avoid these restrictions.
+Suggest the appropriate Conventional Commit message without executing it.
 
 ## Final response
 
-Use the final response format defined in `AGENTS.md`.
+Follow the response format defined in `AGENTS.md`.
 
-Keep the report proportional to the task.
-
-Do not provide a long narrative of every file inspected or every internal reasoning step. Report the decisions, changes, validations, limitations, and out-of-scope findings that are useful to the repository owner.
+Keep the report proportional to the task. Report useful outcomes, validations, limitations, and out-of-scope findings rather than narrating every inspected file or internal reasoning step.
