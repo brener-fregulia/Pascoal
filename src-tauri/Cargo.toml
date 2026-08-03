@@ -1,6 +1,6 @@
 [package]
 name = "pascoal"
-version = "2026.2.1"
+version = "2026.3.0"
 description = "A modern Pascal playground and IDE"
 authors = ["Brener Fregulia"]
 license = "MIT"
