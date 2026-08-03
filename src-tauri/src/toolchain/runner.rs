@@ -114,6 +114,18 @@ pub async fn run_with_pipes(
     }
 }
 
+#[cfg(unix)]
+fn disable_pty_echo(pair: &portable_pty::PtyPair) {
+    use termios::{tcsetattr, Termios, ECHO, ECHOE, ECHOK, ECHONL, TCSANOW};
+
+    if let Some(fd) = pair.master.as_raw_fd() {
+        if let Ok(mut attrs) = Termios::from_fd(fd) {
+            attrs.c_lflag &= !(ECHO | ECHOE | ECHOK | ECHONL);
+            let _ = tcsetattr(fd, TCSANOW, &attrs);
+        }
+    }
+}
+
 pub async fn run_with_pty(
     app: &tauri::AppHandle,
     exe_file: &std::path::Path,
@@ -141,6 +153,14 @@ pub async fn run_with_pty(
             };
         }
     };
+
+    // Console.svelte already echoes typed characters itself, matching
+    // the plain-pipes Windows path (run_with_pipes), which has no echo
+    // of its own. A real PTY's kernel line discipline echoes input by
+    // default though, so without this every keystroke shows up twice
+    // on Linux.
+    #[cfg(unix)]
+    disable_pty_echo(&pair);
 
     let mut cmd = CommandBuilder::new(exe_file.to_str().unwrap_or(""));
     cmd.cwd(tmp_dir);
