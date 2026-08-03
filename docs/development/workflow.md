@@ -2,298 +2,242 @@
 
 ## Purpose
 
-This document defines the recommended development workflow for Pascoal.
+This document defines the standard development workflow for Pascoal.
 
-Pascoal is currently maintained primarily by a single developer. The workflow is intentionally lightweight and does not require pull requests, mandatory branches, squash merges, or team-oriented ceremonies.
+Pascoal is primarily maintained by a single developer. The process should preserve control, traceability, and clear development stages without introducing mandatory pull requests, branches, squash merges, or team ceremonies.
 
-The goal is to preserve control, traceability, and clear development stages while using AI agents to reduce repetitive work.
+Shared agent rules, including Git restrictions, are defined in `AGENTS.md`.
 
-## Core principles
+Testing details are defined in:
+
+```text
+docs/development/testing.md
+```
+
+## Principles
 
 The workflow follows these principles:
 
 * the repository is the permanent source of project context;
-* the repository owner retains full control of Git operations;
-* implementation, tests, review, documentation, translations, and release preparation are separate stages;
-* commits should represent meaningful development stages;
-* direct development on the main branch is acceptable for normal changes;
-* branches are useful for large, risky, or long-running changes;
-* pull requests remain optional;
-* agents must operate only within the scope of the current task;
-* automation should reduce repetitive work without removing manual control.
+* the repository owner controls all Git operations;
+* development stages remain separate when they represent independently reviewable work;
+* commits should reflect meaningful stages;
+* direct development on the main branch is acceptable;
+* branches and pull requests are optional;
+* automation should reduce repetitive work without removing manual control;
+* agents should receive only the context required for the current stage.
 
-## Why stages remain separate
+## Standard stages
 
-Pascoal intentionally keeps implementation, tests, documentation, and release work in separate commits when practical.
+A complete change may pass through:
 
-This provides:
-
-* clearer review boundaries;
-* easier partial reversions;
-* more useful repository history;
-* better support for `git bisect`;
-* isolation between behavioral and non-behavioral changes;
-* easier identification of where regressions were introduced;
-* more accurate Conventional Commit messages.
-
-Agents must not combine stages merely to reduce the number of commits.
-
-## Standard workflow
-
-The standard workflow consists of the following stages:
-
-1. planning;
-2. implementation;
-3. manual validation;
-4. tests;
-5. manual validation;
+1. task definition;
+2. planning;
+3. implementation;
+4. manual validation;
+5. tests;
 6. technical review;
 7. documentation and translations;
 8. changelog and release notes;
-9. version preparation;
-10. manual Git and release operations.
+9. release preparation;
+10. manual Git and publication.
 
 Not every task requires every stage.
 
-Small fixes may use a reduced workflow, but the separation of responsibilities should still be preserved.
+Small changes may use a reduced workflow when the risk and scope justify it.
 
-## Stage 1: task definition
+## 1. Task definition
 
-A task may begin from:
+A task may originate from:
 
 * a GitHub Issue;
-* a GitHub Project draft item;
+* a GitHub Project item;
 * a structured prompt;
-* a short repository document;
 * a bug report;
-* an observed regression;
-* an architectural research question.
+* a short planning document;
+* an architectural question;
+* an observed problem.
 
-A task definition should describe, when relevant:
+A useful task definition should include, when relevant:
 
 * the problem;
-* the expected result;
+* expected behavior;
 * current behavior;
 * affected area;
-* known constraints;
-* explicit non-goals;
+* constraints;
+* non-goals;
 * platform considerations;
 * validation expectations.
 
-The task does not need to be formal or extensive. It only needs enough information to establish a concrete scope.
+The task does not need to be extensive. It only needs enough information to establish a concrete scope.
 
-## Stage 2: planning
+## 2. Planning
 
-The planning stage is read-only.
+Planning is read-only.
 
 The agent should:
 
-1. read the task;
-2. inspect the relevant implementation;
-3. inspect nearby tests;
-4. inspect relevant architecture or feature documentation;
-5. identify dependencies and affected layers;
-6. describe the current behavior;
-7. propose an implementation plan;
+1. inspect the relevant implementation;
+2. inspect nearby tests and documentation;
+3. describe the current behavior;
+4. define the proposed scope;
+5. identify non-goals;
+6. identify affected files or layers;
+7. propose implementation steps;
 8. identify risks and edge cases;
-9. define validation steps;
-10. state what will not be changed.
+9. define the validation strategy.
 
-The planning stage must not modify files.
+A useful plan should be repository-specific rather than a generic checklist.
 
-A useful plan should identify concrete files, modules, symbols, commands, or application flows whenever the repository supports that level of certainty.
-
-Generic plans that do not reflect the repository should be rejected or revised.
-
-### Planning output
-
-The expected output is:
+Expected structure:
 
 ```text
 Objective
-
 Current behavior
-
-Proposed scope
-
+Scope
 Non-goals
-
-Relevant files and layers
-
+Relevant files or layers
 Implementation steps
-
 Risks and edge cases
-
-Validation plan
-
+Validation
 Open questions
 ```
 
-The `Open questions` section may be omitted when no material ambiguity remains.
+`Open questions` may be omitted when no material ambiguity remains.
 
-## Stage 3: implementation
+No files should be changed during a planning-only task.
 
-Implementation begins only after the scope is understood and, when requested, the plan has been approved.
+## 3. Implementation
+
+Implementation begins after the scope is understood and, when requested, the plan is approved.
 
 The implementation agent should:
 
-1. inspect the current state of the relevant files;
-2. implement only the approved behavior;
-3. preserve existing architectural boundaries;
-4. avoid unrelated refactoring;
-5. evaluate Windows and Linux behavior where applicable;
-6. run the narrowest relevant existing validations;
-7. report all changed files;
-8. suggest a Conventional Commit message.
+* inspect the current relevant files;
+* implement only the approved behavior;
+* preserve architectural boundaries;
+* avoid unrelated refactoring;
+* consider Windows and Linux where applicable;
+* execute relevant existing validation;
+* report changed files;
+* suggest one Conventional Commit message.
 
-Implementation must not silently include:
+Unless explicitly requested, implementation must not include:
 
 * new tests;
-* documentation updates;
-* translation updates;
+* documentation;
+* translations;
 * changelog entries;
 * release notes;
-* version bumps;
+* version changes;
 * dependency upgrades;
 * workflow restructuring.
 
-These may be included only when explicitly part of the approved task.
+Existing tests may be executed during implementation.
 
-### Implementation commit
+After review, the repository owner creates the implementation commit manually.
 
-After manual review, the repository owner creates the implementation commit.
-
-Typical commit types include:
+Typical commit types:
 
 ```text
-feat(scope): add new behavior
-fix(scope): correct existing behavior
-refactor(scope): restructure implementation without changing behavior
-perf(scope): improve runtime performance
+feat(scope): add behavior
+fix(scope): correct behavior
+refactor(scope): restructure implementation
+perf(scope): improve performance
 ```
 
-The agent only suggests the message. It does not execute the commit.
+## 4. Manual validation
 
-## Stage 4: manual implementation validation
+Manual validation confirms that the implementation matches the intended behavior before the dedicated testing stage.
 
-The repository owner validates the implementation before creating or requesting tests.
+It may include:
 
-Manual validation may include:
-
-* verifying the user interface;
-* testing application flows;
 * reproducing the original problem;
-* checking behavior on Windows;
-* checking behavior on Linux;
-* inspecting process or filesystem integration;
-* verifying toolchain behavior;
-* checking visual consistency;
-* evaluating whether the implementation matches the approved scope.
+* validating the user interface;
+* checking editor behavior;
+* testing files, processes, Git, or toolchains;
+* checking Windows or Linux behavior;
+* verifying visual consistency;
+* confirming that the scope was respected.
 
-Problems found during validation return the task to the implementation stage.
+Problems found during validation return to the implementation stage.
 
-The implementation commit should represent behavior considered acceptable before the dedicated test stage begins.
+Agents should report any manual checks that still require the repository owner.
 
-## Stage 5: tests
+## 5. Tests
 
 The testing stage starts from an existing implementation.
 
-The test agent should:
+The testing agent should:
 
-1. inspect the implementation or relevant diff;
-2. inspect existing test conventions;
-3. identify important scenarios;
-4. add focused tests;
-5. execute the relevant test commands;
-6. run coverage when useful;
-7. report uncovered or difficult-to-test behavior;
-8. avoid rewriting production code without necessity;
-9. suggest a `test(...)` commit message.
+* inspect the implementation or relevant diff;
+* inspect existing test conventions;
+* identify important scenarios;
+* add focused tests;
+* execute relevant test commands;
+* run coverage when useful or requested;
+* report difficult-to-test behavior;
+* suggest one `test(...)` commit message.
 
-Relevant scenarios may include:
+Production code may change only when a small behavior-preserving adjustment is strictly required for testability.
 
-* expected successful behavior;
-* invalid input;
-* missing tools or files;
-* operating-system errors;
-* empty states;
-* boundary conditions;
-* regression cases;
-* platform-specific behavior;
-* asynchronous failures;
-* state synchronization;
-* IPC failures.
+Substantial production changes return to the implementation stage.
 
-Tests should validate behavior rather than implementation details whenever practical.
-
-### Production changes during testing
-
-A test task may modify production code only when a small change is strictly required for testability.
-
-Such a change must be:
-
-* minimal;
-* behavior-preserving;
-* clearly reported;
-* included in the scope of the test commit only when appropriate.
-
-Substantial production changes should return to the implementation stage.
-
-### Test commit
-
-Typical message:
+Testing procedures and the current E2E status are defined in:
 
 ```text
-test(scope): cover relevant behavior
+docs/development/testing.md
 ```
 
-The repository owner validates and creates the commit manually.
+After validation, the repository owner creates the test commit manually.
 
-## Stage 6: technical review
+Example:
 
-The review stage is read-only by default.
+```text
+test(toolchain): cover compiler detection states
+```
 
-The review agent should compare the completed work with:
+## 6. Technical review
+
+Technical review is read-only by default.
+
+The reviewer should compare the completed work with:
 
 * the original task;
 * the approved plan;
 * the implementation;
 * the tests;
-* relevant project conventions;
-* cross-platform expectations.
+* project conventions;
+* platform expectations.
 
 The review should prioritize:
 
 1. correctness;
 2. regressions;
-3. data loss or destructive behavior;
-4. platform incompatibilities;
-5. incorrect architectural boundaries;
+3. destructive or unsafe behavior;
+4. cross-platform problems;
+5. architectural inconsistencies;
 6. missing error handling;
 7. missing tests;
 8. accessibility problems;
 9. unnecessary complexity;
 10. out-of-scope changes.
 
-Review findings should be concrete and actionable.
-
-Each finding should include:
+Findings should include:
 
 * severity;
-* file and location;
-* observed issue;
+* file or location;
+* concrete issue;
 * practical consequence;
 * recommended correction.
 
-Suggestions based only on personal style should not be presented as defects.
+Verified defects must be distinguished from optional suggestions.
 
-If fixes are required, they should return to the appropriate implementation or testing stage and receive their own commit when meaningful.
+Required corrections return to the appropriate implementation or testing stage.
 
-## Stage 7: documentation
+## 7. Documentation and translations
 
 Documentation is updated after behavior is stable.
-
-The documentation stage should determine which sources actually require changes.
 
 Possible targets include:
 
@@ -303,131 +247,105 @@ Possible targets include:
 * `docs/architecture/`;
 * `docs/features/`;
 * `docs/decisions/`;
-* `KNOWN_ISSUES.md`;
-* examples and command references.
+* `KNOWN_ISSUES.md`.
 
-Not every code change requires README changes.
+Not every implementation requires README changes.
 
-Documentation should describe confirmed behavior, not intentions or implementation assumptions.
+Documentation must describe confirmed behavior rather than planned or assumed functionality.
 
-### Documentation commit
+Translations should remain synchronized with the authoritative source while preserving:
 
-Typical messages include:
+* keys;
+* placeholders;
+* interpolation;
+* markup;
+* existing terminology.
 
-```text
-docs(readme): update feature overview
-docs(architecture): document application flow
-docs(feature): describe toolchain detection
-docs(development): update testing instructions
-```
+Documentation and translation work may use separate commits when that improves review and traceability.
 
-## Stage 8: translations
-
-Translation work remains separate when it involves application locale files, translated READMEs, or localized release notes.
-
-The translation stage should:
-
-1. identify the authoritative source language;
-2. inspect existing terminology;
-3. compare supported locale keys or sections;
-4. preserve placeholders and interpolation;
-5. translate only confirmed behavior;
-6. report ambiguous source wording;
-7. verify key synchronization.
-
-Translation changes may be committed separately from general documentation when that improves review and traceability.
-
-Typical messages include:
+Examples:
 
 ```text
+docs(readme): update settings overview
+docs(architecture): document toolchain flow
 i18n(settings): add toolchain status translations
 docs(i18n): synchronize translated readmes
 ```
 
-## Stage 9: changelog and release notes
+## 8. Changelog and release notes
 
-The changelog and release notes are updated when the change is intended for a release.
+Changelog and release-note work begins when a change is intended for a release.
 
-They serve different purposes:
+Their responsibilities differ:
 
-* `CHANGELOG.md` records versioned technical and user-relevant changes;
+* `CHANGELOG.md` records versioned changes;
 * in-application release notes provide concise localized summaries;
 * the GitHub Release body may be generated from the changelog.
 
-Changelog entries should:
+Entries should:
 
-* use the repository's existing format;
-* describe externally relevant changes;
-* avoid exposing unnecessary implementation details;
-* avoid promising unfinished work;
-* use the target version only when it is known.
+* follow the existing repository format;
+* describe completed behavior;
+* avoid unnecessary internal details;
+* avoid promising unfinished functionality;
+* use a target version only when it is known.
 
-Release notes should be shorter and written for users rather than maintainers.
-
-Typical commit messages include:
+Examples:
 
 ```text
 docs(changelog): add version 2026.4.0 changes
 docs(release): add version 2026.4.0 release notes
 ```
 
-These may remain separate when they represent distinct review stages.
+## 9. Release preparation
 
-## Stage 10: version preparation
+Release preparation begins only after the intended content is approved.
 
-Version preparation occurs only when the target release is approved.
+It should first verify:
 
-The release agent should first perform a read-only check and identify:
-
-* the current version;
-* the intended next version;
-* all version-bearing files;
-* relevant scripts;
+* current and target versions;
+* version-bearing files;
+* version scripts;
 * changelog readiness;
 * release-note readiness;
 * translation consistency;
-* test commands;
+* required tests;
 * workflow expectations;
 * working-tree state.
 
-Version changes should use the existing repository scripts and conventions whenever possible.
+Files should only be changed when explicitly requested.
 
-The agent must not assume which files require changes without inspecting the current repository.
+Version changes should use existing repository scripts and conventions.
 
-### Version commit
-
-Typical message:
+Example:
 
 ```text
 chore(release): bump version to 2026.4.0
 ```
 
-This commit should contain only the approved version preparation changes.
+The agent must not create a tag, push, or publish a release.
 
-## Stage 11: manual Git and release operations
+A dedicated release-process document may provide the detailed checklist.
 
-The repository owner performs all final Git and release operations.
+## 10. Manual Git and publication
 
-These may include:
+The repository owner performs final Git and release operations, including:
 
-1. reviewing the working tree;
-2. creating commits;
-3. creating or switching branches;
-4. merging;
-5. creating the release tag;
-6. pushing commits and tags;
-7. monitoring GitHub Actions;
-8. publishing or editing the GitHub Release;
-9. validating generated artifacts;
-10. verifying updater behavior.
+* reviewing the working tree;
+* creating commits;
+* managing branches;
+* creating the version tag;
+* pushing commits and tags;
+* monitoring GitHub Actions;
+* reviewing generated artifacts;
+* publishing or editing the GitHub Release;
+* validating updater behavior.
 
-Agents must not perform these operations unless a specific operation is explicitly requested in the current task.
+Preparing a release does not grant an agent permission to perform these operations.
 
-A request to prepare a release is not permission to create a tag, push, or publish.
+## Reduced workflow
 
-## Reduced workflow for small changes
-
-Small, low-risk changes may use:
+Small, low-risk tasks may use:
 
 ```text
 implementation
@@ -436,42 +354,40 @@ implementation
 → commit
 ```
 
-Examples may include:
+Examples include:
 
 * correcting a typo;
-* adjusting an isolated style;
-* fixing a simple translation;
-* updating a broken link;
-* changing a narrowly scoped configuration value.
+* updating an isolated translation;
+* fixing a broken link;
+* adjusting a small style;
+* changing a narrow configuration value.
 
-A reduced workflow does not remove the requirements to:
+A reduced workflow still requires:
 
-* respect scope;
-* inspect the relevant source;
-* avoid unrelated changes;
-* run proportional validation;
-* preserve Git control.
+* repository inspection;
+* scope control;
+* proportional validation;
+* preservation of Git control;
+* a focused commit message.
 
-## Branch strategy
+## Branches
 
 Branches are optional for normal development.
 
 Direct work on the main branch is acceptable when:
 
+* the scope is understood;
 * the change is small or moderate;
-* the scope is well understood;
 * the working state remains manageable;
-* partial work will not block other development;
-* the repository owner prefers direct progression.
+* the developer prefers direct progression.
 
-A separate branch is recommended when:
+A branch is useful when:
 
 * the change is a large restructuring;
 * multiple architectural areas are affected;
-* the work will span a long period;
-* the repository may remain temporarily broken;
-* experimental alternatives must be compared;
-* the change is difficult to revert partially.
+* work may remain temporarily unstable;
+* alternatives need to be compared;
+* partial reversal would be difficult.
 
 Agents must not create or switch branches automatically.
 
@@ -483,73 +399,67 @@ They may be useful for:
 
 * large restructuring;
 * external contributions;
-* reviewable experiments;
-* comparison of a large branch with the main branch;
-* GitHub-specific review tools;
-* validating workflows triggered by pull requests.
+* experiments;
+* reviewing a long-running branch;
+* using GitHub review tools;
+* validating pull-request workflows.
 
-The absence of a pull request does not reduce the need for tests, review, or clear commits.
+The absence of a pull request does not remove the need for tests, review, or clear commits.
 
-Workflows must not depend exclusively on pull-request comments or pull-request-only reporting.
+Automation must not depend exclusively on pull-request comments.
 
 ## Commit strategy
 
-Commits should reflect actual development stages.
+Commits should represent actual development stages.
 
-A typical feature history may be:
+A feature may produce:
 
 ```text
 feat(settings): add toolchain status page
-
 test(settings): cover toolchain detection states
-
-docs(readme): update settings feature overview
-
+docs(readme): update settings overview
 i18n(settings): add toolchain status translations
-
 docs(changelog): add version 2026.4.0 changes
-
 chore(release): bump version to 2026.4.0
 ```
 
-Not every feature requires all of these commits.
+Not every change requires all these commits.
 
-Commits should not be split artificially when changes cannot be reviewed or reverted independently.
-
-Likewise, meaningful stages should not be combined merely to produce a shorter history.
+Do not split inseparable work artificially, but do not combine independently reviewable stages merely to shorten history.
 
 Squashing is not required.
 
 ## Task tracking
 
-Use the appropriate source for each kind of information:
+Use each source for its intended purpose:
 
-* GitHub Issues: actionable bugs, features, research, maintenance, and documentation work;
-* GitHub Projects: status, priority, area, target, and progress;
-* `docs/roadmap/`: strategic direction and longer-term themes;
+* GitHub Issues: actionable work;
+* GitHub Projects: status, priority, area, and progress;
+* `docs/roadmap/`: strategic direction;
 * `docs/architecture/`: current architecture;
-* `docs/decisions/`: significant decisions and their consequences;
+* `docs/decisions/`: significant decisions;
 * prompts: temporary task instructions;
-* commits: completed repository history.
+* commits: completed history.
 
-Do not duplicate the full backlog in the repository roadmap.
+Not every small change needs an issue.
 
-Not every small change requires an issue. An issue is most useful when the work:
+Issues are most useful when work:
 
-* needs planning;
+* requires planning;
 * may be interrupted;
 * spans multiple stages;
-* requires research;
-* should remain visible in the backlog;
-* represents a user-facing bug or feature;
+* needs research;
 * belongs to a future target;
-* benefits from recorded acceptance criteria.
+* should remain visible in the backlog;
+* benefits from acceptance criteria.
+
+Do not duplicate the full backlog in the roadmap.
 
 ## Agent handoff
 
-When one stage is handed to another agent or tool, provide only the context required for that stage.
+When transferring work between agents or tools, provide only the context needed for the next stage.
 
-Useful handoff material includes:
+Useful handoff information includes:
 
 * task or issue;
 * approved plan;
@@ -559,25 +469,26 @@ Useful handoff material includes:
 * known limitations;
 * unresolved findings.
 
-Do not transfer an entire long conversation when the repository and a concise handoff provide the necessary context.
+Do not transfer an entire long conversation when the repository and a concise handoff are sufficient.
 
-The receiving agent must verify repository state rather than assuming the handoff is perfectly current.
+The receiving agent must verify the current repository state.
 
-## Workflow exceptions
+## Exceptions
 
-Exceptions are allowed when justified by the task.
+The workflow may be adjusted when the task justifies it.
 
 Examples include:
 
 * a bug fix that requires an immediate regression test;
 * a documentation-only release;
-* a refactor required before a small implementation;
-* a testability change that touches production code;
-* a security fix that requires an accelerated process.
+* a refactor required before implementation;
+* a testability change touching production code;
+* an urgent security correction.
 
 When deviating from the standard workflow:
 
 * state the reason;
-* keep Git control with the repository owner;
-* preserve focused commits where practical;
-* do not use the exception to include unrelated work.
+* preserve repository-owner Git control;
+* keep changes focused;
+* avoid unrelated work;
+* preserve meaningful commit boundaries where practical.
