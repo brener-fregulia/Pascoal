@@ -2,407 +2,239 @@
 
 ## Purpose
 
-This document defines the active testing strategy for Pascoal.
+This document is the operational testing reference for Pascoal.
 
-It covers:
+It defines active layers, commands, prerequisites, isolation, test selection, coverage, limitations, and result reporting. `package.json`, Cargo configuration, test configuration, and workflows remain authoritative.
 
-* the current test layers;
-* when each test command should be used;
-* how test scope should be selected;
-* the current status of E2E testing;
-* the role of coverage;
-* how validation results should be reported.
-
-The repository configuration remains the source of truth for exact commands and behavior. Always verify `package.json`, Cargo configuration, test configuration, and workflows before relying on this document.
+General safety and validation rules are in `AGENTS.md`. Workflow guidance is in `docs/development/workflow.md`.
 
 ## Principles
 
-Testing in Pascoal should remain proportional to the change.
-
-* Test observable project behavior rather than library internals.
-* Run the narrowest relevant tests first.
-* Add regression tests for reproducible bugs when practical.
-* Keep frontend, Rust, and external-tool behavior in their appropriate test layers.
-* Consider Windows and Linux when platform behavior is affected.
-* Treat coverage as a diagnostic tool, not a target by itself.
-* Do not claim that a test passed unless it was executed successfully.
-* Automated tests complement, but do not replace, manual validation.
+- Test observable Pascoal behavior, not dependency internals.
+- Run the narrowest relevant tests first.
+- Add reliable regression tests for reproducible bugs.
+- Keep frontend, Rust, and real-toolchain behavior in the appropriate layer.
+- Consider Windows and Linux when platform behavior changes.
+- Use isolated, deterministic test data.
+- Treat coverage as a diagnostic signal, not proof of correctness.
+- Use manual validation where automation is insufficient.
 
 ## Current commands
 
-The repository currently defines test entry points such as:
+The current `package.json` defines:
 
-```text
-npm run test:frontend
-npm run test:frontend:watch
-npm run test:frontend:coverage
-npm run test:rust
-npm run test:rust:coverage
-npm run test:pascal
-npm run test:e2e
-npm test
-```
+| Command | Behavior |
+| --- | --- |
+| `npm run test:frontend` | Runs Vitest once from `src/` |
+| `npm run test:frontend:watch` | Runs Vitest in watch mode |
+| `npm run test:frontend:coverage` | Runs frontend tests with V8 coverage |
+| `npm run test:rust` | Runs `cargo test --lib` from `src-tauri/` |
+| `npm run test:rust:coverage` | Runs `cargo llvm-cov --lib --html` |
+| `npm run test:pascal` | Runs the `pascal_runner` Rust integration test |
+| `npm test` | Runs frontend, Rust library, and Pascal integration tests sequentially |
+| `npm run test:e2e` | Invokes WebdriverIO; see **E2E status** |
 
-Verify their current definitions in `package.json` before use.
+Verify commands before use because configuration may change. `npm test` currently excludes coverage and E2E.
 
-The existence of a script does not necessarily mean that it is part of the active CI or release workflow.
+## Prerequisites
+
+### Frontend
+
+- Node.js and dependencies installed from the repository lockfile;
+- the frontend test environment configured by the project.
+
+### Rust
+
+- the repository's Rust toolchain;
+- platform build dependencies required by the tested code or environment.
+
+### Rust coverage
+
+- `cargo-llvm-cov` installed;
+- compatible Rust instrumentation support.
+
+The package command currently generates HTML only. Other formats require an explicit command or workflow change.
+
+### Pascal integration
+
+- Free Pascal Compiler installed and discoverable;
+- permission to create and execute temporary artifacts.
+
+When a prerequisite is missing, run narrower applicable tests and report the unavailable command and remaining checks.
 
 ## Active test layers
 
-The active testing strategy currently includes:
+The active strategy consists of frontend tests, Rust library tests, Pascal integration tests, and manual desktop validation.
 
-* frontend tests;
-* Rust tests;
-* Pascal integration tests;
-* manual application validation.
+### Frontend tests
 
-End-to-end testing is currently paused.
+Use frontend tests for:
 
-## Frontend tests
+- Svelte components;
+- TypeScript modules, utilities, state, and stores;
+- CodeMirror integration and editor behavior;
+- frontend validation and error states;
+- mocked frontend boundaries to Tauri commands.
 
-Use frontend tests for behavior implemented in:
+Prefer user-observable assertions: rendered state, interactions, loading, empty, disabled and error states, keyboard behavior, and accessibility attributes.
 
-* Svelte components;
-* TypeScript modules;
-* application state and stores;
-* CodeMirror integrations;
-* editor commands and utilities;
-* frontend validation and error handling.
+Do not reproduce dependency test suites or rely on incidental markup, generated classes, or private implementation details.
 
-Relevant commands:
+### Rust tests
 
-```text
-npm run test:frontend
-npm run test:frontend:watch
-npm run test:frontend:coverage
-```
+Use Rust tests for:
 
-`test:frontend:watch` is intended for interactive local development, not final validation or CI.
+- Tauri backend logic, services, and state;
+- parsing, validation, paths, and configuration;
+- filesystem and process integration;
+- toolchain and Git integration;
+- backend response and error mapping.
 
-Frontend tests should focus on Pascoal-specific behavior. Do not reproduce tests for Svelte, CodeMirror, or other dependencies.
+Tauri command tests should cover the application boundary: input, state, service invocation, output, serialization, and error mapping. Test lower-level logic in its own layer when possible.
 
-Component tests should prefer user-observable behavior, including:
+### Pascal integration tests
 
-* rendered states;
-* interactions;
-* loading, empty, disabled, and error states;
-* keyboard behavior;
-* accessibility attributes;
-* state synchronization.
+Use Pascal integration tests when correctness depends on the real compiler or executable flow:
 
-Avoid assertions that depend unnecessarily on internal component structure or fragile CSS selectors.
+- compiler discovery and invocation;
+- arguments, compilation results, and diagnostics;
+- executable invocation and runtime output;
+- temporary artifact creation and cleanup.
 
-## Rust tests
-
-Use Rust tests for behavior implemented in:
-
-* Tauri backend logic;
-* application services;
-* state;
-* filesystem and process integration;
-* toolchain detection;
-* Git integration;
-* path handling;
-* parsing and validation;
-* backend error mapping.
-
-Relevant commands:
-
-```text
-npm run test:rust
-npm run test:rust:coverage
-```
-
-Tests that interact with the operating system must use isolated test data and must not modify:
-
-* real user projects;
-* user Git configuration;
-* application settings;
-* personal directories;
-* installed toolchains.
-
-Where behavior differs by platform, cover Windows and Linux where practical.
-
-Tauri command tests should validate command boundaries, inputs, outputs, state access, and error mapping. Lower-level logic should normally be tested in the layer where it is implemented.
-
-## Pascal integration tests
-
-Use Pascal integration tests for behavior that requires the real Pascal toolchain, including:
-
-* compiler detection;
-* compiler invocation;
-* arguments;
-* compilation results;
-* diagnostics;
-* executable invocation;
-* runtime output;
-* temporary artifacts.
-
-Relevant command:
-
-```text
-npm run test:pascal
-```
-
-These tests may require Free Pascal Compiler to be installed and available.
-
-When FPC is unavailable:
-
-* do not report the tests as passing;
-* state that the command was not executed;
-* report the missing prerequisite;
-* run narrower tests that do not require FPC when useful.
-
-Tests must use temporary files and must not depend on real user projects.
-
-## Aggregate test command
-
-The aggregate command is:
-
-```text
-npm test
-```
-
-Inspect its current definition before assuming which suites it includes.
-
-It may depend on external tools such as FPC. Distinguish failures caused by missing environment requirements from product regressions.
+Do not replace the real integration with mocks when the integration itself is under test.
 
 ## E2E status
 
-End-to-end testing is currently paused.
+End-to-end testing is paused.
 
-The repository may contain an E2E command, preliminary configuration, dependencies, or existing experiments. These do not make E2E an active requirement.
+The repository contains a command and preliminary infrastructure, but E2E is not required for normal implementation, CI, coverage, release preparation, or a complete local test run.
 
-E2E tests are currently not required for:
+Do not expand, activate, or require it unless a task specifically resumes E2E work. Validate complete desktop flows manually in the meantime.
 
-* normal implementation tasks;
-* the dedicated testing stage;
-* CI;
-* coverage reporting;
-* release preparation;
-* the definition of a complete local test run.
-
-Agents must not modify, expand, activate, or require E2E infrastructure unless the task explicitly concerns E2E testing.
-
-While E2E remains paused, complete desktop application flows should be validated manually.
-
-When E2E work resumes, its scope, supported platforms, isolation strategy, CI behavior, reliability expectations, and critical flows must be defined in a dedicated task.
+Before activation, define supported platforms, build mode, isolation, setup and teardown, prerequisites, reliability, CI execution, artifacts, and critical flows.
 
 ## Selecting tests
 
-Run tests according to the affected behavior.
+| Change | Minimum relevant validation |
+| --- | --- |
+| Frontend utility, state, component, or editor behavior | Relevant frontend tests |
+| Rust service, parser, state, or backend behavior | Relevant Rust tests |
+| Frontend and Tauri contract | Relevant frontend and Rust tests |
+| Compiler or Pascal execution | Rust and Pascal integration tests when FPC is available |
+| Shared or cross-cutting behavior | All affected active layers |
+| Platform-specific behavior | Affected platform and evaluation of the other supported platform |
+| Documentation only | Verify commands, paths, links, examples, and terminology |
 
-### Frontend-only change
+Run broader suites for shared code, IPC contracts, common state, filesystem or process behavior, or changes across several domains.
 
-Run the relevant frontend tests.
+Use `npm test` when the full active aggregate suite is justified and prerequisites are available.
 
-### Rust-only change
+## Designing tests
 
-Run the relevant Rust tests.
+Inspect the implementation and nearby tests before adding cases.
 
-### Frontend and backend change
+Relevant scenarios may include:
 
-Run both frontend and Rust tests.
+- expected success;
+- invalid or empty input;
+- missing files, directories, executables, or permissions;
+- malformed external output or process failure;
+- repeated invocation or stale asynchronous state;
+- Unicode and paths containing spaces;
+- Windows and Linux differences;
+- cleanup after success or failure;
+- the exact condition of a regression.
 
-### Compiler or Pascal execution change
+Select only scenarios that represent actual behavior and risk.
 
-Run Rust tests and Pascal integration tests when FPC is available.
-
-### Platform-specific change
-
-Run tests on the affected operating system and evaluate whether the other supported platform also requires validation.
-
-### Documentation-only change
-
-Code tests are normally unnecessary. Verify:
-
-* paths;
-* command names;
-* examples;
-* links;
-* terminology;
-* consistency with repository configuration.
-
-Broader suites are appropriate when shared code, IPC contracts, common state, filesystem behavior, or multiple architectural areas are affected.
-
-## Adding tests
-
-A test task should:
-
-1. inspect the implemented behavior or relevant diff;
-2. inspect nearby test conventions;
-3. identify the important success, failure, boundary, and regression scenarios;
-4. add focused tests;
-5. run the narrowest relevant command;
-6. expand validation only when justified;
-7. report remaining manual checks;
-8. suggest one `test(...)` Conventional Commit message.
-
-Useful scenarios may include:
-
-* successful behavior;
-* invalid or empty input;
-* missing file or executable;
-* malformed external output;
-* process failure;
-* permission failure;
-* repeated invocation;
-* stale asynchronous state;
-* Unicode;
-* paths containing spaces;
-* Windows and Linux differences;
-* cleanup after failure.
-
-Only include scenarios relevant to the changed behavior.
+Test names should state the condition and result, such as `returns an unavailable status when the compiler cannot be found`, rather than `handles error`.
 
 ## Regression tests
 
-A reproducible bug should receive a regression test when an active test layer can represent it reliably.
+A regression test should reproduce the original failure, assert expected behavior, and avoid unrelated implementation details. It should fail against the defective behavior when practical.
 
-The test should:
+When no active layer can represent the regression reliably, document the reason and required manual validation. Do not activate an inactive layer solely for one unrelated regression.
 
-* reproduce the original failure;
-* validate the expected behavior;
-* avoid depending on unrelated implementation details;
-* fail against the defective implementation when practical.
+## Isolation and test data
 
-When automated coverage is not practical, report the reason and describe the necessary manual validation.
+Tests must not modify or depend on:
 
-Do not create or expand E2E infrastructure only to cover one regression while E2E remains paused.
+- real user projects or personal directories;
+- user Git configuration or repositories;
+- non-isolated application settings;
+- installed toolchains except in explicit integration tests;
+- credentials, network services, or mutable external state.
 
-## Production changes during testing
+Use temporary directories, deterministic fixtures, and platform-safe path APIs. Preserve Unicode and spaces, and clean up created resources.
 
-A testing task may modify production code only when a small behavior-preserving change is required for testability.
+Mocks and fakes are appropriate at boundaries such as Tauri invocation, filesystem adapters, process execution, Git, compiler execution, or timing. Do not mock the behavior under test.
 
-Examples include:
+## Production changes for testability
 
-* extracting deterministic logic;
-* introducing an existing dependency through a testable boundary;
-* separating parsing from process execution.
+Tests may require a small behavior-preserving production change, such as extracting deterministic logic or separating parsing from process execution. Report it clearly.
 
-The change must be minimal and clearly reported.
-
-Substantial production changes must return to the implementation stage.
+Substantial redesign is implementation work and should remain independently reviewable when practical.
 
 ## Coverage
 
-Coverage is used to find weakly tested behavior, especially:
-
-* error paths;
-* branches;
-* shared logic;
-* critical state transitions;
-* platform-specific behavior.
-
-Current coverage commands include:
+Current commands:
 
 ```text
 npm run test:frontend:coverage
 npm run test:rust:coverage
 ```
 
-Verify their current output formats and requirements before use.
+Use coverage to inspect weak error paths, branches, shared logic, state transitions, and platform-specific behavior.
 
-Frontend and Rust coverage should remain separate. Combining them into one percentage would require an explicit and justified methodology.
+Keep frontend and Rust coverage separate because their tools, scopes, and metrics differ.
 
-Initial coverage improvements should prefer native GitHub Actions features:
+Initial GitHub Actions reporting should prefer:
 
-* `GITHUB_STEP_SUMMARY`;
-* downloadable HTML reports;
-* machine-readable reports such as LCOV or Cobertura;
-* separate frontend and Rust artifacts.
+- `GITHUB_STEP_SUMMARY`;
+- downloadable HTML reports;
+- machine-readable LCOV or Cobertura reports when configured;
+- separate frontend and Rust artifacts.
 
-An external coverage service is optional and should be adopted only when its historical reporting, badges, commit comparison, or changed-code coverage provides sufficient value.
+An external service is optional. Adopt one only when history, badges, commit comparison, or changed-code coverage justifies it.
 
-## Thresholds
+### Thresholds
 
-Do not introduce arbitrary coverage thresholds.
+Do not choose arbitrary thresholds.
 
-Before setting thresholds:
+1. verify a stable baseline and included files;
+2. inspect important uncovered paths;
+3. choose conservative initial values;
+4. prevent meaningful regression;
+5. raise thresholds gradually when justified.
 
-1. generate a stable baseline;
-2. confirm which files are included;
-3. inspect important uncovered paths;
-4. define conservative values;
-5. prevent meaningful regressions;
-6. increase thresholds gradually when justified.
-
-Do not reduce a threshold only to make a workflow pass without investigating the change.
-
-Changed-code coverage is not an initial requirement.
+Do not lower a threshold merely to pass a workflow. Changed-code coverage is not an initial requirement.
 
 ## Manual validation
 
-Manual validation remains important, especially for:
+Manual validation is important for layout, responsiveness, keyboard and CodeMirror behavior, native windows and dialogs, filesystem and process integration, Git and toolchains, complete desktop flows, and platform differences.
 
-* visual behavior;
-* responsive layout;
-* CodeMirror interactions;
-* keyboard behavior;
-* native windows and dialogs;
-* filesystem and process integration;
-* Git and toolchain integration;
-* complete application flows;
-* behavior currently outside stable automated E2E coverage.
-
-Agents must distinguish between:
-
-* automated tests executed;
-* static checks performed;
-* manual checks they performed;
-* manual checks still required from the repository owner.
-
-Do not claim that the repository owner completed a manual validation.
+Report separately automated tests, manual checks performed by the agent, and checks remaining for the repository owner.
 
 ## Handling failures
 
-When a test fails:
+1. Reproduce the failure with the narrowest useful command.
+2. Determine whether it comes from the change, environment, missing prerequisite, platform, flaky behavior, or existing repository state.
+3. Correct the current change when responsible.
+4. Report unresolved and unrelated failures.
 
-1. inspect the actual error;
-2. reproduce it with the narrowest command possible;
-3. determine whether it comes from the current change, the environment, a missing dependency, platform behavior, or a pre-existing problem;
-4. correct the current change when responsible;
-5. report unresolved or unrelated failures clearly.
+Do not delete, skip, weaken, retry, or extend timeouts without understanding and documenting the cause.
 
-Do not delete, skip, weaken, retry, or increase the timeout of a failing test without understanding and justifying the underlying cause.
+## Reporting results
 
-## Validation report
+Report:
 
-A testing task should report:
-
-### Summary
-
-What behavior was tested.
-
-### Files changed
-
-Test files and any strictly necessary production changes.
-
-### Scenarios covered
-
-The relevant success, failure, boundary, and regression cases.
-
-### Validation
-
-Commands executed and their actual results.
-
-### Coverage
-
-Coverage results when coverage was executed.
-
-### Manual validation
-
-Application behavior that still requires manual checking.
-
-### Notes
-
-Environment limitations, missing tools, platform gaps, or follow-up work.
-
-### Suggested commit
-
-One Conventional Commit message for the testing stage.
-
-Example:
+- behavior and scenarios covered;
+- test and production files changed;
+- commands executed and actual results;
+- coverage results when collected;
+- missing prerequisites or environment limits;
+- manual validation completed and remaining;
+- a suggested Conventional Commit message when tests remain independently reviewable.
 
 ```text
 test(toolchain): cover compiler detection states
@@ -410,13 +242,11 @@ test(toolchain): cover compiler detection states
 
 ## Current limitations
 
-Current known limitations include:
+- Complete desktop flows depend primarily on manual validation.
+- Pascal integration tests require FPC.
+- Rust coverage requires `cargo-llvm-cov` and currently produces HTML through the package command.
+- GitHub Actions does not yet have a dedicated coverage workflow.
+- CI runs frontend tests on Ubuntu and Rust library tests on Ubuntu and Windows; Pascal integration is not currently in CI.
+- Windows and Linux do not yet have identical automated coverage.
 
-* E2E testing is paused;
-* complete desktop flows depend primarily on manual validation;
-* Pascal integration tests require FPC;
-* Rust coverage may require additional tooling;
-* coverage reporting in GitHub Actions is not yet fully structured;
-* Windows and Linux may not yet have identical automated coverage.
-
-These limitations should guide future improvements without being treated as already implemented infrastructure.
+Treat these as current constraints, not completed future infrastructure.
