@@ -69,3 +69,12 @@ pub fn git_check_local_identity(folder_path: String) -> git::GitIdentity {
 pub fn git_set_global_identity(name: String, email: String) -> Result<(), String> {
     git::set_global_identity(&name, &email)
 }
+
+#[tauri::command]
+pub fn git_show_file(
+    folder_path: String,
+    revision: String,
+    file_path: String,
+) -> Result<String, String> {
+    git::show_file(&folder_path, &revision, &file_path)
+}

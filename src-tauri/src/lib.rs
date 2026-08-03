@@ -102,6 +102,7 @@ pub fn run() {
             commands::git_commands::git_check_global_identity,
             commands::git_commands::git_check_local_identity,
             commands::git_commands::git_set_global_identity,
+            commands::git_commands::git_show_file,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
             commands::installer_commands::detect_installer,

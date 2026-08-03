@@ -4,9 +4,11 @@
   import { explorerStore } from '../../project/explorerStore'
   import { i18n } from '../../i18n'
   import { isTauriAvailable, invoke } from '../tauri/client'
+  import DiffView from './DiffView.svelte'
 
   let expandedKey = $state<string | null>(null)
-  let diffText = $state<string>('')
+  let diffOriginal = $state<string>('')
+  let diffModified = $state<string>('')
   let diffLoading = $state(false)
 
   let identityName = $state('')
@@ -61,6 +63,42 @@
     }
   }
 
+  async function showAt(revision: string, path: string): Promise<string> {
+    try {
+      return await invoke<string>('git_show_file', {
+        folderPath: folder!.path,
+        revision,
+        filePath: path,
+      })
+    } catch {
+      return ''
+    }
+  }
+
+  async function loadDiffContent(
+    path: string,
+    isStaged: boolean,
+  ): Promise<{ original: string; modified: string }> {
+    if (isStaged) {
+      const [original, modified] = await Promise.all([
+        showAt('HEAD', path),
+        showAt('', path),
+      ])
+      return { original, modified }
+    }
+
+    const original = await showAt('', path)
+    let modified = ''
+    try {
+      modified = await invoke<string>('read_file', {
+        path: `${folder!.path}/${path}`,
+      })
+    } catch {
+      modified = ''
+    }
+    return { original, modified }
+  }
+
   async function toggleDiff(path: string, isStaged: boolean) {
     const key = `${isStaged ? 'staged' : 'unstaged'}:${path}`
     if (expandedKey === key) {
@@ -69,29 +107,20 @@
     }
 
     expandedKey = key
-    diffText = ''
+    diffOriginal = ''
+    diffModified = ''
 
     if (!folder || !isTauriAvailable()) return
     diffLoading = true
     try {
-      diffText = await invoke<string>('git_diff', {
-        folderPath: folder.path,
-        filePath: path,
-        staged: isStaged,
-      })
+      const content = await loadDiffContent(path, isStaged)
+      diffOriginal = content.original
+      diffModified = content.modified
     } catch (e) {
-      diffText = String(e)
+      diffModified = String(e)
     } finally {
       diffLoading = false
     }
-  }
-
-  function diffLineClass(line: string): string {
-    if (line.startsWith('+++') || line.startsWith('---')) return 'diff-meta'
-    if (line.startsWith('@@')) return 'diff-hunk'
-    if (line.startsWith('+')) return 'diff-add'
-    if (line.startsWith('-')) return 'diff-remove'
-    return 'diff-context'
   }
 
   async function handleCommit() {
@@ -221,11 +250,7 @@
               {#if diffLoading}
                 <p class="status-msg">{$i18n('explorer.loading')}</p>
               {:else}
-                <pre
-                  class="diff-content">{#each diffText.split('\n') as line}<span
-                      class={diffLineClass(line)}
-                      >{line}
-</span>{/each}</pre>
+                <DiffView original={diffOriginal} modified={diffModified} />
               {/if}
             </div>
           {/if}
@@ -264,14 +289,8 @@
             <div class="diff-box">
               {#if diffLoading}
                 <p class="status-msg">{$i18n('explorer.loading')}</p>
-              {:else if file.status === 'untracked'}
-                <p class="status-msg">{$i18n('git.untracked_no_diff')}</p>
               {:else}
-                <pre
-                  class="diff-content">{#each diffText.split('\n') as line}<span
-                      class={diffLineClass(line)}
-                      >{line}
-</span>{/each}</pre>
+                <DiffView original={diffOriginal} modified={diffModified} />
               {/if}
             </div>
           {/if}
@@ -595,31 +614,5 @@
     padding: 4px 8px 8px 24px;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-  }
-
-  .diff-content {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 240px;
-    overflow-y: auto;
-  }
-
-  .diff-add {
-    color: var(--success);
-  }
-  .diff-remove {
-    color: var(--error);
-  }
-  .diff-hunk {
-    color: var(--accent2);
-  }
-  .diff-meta {
-    color: var(--text-dim);
-  }
-  .diff-context {
-    color: var(--text-dim);
   }
 </style>

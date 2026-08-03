@@ -181,7 +181,6 @@
     "unstage": "Unstage",
     "stage_all": "Stage All",
     "unstage_all": "Unstage All",
-    "untracked_no_diff": "New file — nothing to compare yet.",
     "clean": "No changes.",
     "commit_success": "Commit created successfully.",
     "identity_needed": "Git needs to know who you are before committing.",

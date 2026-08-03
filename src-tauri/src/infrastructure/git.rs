@@ -259,3 +259,12 @@ pub fn detect_git_version() -> (bool, Option<String>) {
         _ => (false, None),
     }
 }
+
+/// Reads a file's content at a given git revision spec (e.g. "HEAD", or
+/// an empty string for the index/staging area), via `git show`.
+pub fn show_file(folder_path: &str, revision: &str, file_path: &str) -> Result<String, String> {
+    run_git(
+        folder_path,
+        &["show", &format!("{}:{}", revision, file_path)],
+    )
+}

@@ -181,7 +181,6 @@
     "unstage": "Remover do stage",
     "stage_all": "Preparar tudo",
     "unstage_all": "Remover tudo do stage",
-    "untracked_no_diff": "Arquivo novo — nada para comparar ainda.",
     "clean": "Nenhuma alteração.",
     "commit_success": "Commit criado com sucesso.",
     "identity_needed": "O Git precisa saber quem você é antes de commitar.",

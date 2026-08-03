@@ -40,3 +40,17 @@ export function pascalExtensions(onDocChange: () => void, highlightExtensions: E
     }),
   ]
 }
+
+// A leaner extension set for read-only diff panes (DiffView.svelte) -
+// syntax highlighting and line numbers, no editing keymaps, history,
+// or search, since there's nothing to edit or search there.
+export function pascalDiffExtensions(highlightExtensions: Extension[] = []) {
+  return [
+    lineNumbers(),
+    StreamLanguage.define(pascal),
+    ...highlightExtensions,
+    themeCompartment.of(buildPascoalTheme()),
+    EditorView.editable.of(false),
+    EditorState.readOnly.of(true),
+  ]
+}

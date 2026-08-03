@@ -181,7 +181,6 @@
     "unstage": "Cofnij przygotowanie",
     "stage_all": "Przygotuj wszystko",
     "unstage_all": "Cofnij przygotowanie wszystkiego",
-    "untracked_no_diff": "Nowy plik — nie ma jeszcze czego porównać.",
     "clean": "Brak zmian.",
     "commit_success": "Commit został utworzony pomyślnie.",
     "identity_needed": "Git musi wiedzieć, kim jesteś, zanim wykonasz commit.",
