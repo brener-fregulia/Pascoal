@@ -50,3 +50,6 @@ strip = true
 lto = true
 codegen-units = 1
 opt-level = "s"
+
+[target.'cfg(any(windows, target_os = "linux"))'.dependencies]
+tauri-plugin-window-state = "2.4.1"

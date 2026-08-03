@@ -52,6 +52,27 @@ vi.mock('../../../src/project/recent', () => ({
     },
 }))
 
+const { mockExplorerState } = vi.hoisted(() => ({
+    mockExplorerState: {
+        folder: null as { name: string; path: string } | null,
+        tree: [] as unknown[],
+        loading: false,
+        error: null as string | null,
+    },
+}))
+
+vi.mock('../../../src/project/explorerStore', () => ({
+    explorerStore: {
+        subscribe: (fn: (v: typeof mockExplorerState) => void) => {
+            fn(mockExplorerState)
+            return () => { }
+        },
+        openFolder: vi.fn(),
+        refresh: vi.fn(),
+        closeFolder: vi.fn(),
+    },
+}))
+
 import EditorArea from '../../../src/editor/EditorArea.svelte'
 
 afterEach(() => {
@@ -61,6 +82,8 @@ afterEach(() => {
     mockTabState.activeView = 'welcome'
     mockConsoleState.visible = false
     mockConsoleState.position = 'bottom'
+    mockExplorerState.folder = null
+    mockExplorerState.tree = []
     vi.clearAllMocks()
 })
 
@@ -96,5 +119,26 @@ describe('EditorArea', () => {
             props: { activePanel: null },
         })
         expect(container.querySelector('#side-panel')).toBeNull()
+    })
+
+    it('renders the side panel with explorer content when activePanel is explorer', () => {
+        const { container } = render(EditorArea, {
+            props: { activePanel: 'explorer' },
+        })
+        expect(container.querySelector('#side-panel')).toBeInTheDocument()
+    })
+
+    it('still renders the main content area alongside the side panel', () => {
+        const { container } = render(EditorArea, {
+            props: { activePanel: 'explorer' },
+        })
+        expect(container.querySelector('#main-content')).toBeInTheDocument()
+    })
+
+    it('renders main content without a side panel when activePanel is null', () => {
+        const { container } = render(EditorArea, {
+            props: { activePanel: null },
+        })
+        expect(container.querySelector('#main-content')).toBeInTheDocument()
     })
 })

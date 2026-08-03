@@ -1,54 +1,78 @@
 <script lang="ts">
-  import Welcome from '../app/Welcome.svelte'
-  import TabBar from '../shared/TabBar.svelte'
-  import Editor from './Editor.svelte'
-  import Console from '../toolchain/Console.svelte'
+  import { onMount } from 'svelte'
+  import { PaneGroup, Pane, PaneResizer } from 'paneforge'
   import FileTree from '../project/FileTree.svelte'
   import SearchPanel from '../project/SearchPanel.svelte'
   import GitPanel from '../integrations/git/GitPanel.svelte'
-  import { tabStore } from './tabs'
-  import { consoleStore } from '../toolchain/console'
+  import MainContent from './MainContent.svelte'
 
   export let activePanel: string | null
 
-  $: hasOpenTabs = $tabStore.tabs.length > 0
-  $: showConsole = $consoleStore.visible
-  $: position = $consoleStore.position
+  $: hasSidePanel =
+    activePanel === 'explorer' ||
+    activePanel === 'search' ||
+    activePanel === 'git'
+
+  const ACTIVITY_BAR_WIDTH = 48
+  const MIN_SIDEBAR_PX = 180
+  const EDITOR_RESERVED_PX = 480
+  const DEFAULT_SIDEBAR_PX = 220
+
+  let windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1280
+  let isDraggingResizer = false
+
+  onMount(() => {
+    function handleResize() {
+      windowWidth = window.innerWidth
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  })
+
+  $: groupWidth = Math.max(windowWidth - ACTIVITY_BAR_WIDTH, 1)
+  $: minSizePct = (MIN_SIDEBAR_PX / groupWidth) * 100
+  $: maxSizePct = Math.max(
+    100 - (EDITOR_RESERVED_PX / groupWidth) * 100,
+    minSizePct,
+  )
+  $: defaultSizePct = (DEFAULT_SIDEBAR_PX / groupWidth) * 100
 </script>
 
 <div id="editor-area">
-  <TabBar />
-  <div id="editor-content" class:right={position === 'right'}>
-    {#if activePanel === 'explorer'}
-      <div id="side-panel">
-        <FileTree />
-      </div>
-    {:else if activePanel === 'search'}
-      <div id="side-panel">
-        <SearchPanel />
-      </div>
-    {:else if activePanel === 'git'}
-      <div id="side-panel">
-        <GitPanel />
-      </div>
-    {/if}
-
-    <div id="view-area">
-      {#if !hasOpenTabs || $tabStore.activeView === 'welcome'}
-        <Welcome />
-      {/if}
-      <div
-        id="editor-wrapper"
-        class:visible={hasOpenTabs && $tabStore.activeView === 'editor'}
+  <div id="editor-content">
+    {#if hasSidePanel}
+      <PaneGroup
+        direction="horizontal"
+        autoSaveId="pascoal-side-panel"
+        class="pane-group"
       >
-        <Editor />
-      </div>
-    </div>
-
-    {#if showConsole}
-      <div id="console-area" class:right={position === 'right'}>
-        <Console />
-      </div>
+        <Pane
+          defaultSize={defaultSizePct}
+          minSize={minSizePct}
+          maxSize={maxSizePct}
+          collapsible={true}
+          collapsedSize={0}
+        >
+          <div id="side-panel">
+            {#if activePanel === 'explorer'}
+              <FileTree />
+            {:else if activePanel === 'search'}
+              <SearchPanel />
+            {:else if activePanel === 'git'}
+              <GitPanel />
+            {/if}
+          </div>
+        </Pane>
+        <PaneResizer
+          class={`pane-resizer ${isDraggingResizer ? 'dragging' : ''}`}
+          onDraggingChange={(dragging) => (isDraggingResizer = dragging)}
+        />
+        <Pane>
+          <MainContent />
+        </Pane>
+      </PaneGroup>
+    {:else}
+      <MainContent />
     {/if}
   </div>
 </div>
@@ -68,42 +92,30 @@
     overflow: hidden;
   }
 
+  :global(.pane-group) {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  :global(.pane-resizer) {
+    width: 4px;
+    flex-shrink: 0;
+    background: transparent;
+    cursor: col-resize;
+    transition: background 0.1s;
+  }
+
+  :global(.pane-resizer:hover),
+  :global(.pane-resizer.dragging) {
+    background: var(--accent2);
+  }
+
   #side-panel {
-    width: 220px;
-    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-  }
-
-  #view-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-    min-width: 0;
-  }
-
-  #editor-wrapper {
-    display: none;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  #editor-wrapper.visible {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #console-area {
-    height: 240px;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  #console-area.right {
-    height: auto;
-    width: 420px;
   }
 </style>

@@ -37,6 +37,11 @@
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^25.9.3",
     "@vitest/coverage-v8": "^4.1.10",
+    "@wdio/cli": "^9.19.0",
+    "@wdio/local-runner": "^9.19.0",
+    "@wdio/mocha-framework": "^9.19.0",
+    "@wdio/spec-reporter": "^9.19.0",
+    "@wdio/tauri-service": "^1.2.0",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.4",
@@ -45,12 +50,7 @@
     "svelte-check": "^4.6.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
-    "vitest": "^4.1.8",
-    "@wdio/cli": "^9.19.0",
-    "@wdio/local-runner": "^9.19.0",
-    "@wdio/mocha-framework": "^9.19.0",
-    "@wdio/spec-reporter": "^9.19.0",
-    "@wdio/tauri-service": "^1.2.0"
+    "vitest": "^4.1.8"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.3",
@@ -64,7 +64,8 @@
     "@tauri-apps/plugin-process": "^2",
     "@tauri-apps/plugin-updater": "^2",
     "@xterm/addon-fit": "^0.11.0",
-    "@xterm/xterm": "^6.0.0"
+    "@xterm/xterm": "^6.0.0",
+    "paneforge": "^1.0.2"
   },
   "overrides": {
     "serialize-javascript": "^7.0.7",

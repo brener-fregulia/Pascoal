@@ -8,6 +8,7 @@ mod toolchain;
 
 use infrastructure::environment::{detect_fpc, get_documents_dir};
 use state::ProcessState;
+use tauri::Manager;
 
 // ── Structs ───────────────────────────────────────────────────────────────────
 
@@ -54,6 +55,23 @@ pub fn run() {
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.handle().plugin(tauri_plugin_process::init())?;
+            app.handle()
+                .plugin(tauri_plugin_window_state::Builder::default().build())?;
+
+            // First-ever launch (no settings.json saved yet) starts
+            // maximized. Every launch after that is left entirely to the
+            // window-state plugin above - we don't touch it again.
+            let is_first_launch = app
+                .path()
+                .app_config_dir()
+                .map(|dir| !dir.join("settings.json").exists())
+                .unwrap_or(true);
+
+            if is_first_launch {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.maximize();
+                }
+            }
 
             #[cfg(feature = "e2e")]
             app.handle().plugin(tauri_plugin_wdio_webdriver::init())?;
