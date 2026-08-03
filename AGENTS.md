@@ -2,191 +2,141 @@
 
 ## Purpose
 
-This file defines the shared rules for AI agents working in the Pascoal repository.
+This file defines the shared rules for any AI agent working in the Pascoal repository.
 
-These instructions apply regardless of the model, provider, editor, or agent framework being used. Tool-specific behavior belongs in the corresponding tool configuration, such as `CLAUDE.md` or `.claude/`.
+Tool-specific instructions belong in files such as `CLAUDE.md` and `.claude/`. Detailed procedures belong in `docs/development/` and `.claude/skills/`.
 
-Pascoal is an actively developed desktop IDE for Pascal. Changes must preserve the existing architecture, remain focused on the requested task, and work on both Windows and Linux whenever the affected functionality is expected to be cross-platform.
-
-## Repository as the source of truth
+## Source of truth
 
 The repository is the permanent source of project context.
 
-Before proposing or making changes, inspect the relevant source files, tests, configuration, scripts, workflows, and documentation. Do not infer technologies, commands, paths, conventions, or behavior from assumptions.
+Before proposing or making changes:
 
-Use the narrowest relevant context for the task. Do not read or load unrelated parts of the repository without a concrete reason.
+* inspect the relevant implementation;
+* inspect nearby tests;
+* verify commands and paths in the repository;
+* follow existing conventions;
+* read only the documentation relevant to the task.
 
-When repository content conflicts with a prompt, report the conflict before proceeding. Do not silently replace the repository's current behavior with an assumed design.
+Do not assume technologies, APIs, files, commands, behavior, architecture, or test results.
 
-## Project overview
+When a prompt conflicts with the repository, report the conflict.
 
-Pascoal is a desktop IDE for Pascal built with a Svelte and TypeScript frontend and a Rust backend using Tauri.
-
-The repository includes, among other areas:
-
-* application layout and workspace behavior;
-* editor integration and CodeMirror functionality;
-* Pascal language support;
-* project and file management;
-* settings and toolchain integration;
-* Git integration;
-* internationalization;
-* Tauri commands and operating-system integrations;
-* frontend, Rust, Pascal integration, and end-to-end tests;
-* public and technical documentation;
-* release and versioning automation.
-
-This overview is not a substitute for inspecting the current repository structure.
-
-## General working rules
+## General rules
 
 Agents must:
 
-1. understand the requested outcome before editing files;
-2. inspect the existing implementation and nearby tests;
-3. present a plan before substantial or cross-cutting changes;
-4. follow the existing architecture and naming conventions;
-5. modify only what is required by the current task;
-6. preserve unrelated behavior;
-7. avoid speculative abstractions;
-8. avoid cosmetic refactors unrelated to the requested result;
-9. consider Windows and Linux behavior where applicable;
-10. run the relevant available validations;
-11. report files changed and validations performed;
-12. suggest one Conventional Commit message for the current stage.
+* understand the requested result;
+* remain within the approved scope;
+* preserve unrelated behavior;
+* follow existing architecture and naming;
+* avoid speculative abstractions;
+* avoid unrelated refactors and formatting;
+* consider Windows and Linux when applicable;
+* run proportional validation;
+* report changed files and validation results;
+* suggest one Conventional Commit message after changing files.
 
-Agents must not invent files, commands, APIs, functionality, requirements, test results, or repository conventions.
+Potential improvements outside the task must be reported separately, not implemented.
 
-When information is missing or ambiguous, inspect the repository first. If the ambiguity remains material to the implementation, explain it explicitly.
+## Development stages
 
-## Scope control
+Pascoal separates:
 
-Every task must have a defined scope.
+* planning;
+* implementation;
+* testing;
+* review;
+* documentation;
+* translations;
+* release preparation.
 
-Changes outside that scope are prohibited unless they are strictly necessary for the requested behavior. When an out-of-scope change is necessary, explain the reason before making it whenever possible and report it clearly in the final response.
+Do not combine stages unless explicitly requested.
 
-Do not perform opportunistic cleanup merely because a file is being edited.
+Detailed workflow rules are defined in:
 
-Examples of unrelated changes to avoid include:
-
-* renaming unrelated symbols;
-* reformatting entire files;
-* reorganizing directories;
-* replacing established patterns with personal preferences;
-* updating dependencies;
-* rewriting working tests;
-* changing public text;
-* changing translations;
-* updating versions;
-* modifying release notes.
-
-Potential improvements that are not required for the task should be reported separately rather than implemented.
-
-## Separation of development stages
-
-Pascoal intentionally separates implementation, tests, review, documentation, translations, changelog updates, and release preparation.
-
-Unless a task explicitly combines stages, preserve the following boundaries.
+```text
+docs/development/workflow.md
+```
 
 ### Planning
 
-Planning tasks must not modify files.
+Planning tasks are read-only.
 
-They should produce:
+A plan should identify:
 
-* the understood objective;
-* relevant existing behavior;
-* proposed scope;
-* explicit non-goals;
-* likely files involved;
+* objective;
+* current behavior;
+* scope and non-goals;
+* relevant files or layers;
 * implementation steps;
-* risks and edge cases;
-* validation strategy;
-* unresolved questions, when material.
+* risks;
+* validation strategy.
 
 ### Implementation
 
-Implementation tasks may modify production code required by the approved scope.
+Implementation tasks may modify only the production code required by the approved scope.
 
-They must not modify, unless explicitly requested:
+Unless explicitly requested, do not modify:
 
+* tests;
 * documentation;
 * translations;
-* `CHANGELOG.md`;
+* changelog;
 * release notes;
-* version files;
-* release workflows;
-* unrelated tests.
-
-Existing relevant tests may be executed during implementation. New tests normally belong to the dedicated testing stage.
+* versions;
+* release workflows.
 
 ### Testing
 
-Testing tasks should analyze an existing implementation and add or update tests for its behavior.
+Testing tasks should add or update focused tests for an existing implementation.
 
-They should:
+Production code may change only when a small behavior-preserving adjustment is strictly required for testability.
 
-* cover relevant successful, failure, boundary, and regression scenarios;
-* follow existing test patterns;
-* avoid rewriting the implementation merely to match a preferred test style;
-* report code that is difficult to test;
-* make production changes only when strictly required for testability and clearly report them.
+Detailed testing rules are defined in:
 
-Testing tasks must not update documentation, translations, changelog entries, release notes, or versions.
+```text
+docs/development/testing.md
+```
 
 ### Review
 
 Review tasks are read-only by default.
 
-They should identify concrete:
+Focus on concrete:
 
 * bugs;
 * regressions;
-* missing validation;
 * architectural inconsistencies;
 * cross-platform problems;
-* accessibility problems;
-* unnecessary complexity;
-* duplication with practical impact;
+* missing validation;
 * missing tests;
+* unnecessary complexity;
 * out-of-scope changes.
 
-Reviews must distinguish verified defects from suggestions. Do not request rewrites based only on stylistic preference.
+Distinguish defects from optional suggestions.
 
-### Documentation
+### Documentation and translation
 
-Documentation tasks may update only the documentation required by confirmed behavior.
+Documentation must describe confirmed behavior.
 
-Do not describe planned or assumed functionality as implemented.
+Translations must preserve keys, placeholders, interpolation, structure, and established terminology.
 
-Public documentation, technical documentation, changelog entries, and release notes have different purposes and must not be treated as interchangeable.
-
-### Translation
-
-Translation tasks must inspect the existing locale files and terminology before translating.
-
-They must:
-
-* preserve keys, placeholders, markup, and interpolation syntax;
-* keep supported locale files synchronized when requested;
-* follow established terminology;
-* avoid reorganizing locale files without need;
-* avoid inventing features or behavior;
-* report genuine ambiguities instead of silently guessing.
+Do not invent functionality or reorganize files unnecessarily.
 
 ### Release preparation
 
-Release preparation verifies and, only when explicitly requested, updates the files required for a release.
+Release preparation may verify or update release-related files only when explicitly requested.
 
-It must not create tags, push changes, publish releases, or alter Git history.
+It must never create tags, push changes, or publish releases.
 
 ## Git policy
 
-The repository owner retains full control of Git operations.
+The repository owner retains full control of Git.
 
-Agents must not execute write or history-changing Git operations unless the user explicitly requests that exact operation in the current task.
+Agents must not execute Git write or history-changing operations unless the user explicitly requests that exact operation in the current task.
 
-Prohibited operations include, but are not limited to:
+This includes:
 
 ```text
 git commit
@@ -205,227 +155,164 @@ git stash
 git clean
 ```
 
-Agents must also not:
+Agents must not:
 
-* create or delete branches;
-* change branches;
+* create, delete, or switch branches;
 * create or delete tags;
-* amend commits;
 * discard working-tree changes;
 * resolve conflicts automatically;
 * alter Git history;
-* publish GitHub releases;
-* merge pull requests.
+* merge pull requests;
+* publish releases.
 
-Read-only inspection is permitted when relevant, including commands such as:
+Read-only commands such as `git status`, `git diff`, `git log`, and `git show` are allowed when relevant.
 
-```text
-git status
-git diff
-git diff --stat
-git log
-git show
-git branch --show-current
-git rev-parse
-git tag --list
-```
-
-Read-only Git commands must not be used to justify unrelated repository exploration.
-
-Never assume the working tree is clean. Never discard changes that may belong to the user.
+Never assume the working tree is clean.
 
 ## Commit messages
 
-After completing a stage that changed files, suggest exactly one Conventional Commit message describing only the work performed in that stage.
+After changing files, suggest exactly one Conventional Commit message describing only the current stage.
 
 Examples:
 
 ```text
 feat(settings): add toolchain status page
 test(settings): cover toolchain detection states
-docs(readme): update settings feature overview
+docs(readme): update settings overview
 docs(changelog): add version 2026.4.0 changes
 chore(release): bump version to 2026.4.0
 ```
-
-Do not include implementation, tests, documentation, translations, and version changes in the same suggested commit unless the current task explicitly performed all of them as one approved stage.
 
 Do not execute the commit.
 
 ## Cross-platform requirements
 
-Pascoal is developed on Windows 11 and CachyOS/Linux.
+Pascoal targets Windows and Linux.
 
-For functionality that interacts with the operating system, filesystem, processes, commands, paths, environment variables, toolchains, or Git:
+For paths, filesystem, processes, shells, Git, toolchains, and operating-system integration:
 
-* evaluate Windows and Linux behavior;
 * use platform-safe path handling;
-* avoid hard-coded path separators;
+* avoid hard-coded separators;
 * avoid assuming a specific shell;
-* avoid assuming GNU utilities exist on Windows;
-* avoid assuming PowerShell exists or is configured on Linux;
 * preserve Unicode and paths containing spaces;
-* handle missing external tools gracefully;
-* follow existing abstractions in the Rust backend.
+* handle missing external tools;
+* follow existing Rust backend abstractions;
+* evaluate both supported platforms when behavior may differ.
 
-Shared automation should preferably use tools already required by the project, such as Node.js or Rust, when that provides a maintainable cross-platform solution.
+Prefer cross-platform automation using tools already required by the project, such as Node.js or Rust.
 
-Platform-specific implementations are acceptable when the operating systems genuinely require different behavior, but they must expose consistent application behavior where practical.
+## Architecture
 
-## Architecture rules
+Before introducing a module, abstraction, command, store, service, dependency, or directory:
 
-Before introducing a new module, abstraction, dependency, command, store, service, or directory:
+1. inspect existing patterns;
+2. identify the correct layer;
+3. prefer extending established behavior;
+4. avoid bypassing architectural boundaries;
+5. justify the addition with a current requirement.
 
-1. inspect how the same responsibility is handled elsewhere;
-2. determine the correct architectural layer;
-3. prefer extending an existing pattern when appropriate;
-4. avoid bypassing established boundaries;
-5. justify new abstractions with a current requirement.
+Operating-system and filesystem responsibilities belong in the Tauri/Rust backend.
 
-Frontend code must not reproduce operating-system responsibilities that belong in the Tauri/Rust backend.
+Tauri commands should remain focused on the application boundary.
 
-Tauri commands should remain focused on the application boundary rather than accumulating unrelated business logic.
-
-Shared behavior should not be duplicated across components or commands when an established reusable layer already exists.
-
-Architecture documentation under `docs/architecture/` describes current structure. Architectural decisions under `docs/decisions/` record significant choices and their consequences. Neither should be replaced by temporary chat context.
+Do not duplicate behavior already provided by an existing layer.
 
 ## Dependencies
 
-Do not add, remove, replace, or upgrade dependencies unless the task explicitly requires it or the existing implementation cannot reasonably satisfy the requirement.
+Do not add, remove, replace, or upgrade dependencies unless explicitly required.
 
-Before adding a dependency:
+Before adding one:
 
-* inspect whether the repository already contains an equivalent solution;
-* evaluate maintenance and cross-platform implications;
-* prefer the existing project stack;
-* explain why the dependency is necessary;
-* limit the dependency to the appropriate frontend or Rust layer.
+* confirm no existing solution is sufficient;
+* evaluate maintenance and cross-platform impact;
+* explain why it is necessary;
+* add it only to the appropriate layer.
 
-Do not regenerate lockfiles unless required by an approved dependency change.
+Do not regenerate lockfiles without an approved dependency change.
 
-## Testing and validation
+## Validation
 
-Use the scripts currently defined by the repository as the source of truth.
+The repository configuration is the source of truth for commands.
 
-Common test entry points currently include:
+Verify command definitions before running them.
 
-```text
-npm run test:frontend
-npm run test:frontend:coverage
-npm run test:rust
-npm run test:rust:coverage
-npm run test:pascal
-npm run test:e2e
-npm test
-```
+End-to-end testing is currently paused and is not an active requirement unless the task explicitly concerns E2E work.
 
-Before using a command, verify its current definition in `package.json`, workflow files, or the relevant project configuration.
+Do not claim a test or validation passed unless it was executed successfully.
 
-Select validation proportionally:
+When validation cannot run, report:
 
-* frontend changes: relevant frontend tests and static checks;
-* Rust changes: relevant Rust tests;
-* Pascal execution changes: Pascal integration tests when the environment supports them;
-* cross-layer changes: validate both affected layers;
-* user-interface flows: consider end-to-end tests when applicable;
-* documentation-only changes: verify links, paths, examples, and consistency.
+* the command not executed;
+* the reason;
+* any substitute validation;
+* remaining manual checks.
 
-Do not claim a command passed unless it was actually executed successfully.
+Do not hide or ignore failures.
 
-When a validation cannot be executed, report:
+## Documentation responsibilities
 
-* the command not run;
-* the concrete reason;
-* any substitute validation performed;
-* what still requires manual verification.
+Use:
 
-Do not silently ignore failures. Distinguish failures caused by the change from environment or pre-existing failures when evidence allows.
+* `README.md` for the public overview;
+* translated READMEs for localized public documentation;
+* `CHANGELOG.md` for versioned changes;
+* release notes for release-specific communication;
+* `docs/development/` for development processes;
+* `docs/architecture/` for current architecture;
+* `docs/decisions/` for significant decisions;
+* `docs/features/` for detailed feature documentation;
+* `docs/roadmap/` for strategic direction;
+* GitHub Issues and Projects for actionable work.
 
-## Documentation sources of truth
+Avoid duplicating the same information across files.
 
-Avoid duplicating the same information across multiple files.
-
-Use these responsibilities:
-
-* `README.md`: public project overview and entry point;
-* translated READMEs: localized versions of the public overview;
-* `CHANGELOG.md`: versioned record of relevant changes;
-* release notes: concise user-facing changes for a specific release;
-* `docs/development/`: development and maintenance processes;
-* `docs/architecture/`: current technical architecture;
-* `docs/decisions/`: significant architectural decision records;
-* `docs/features/`: detailed behavior of features that require dedicated documentation;
-* `docs/roadmap/`: high-level strategic direction, not task tracking;
-* GitHub Issues and Projects: actionable work, priorities, and progress.
-
-Do not use the README as a detailed operational roadmap.
-
-## Security and destructive actions
+## Safety
 
 Do not:
 
-* expose tokens, credentials, private keys, or local secrets;
-* insert secrets into tracked files;
-* weaken security controls to make a task easier;
-* delete user data or project files without explicit approval;
+* expose or store secrets;
+* weaken security controls;
+* delete user data without explicit approval;
 * run destructive filesystem commands;
-* overwrite local configuration without inspecting it;
-* disable tests, checks, or warnings merely to obtain a passing result.
+* overwrite local configuration without inspection;
+* disable tests or warnings merely to obtain a passing result;
+* edit generated or vendored files when their source can be changed instead.
 
-Treat updater keys, signing credentials, release secrets, GitHub tokens, and local environment files as sensitive.
+## Final response
 
-## Generated and external files
-
-Before editing a file, determine whether it is:
-
-* handwritten source;
-* generated output;
-* vendored content;
-* build output;
-* dependency metadata;
-* user-local configuration.
-
-Prefer changing the source or generator rather than manually editing generated output.
-
-Do not modify build artifacts or dependency directories unless explicitly required.
-
-## Final response format
-
-After changing files, provide a concise report with:
+After changing files, report:
 
 ### Summary
 
-What was changed and why.
+What changed and why.
 
 ### Files changed
 
-A list of files created, modified, or deleted, with each file's purpose.
+Files created, modified, or deleted.
 
 ### Validation
 
-Commands executed and their results.
+Commands executed and their actual results.
 
 ### Notes
 
-Relevant limitations, manual checks, follow-up work, or out-of-scope findings.
+Limitations, manual checks, and out-of-scope findings.
 
 ### Suggested commit
 
 Exactly one Conventional Commit message for the current stage.
 
-When no files were changed, state that clearly and omit the commit suggestion unless the user specifically asks for one.
+When no files changed, state that clearly and omit the commit suggestion unless requested.
 
 ## Instruction precedence
 
-When instructions conflict, use this order:
+When instructions conflict:
 
-1. the user's explicit instruction for the current task;
+1. explicit user instruction for the current task;
 2. safety and repository-protection rules;
-3. this `AGENTS.md`;
+3. this file;
 4. tool-specific repository instructions;
-5. relevant technical documentation;
-6. established source-code patterns;
-7. general model preferences.
+5. relevant project documentation;
+6. established source-code patterns.
 
-A task-specific instruction may expand the allowed scope, but agents must not infer permission for Git operations, destructive actions, release publication, or unrelated changes.
+Permission for one task does not imply permission for Git operations, destructive actions, or release publication.
