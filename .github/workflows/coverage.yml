@@ -1,0 +1,143 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'src-tauri/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/coverage.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate frontend coverage
+        run: >-
+          npm run test:frontend:coverage --
+          --coverage.reporter=text-summary
+          --coverage.reporter=html
+          --coverage.reporter=lcov
+          --coverage.reporter=json-summary
+
+      - name: Add frontend summary
+        if: always()
+        shell: bash
+        run: |
+          echo '## Frontend coverage' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f src/coverage/coverage-summary.json ]; then
+            node <<'NODE' >> "$GITHUB_STEP_SUMMARY"
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('src/coverage/coverage-summary.json', 'utf8')).total;
+          console.log('| Metric | Covered | Total | Percentage |');
+          console.log('|---|---:|---:|---:|');
+          for (const key of ['lines', 'statements', 'functions', 'branches']) {
+            const value = summary[key];
+            console.log(`| ${key} | ${value.covered} | ${value.total} | ${value.pct}% |`);
+          }
+          NODE
+          else
+            echo 'Coverage summary was not generated.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: src/coverage/
+          if-no-files-found: warn
+          retention-days: 30
+
+  rust:
+    name: Rust coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          shared-key: pascoal-rust-coverage
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev libwebkit2gtk-4.1-dev \
+            libappindicator3-dev librsvg2-dev \
+            patchelf mold
+
+      - name: Clean previous Rust coverage data
+        working-directory: src-tauri
+        run: cargo llvm-cov clean --workspace
+
+      - name: Run instrumented Rust tests
+        working-directory: src-tauri
+        run: cargo llvm-cov --lib --no-report
+
+      - name: Generate Rust HTML report
+        working-directory: src-tauri
+        run: cargo llvm-cov report --html
+
+      - name: Generate Rust LCOV report
+        working-directory: src-tauri
+        run: cargo llvm-cov report --lcov --output-path target/llvm-cov/lcov.info
+
+      - name: Generate Rust Cobertura report
+        working-directory: src-tauri
+        run: cargo llvm-cov report --cobertura --output-path target/llvm-cov/cobertura.xml
+
+      - name: Add Rust summary
+        if: always()
+        working-directory: src-tauri
+        shell: bash
+        run: |
+          echo '## Rust coverage' >> "$GITHUB_STEP_SUMMARY"
+          if cargo llvm-cov report > target/llvm-cov/summary.txt; then
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            cat target/llvm-cov/summary.txt >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Coverage summary was not generated.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Rust coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-coverage
+          path: src-tauri/target/llvm-cov/
+          if-no-files-found: warn
+          retention-days: 30
