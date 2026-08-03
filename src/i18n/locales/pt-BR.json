@@ -56,7 +56,11 @@
     "git_scope_user": "Usuário",
     "git_name": "Nome",
     "git_email": "Email",
-    "git_workspace_hint": "Abra uma pasta de projeto para configurar uma identidade específica do projeto."
+    "git_workspace_hint": "Abra uma pasta de projeto para configurar uma identidade específica do projeto.",
+    "toolchain_checking": "Verificando...",
+    "toolchain_not_found": "Não encontrado",
+    "toolchain_install": "Instalar",
+    "toolchain_download": "Baixar"
   },
   "titlebar": {
     "close": "Fechar",

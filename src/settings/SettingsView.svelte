@@ -6,6 +6,7 @@
   import ThemesSettings from './ThemesSettings.svelte'
   import LanguageSettings from './LanguageSettings.svelte'
   import GitSettings from './GitSettings.svelte'
+  import ToolchainSettings from './ToolchainSettings.svelte'
 
   export let onClose: () => void
 
@@ -75,6 +76,8 @@
         <LanguageSettings />
       {:else if activeLeaf === 'git'}
         <GitSettings />
+      {:else if activeLeaf === 'toolchain'}
+        <ToolchainSettings />
       {:else}
         <p class="placeholder">{$i18n('settings.coming_soon')}</p>
       {/if}

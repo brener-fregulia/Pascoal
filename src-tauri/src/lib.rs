@@ -91,6 +91,7 @@ pub fn run() {
             commands::language_commands::highlight_pascal,
             commands::settings_commands::load_settings,
             commands::settings_commands::save_settings,
+            commands::toolchain_commands::get_toolchain_status,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")

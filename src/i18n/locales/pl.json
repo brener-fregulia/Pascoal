@@ -56,7 +56,11 @@
     "git_scope_user": "Użytkownik",
     "git_name": "Imię i nazwisko",
     "git_email": "E-mail",
-    "git_workspace_hint": "Otwórz folder projektu, aby ustawić tożsamość specyficzną dla projektu."
+    "git_workspace_hint": "Otwórz folder projektu, aby ustawić tożsamość specyficzną dla projektu.",
+    "toolchain_checking": "Sprawdzanie...",
+    "toolchain_not_found": "Nie znaleziono",
+    "toolchain_install": "Zainstaluj",
+    "toolchain_download": "Pobierz"
   },
   "titlebar": {
     "close": "Zamknij",

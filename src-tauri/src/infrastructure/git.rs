@@ -241,3 +241,21 @@ pub fn set_global_identity(name: &str, email: &str) -> Result<(), String> {
     run_git(cwd, &["config", "--global", "user.email", email])?;
     Ok(())
 }
+
+/// Detects whether git is installed and, if so, its reported version
+/// (e.g. "2.43.0").
+pub fn detect_git_version() -> (bool, Option<String>) {
+    let output = Command::new("git").arg("--version").output();
+
+    match output {
+        Ok(o) if o.status.success() => {
+            let raw = String::from_utf8(o.stdout)
+                .ok()
+                .map(|s| s.trim().to_string());
+            let version =
+                raw.and_then(|s| s.strip_prefix("git version ").map(|v| v.trim().to_string()));
+            (true, version)
+        }
+        _ => (false, None),
+    }
+}

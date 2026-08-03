@@ -56,7 +56,11 @@
     "git_scope_user": "User",
     "git_name": "Name",
     "git_email": "Email",
-    "git_workspace_hint": "Open a project folder to set a project-specific identity."
+    "git_workspace_hint": "Open a project folder to set a project-specific identity.",
+    "toolchain_checking": "Checking...",
+    "toolchain_not_found": "Not found",
+    "toolchain_install": "Install",
+    "toolchain_download": "Download"
   },
   "titlebar": {
     "close": "Close",

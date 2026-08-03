@@ -27,3 +27,17 @@ pub fn get_documents_dir(app: &tauri::AppHandle) -> std::path::PathBuf {
     }
     pascoal_dir
 }
+
+pub fn resolve_executable_path(name: &str) -> Option<String> {
+    let path_var = std::env::var_os("PATH")?;
+    let exe_name = if cfg!(windows) {
+        format!("{}.exe", name)
+    } else {
+        name.to_string()
+    };
+
+    std::env::split_paths(&path_var)
+        .map(|dir| dir.join(&exe_name))
+        .find(|candidate| candidate.is_file())
+        .map(|p| p.to_string_lossy().to_string())
+}

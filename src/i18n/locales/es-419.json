@@ -56,7 +56,11 @@
     "git_scope_user": "Usuario",
     "git_name": "Nombre",
     "git_email": "Correo electrónico",
-    "git_workspace_hint": "Abre una carpeta de proyecto para configurar una identidad específica del proyecto."
+    "git_workspace_hint": "Abre una carpeta de proyecto para configurar una identidad específica del proyecto.",
+    "toolchain_checking": "Verificando...",
+    "toolchain_not_found": "No encontrado",
+    "toolchain_install": "Instalar",
+    "toolchain_download": "Descargar"
   },
   "titlebar": {
     "close": "Cerrar",
