@@ -33,6 +33,7 @@ Baixe o instalador mais recente para a sua plataforma na [página de Releases](h
 - **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de "verificar atualizações"
 - **Novidades** — uma nota curta no app após cada atualização, com histórico completo e traduzido navegável dentro do app (Ajuda → Histórico de Versões) e um link pro [changelog](../../CHANGELOG.md) técnico completo
 - **Menu nativo do sistema** — menus Arquivo e Ajuda integrados à barra de título, com links diretos para reportar bugs ou solicitar funcionalidades no GitHub
+- **Painel de Configurações** — configure tema, idioma, identidade do git (global ou por projeto), e confira o status de instalação do Free Pascal e do git, tudo em um só lugar
 - **Três temas** — Escuro, Claro e Charcoal, com detecção do sistema
 - **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
 - **Salvamento automático antes de executar** — configurável
@@ -100,10 +101,12 @@ npm run test:pascal   # testes de integração em Pascal (requer FPC)
 ```text
 src/                       # Frontend Svelte + Vite, organizado por domínio
   app/                       # Shell (Titlebar, ActivityBar, Statusbar), diálogos (About, FpcMissing,
-                              # UpdateAvailable, WhatsNew), tela de boas-vindas, estado do app/settings
+                              # UpdateAvailable, WhatsNew), tela de boas-vindas
   editor/                    # Integração com CodeMirror, estado de abas/sessão, Editor/EditorArea/FindWidget
   language/pascal/           # Lado frontend do highlighting via Tree-sitter (client + decorações)
   project/                   # Explorador de arquivos e busca entre arquivos
+  settings/                  # Painel de Configurações (view + páginas de Temas/Idioma/Git/Toolchain) e
+                              # sua store de persistência
   toolchain/                 # Orquestração de compilar/rodar, console de build, UI de instalação do FPC
   integrations/
     tauri/                    # Ponto único de contato com a ponte de IPC do Tauri
@@ -118,14 +121,16 @@ src-tauri/
     lib.rs                    # Só configuração do app e registro de comandos
     commands/                 # Adaptadores finos dos comandos Tauri
     application/              # Casos de uso (analyze_document, run_program, manage_files,
-                                # manage_workspace, install_toolchain)
+                                # manage_settings, manage_workspace, install_toolchain,
+                                # check_toolchain)
     language/pascal/          # Highlighting via Tree-sitter e sua query vendorizada
     project/                  # Explorer, abrir/salvar arquivo, busca entre arquivos
     toolchain/
       compiler/                 # Compilação via FPC
       installer.rs               # Detecção de gerenciador de pacotes e instalação guiada
       runner.rs                  # Execução de processos (pipes/PTY)
-    infrastructure/            # filesystem, git, environment, platform - primitivas de SO
+    infrastructure/            # filesystem, git, environment, platform, settings - primitivas de SO
+                                # e o store do arquivo de settings
     state/                     # Estado compartilhado do app (ProcessState)
     tests/                     # Testes unitários em Rust
   tests/
@@ -167,10 +172,10 @@ CHANGELOG.md                 # Formato Keep a Changelog, vira o corpo da release
 - [x] Verificador de versão / atualizador
 - [x] Gramática Pascal com Tree-sitter (destaque de sintaxe estrutural)
 - [x] Changelog / notas de versão no app
-- [ ] Integração com Git (implementada, mas não habilitada na primeira versão)
+- [x] Painel de Configurações (temas, idioma, identidade do git, status do toolchain)
+- [ ] Painel de Git / interface de controle de versão (implementada, mas não habilitada ainda)
 - [ ] Terminal PTY (PowerShell, bash, fish)
 - [ ] Janela de terminal destacada para executar programas em Pascal
-- [ ] Persistência de configurações (tamanho da fonte do editor, posição do console)
 - [ ] Guias de indentação e outline de código via Tree-sitter
 - [ ] Modo Playground
 - [ ] Modo Challenge com casos de teste

@@ -33,6 +33,7 @@ Grab the latest installer for your platform from the [Releases page](https://git
 - **Auto-update** - checks for new versions and installs them automatically, with a manual "check for updates" option
 - **What's new** - a short in-app note after every update, with a full, translated version history browsable in-app (Help → Version History) and a link to the full technical [changelog](CHANGELOG.md)
 - **Native OS menu** - File and Help menus integrated into the titlebar, with direct links to report bugs or request features on GitHub
+- **Settings panel** — configure theme, language, git identity (global or per-project), and check Free Pascal/git installation status, all from one place
 - **Three themes** - Dark, Light and Charcoal, with system detection
 - **Native window controls** adapted per platform (macOS traffic lights, Windows/Linux style)
 - **Auto-save before run** - configurable
@@ -100,10 +101,12 @@ npm run test:pascal   # Pascal integration tests (requires FPC)
 ```
 src/                        # Svelte + Vite frontend, organized by domain
   app/                       # Shell (Titlebar, ActivityBar, Statusbar), dialogs (About, FpcMissing,
-                              # UpdateAvailable, WhatsNew), Welcome screen, app/settings state
+                              # UpdateAvailable, WhatsNew), Welcome screen
   editor/                    # CodeMirror integration, tab/session state, Editor/EditorArea/FindWidget
   language/pascal/           # Frontend side of Tree-sitter highlighting (client + decorations)
   project/                   # File explorer and cross-file search
+  settings/                  # Settings panel (view + Themes/Language/Git/Toolchain pages) and its
+                              # persistence store
   toolchain/                 # Compile/run orchestration, build console, FPC install UI
   integrations/
     tauri/                    # Single point of contact with the Tauri IPC bridge
@@ -118,14 +121,16 @@ src-tauri/
     lib.rs                    # App setup and command registration only
     commands/                 # Thin Tauri command adapters
     application/              # Use cases (analyze_document, run_program, manage_files,
-                                # manage_workspace, install_toolchain)
+                                # manage_settings, manage_workspace, install_toolchain,
+                                # check_toolchain)
     language/pascal/          # Tree-sitter highlighting and its vendored query file
     project/                  # Explorer, file open/save, cross-file search
     toolchain/
       compiler/                 # FPC compilation
       installer.rs               # Package manager detection and guided install
       runner.rs                  # Process execution (pipes/PTY)
-    infrastructure/            # filesystem, git, environment, platform - OS-level primitives
+    infrastructure/            # filesystem, git, environment, platform, settings - OS-level
+                                # primitives and the settings file store
     state/                     # Shared app state (ProcessState)
     tests/                     # Rust unit tests
   tests/
@@ -168,10 +173,10 @@ CHANGELOG.md                 # Keep a Changelog format, becomes the GitHub relea
 - [x] Version checker / updater
 - [x] Pascal Tree-sitter grammar (structural syntax highlighting)
 - [x] In-app changelog / release notes
-- [ ] Git integration (implemented, not enabled for the first release)
+- [x] Settings panel (themes, language, git identity, toolchain status)
+- [ ] Git panel / source control UI (implemented, not enabled yet)
 - [ ] PTY terminal (PowerShell, bash, fish)
 - [ ] Detached terminal window for running Pascal programs
-- [ ] Settings persistence (editor font size, console position)
 - [ ] Tree-sitter indent guides and code outline
 - [ ] Playground mode
 - [ ] Challenge mode with test cases

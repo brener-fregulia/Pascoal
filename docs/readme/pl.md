@@ -33,6 +33,7 @@ Pobierz najnowszy instalator dla swojej platformy ze [strony Releases](https://g
 - **Automatyczne aktualizacje** — sprawdza dostępność nowych wersji i instaluje je automatycznie, z opcją ręcznego sprawdzenia aktualizacji
 - **Nowości** — krótka notatka w aplikacji po każdej aktualizacji, z pełną, przetłumaczoną historią wersji dostępną w aplikacji (Pomoc → Historia Wersji) i linkiem do pełnego, technicznego [changeloga](../../CHANGELOG.md)
 - **Natywne menu systemowe** — menu Plik i Pomoc zintegrowane z paskiem tytułu oraz bezpośrednie odnośniki do zgłaszania błędów i propozycji funkcji na GitHubie
+- **Panel Ustawień** — skonfiguruj motyw, język, tożsamość git (globalną lub dla danego projektu), i sprawdź status instalacji Free Pascal oraz git, wszystko w jednym miejscu
 - **Trzy motywy** — Dark, Light i Charcoal z automatycznym wykrywaniem motywu systemowego
 - **Natywne kontrolki okna** dostosowane do platformy (traffic lights w macOS, styl Windows/Linux)
 - **Automatyczne zapisywanie przed uruchomieniem** — konfigurowalne
@@ -100,10 +101,12 @@ npm run test:pascal   # testy integracyjne Pascala (wymagają FPC)
 ```text
 src/                       # Frontend Svelte + Vite, uporządkowany według domen
   app/                       # Shell (Titlebar, ActivityBar, Statusbar), okna dialogowe (About, FpcMissing,
-                              # UpdateAvailable, WhatsNew), ekran powitalny, stan app/settings
+                              # UpdateAvailable, WhatsNew), ekran powitalny
   editor/                    # Integracja z CodeMirror, stan kart/sesji, Editor/EditorArea/FindWidget
   language/pascal/           # Frontendowa część podświetlania przez Tree-sitter (klient + dekoracje)
   project/                   # Eksplorator plików i wyszukiwanie w wielu plikach
+  settings/                  # Panel Ustawień (widok + strony Motywy/Język/Git/Toolchain) i jego
+                              # store persystencji
   toolchain/                 # Orkiestracja kompilacji/uruchamiania, konsola builda, UI instalacji FPC
   integrations/
     tauri/                    # Jedyny punkt kontaktu z mostem IPC Tauri
@@ -118,14 +121,16 @@ src-tauri/
     lib.rs                    # Tylko konfiguracja aplikacji i rejestracja komend
     commands/                 # Cienkie adaptery komend Tauri
     application/              # Przypadki użycia (analyze_document, run_program, manage_files,
-                                # manage_workspace, install_toolchain)
+                                # manage_settings, manage_workspace, install_toolchain,
+                                # check_toolchain)
     language/pascal/          # Podświetlanie przez Tree-sitter i jego zvendorowana query
     project/                  # Explorer, otwieranie/zapisywanie plików, wyszukiwanie w wielu plikach
     toolchain/
       compiler/                 # Kompilacja przez FPC
       installer.rs               # Wykrywanie menedżera pakietów i instalacja z przewodnikiem
       runner.rs                  # Wykonywanie procesów (pipes/PTY)
-    infrastructure/            # filesystem, git, environment, platform - prymitywy systemowe
+    infrastructure/            # filesystem, git, environment, platform, settings - prymitywy systemowe
+                                # i store pliku ustawień
     state/                     # Współdzielony stan aplikacji (ProcessState)
     tests/                     # Testy jednostkowe Rust
   tests/
@@ -167,10 +172,10 @@ CHANGELOG.md                 # Format Keep a Changelog, staje się treścią rel
 - [x] Sprawdzanie wersji / aktualizator
 - [x] Gramatyka Pascala oparta na Tree-sitter (strukturalne podświetlanie składni)
 - [x] Changelog / informacje o wersji w aplikacji
-- [ ] Integracja z Git (zaimplementowana, ale niewłączona w pierwszym wydaniu)
+- [x] Panel Ustawień (motywy, język, tożsamość git, status toolchaina)
+- [ ] Panel Git / interfejs kontroli wersji (zaimplementowany, ale jeszcze niewłączony)
 - [ ] Terminal PTY (PowerShell, bash, fish)
 - [ ] Oddzielne okno terminala do uruchamiania programów Pascala
-- [ ] Zapamiętywanie ustawień (rozmiar czcionki edytora, położenie konsoli)
 - [ ] Prowadnice wcięć i outline kodu przez Tree-sitter
 - [ ] Tryb Playground
 - [ ] Tryb Challenge z zestawami testów
