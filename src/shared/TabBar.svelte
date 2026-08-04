@@ -1,11 +1,14 @@
 <script lang="ts">
   import { tabStore } from '../editor/tabs'
+  import { diffTabStore } from '../editor/diffTabs'
   import { i18n } from '../i18n'
   import Tab from './Tab.svelte'
   import Home from '../icons/Home.svelte'
   import File from '../icons/File.svelte'
+  import Git from '../icons/Git.svelte'
 
   $: tabs = $tabStore.tabs
+  $: diffTabs = $diffTabStore
   $: activeTabId = $tabStore.activeTabId
   $: activeView = $tabStore.activeView
 </script>
@@ -31,6 +34,19 @@
       on:keydown={(e) => e.key === 'Enter' && tabStore.activate(tab.id)}
     >
       <File slot="icon" size={14} />
+    </Tab>
+  {/each}
+
+  {#each diffTabs as tab (tab.id)}
+    <Tab
+      label={tab.fileName}
+      active={tab.id === activeTabId && activeView === 'diff'}
+      closable
+      onClose={() => diffTabStore.close(tab.id)}
+      on:click={() => tabStore.activateDiff(tab.id)}
+      on:keydown={(e) => e.key === 'Enter' && tabStore.activateDiff(tab.id)}
+    >
+      <Git slot="icon" size={14} />
     </Tab>
   {/each}
 </div>

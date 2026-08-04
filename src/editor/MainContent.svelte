@@ -3,12 +3,16 @@
   import Welcome from '../app/Welcome.svelte'
   import Editor from './Editor.svelte'
   import Console from '../toolchain/Console.svelte'
+  import DiffView from '../integrations/git/DiffView.svelte'
   import { tabStore } from './tabs'
+  import { diffTabStore } from './diffTabs'
   import { consoleStore } from '../toolchain/console'
 
   $: hasOpenTabs = $tabStore.tabs.length > 0
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
+  $: activeDiffTab =
+    $diffTabStore.find((t) => t.id === $tabStore.activeTabId) ?? null
 </script>
 
 <div id="main-content">
@@ -24,6 +28,14 @@
       >
         <Editor />
       </div>
+      {#if $tabStore.activeView === 'diff' && activeDiffTab}
+        <div id="diff-wrapper">
+          <DiffView
+            original={activeDiffTab.original}
+            modified={activeDiffTab.modified}
+          />
+        </div>
+      {/if}
     </div>
 
     {#if showConsole}
@@ -80,5 +92,12 @@
   #console-area.right {
     height: auto;
     width: 420px;
+  }
+
+  #diff-wrapper {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 </style>

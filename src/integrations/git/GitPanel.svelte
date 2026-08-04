@@ -1,15 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { ask } from '@tauri-apps/plugin-dialog'
   import { gitStore, type GitFileStatus } from './gitStore'
   import { explorerStore } from '../../project/explorerStore'
+  import { diffTabStore } from '../../editor/diffTabs'
   import { i18n } from '../../i18n'
   import { isTauriAvailable, invoke } from '../tauri/client'
-  import DiffView from './DiffView.svelte'
 
-  let expandedKey = $state<string | null>(null)
-  let diffOriginal = $state<string>('')
-  let diffModified = $state<string>('')
-  let diffLoading = $state(false)
+  let remoteInput = $state('')
+  let remoteUrl = $derived($gitStore.remoteUrl)
 
   let identityName = $state('')
   let identityEmail = $state('')
@@ -39,7 +38,7 @@
     const path = folder?.path ?? null
     if (path !== lastFolderPath) {
       lastFolderPath = path
-      expandedKey = null
+      diffTabStore.reset()
       gitStore.refresh()
     }
   })
@@ -99,28 +98,34 @@
     return { original, modified }
   }
 
-  async function toggleDiff(path: string, isStaged: boolean) {
-    const key = `${isStaged ? 'staged' : 'unstaged'}:${path}`
-    if (expandedKey === key) {
-      expandedKey = null
-      return
-    }
-
-    expandedKey = key
-    diffOriginal = ''
-    diffModified = ''
-
+  async function openDiff(path: string, isStaged: boolean) {
     if (!folder || !isTauriAvailable()) return
-    diffLoading = true
-    try {
-      const content = await loadDiffContent(path, isStaged)
-      diffOriginal = content.original
-      diffModified = content.modified
-    } catch (e) {
-      diffModified = String(e)
-    } finally {
-      diffLoading = false
-    }
+    const { original, modified } = await loadDiffContent(path, isStaged)
+    diffTabStore.open({
+      filePath: path,
+      fileName: path.split(/[\\/]/).pop() ?? path,
+      staged: isStaged,
+      original,
+      modified,
+    })
+  }
+
+  async function handleDiscard(path: string, isUntracked: boolean) {
+    const key = isUntracked
+      ? 'git.discard_untracked_confirm'
+      : 'git.discard_confirm'
+    const message = $i18n(key, { name: path })
+    const confirmed = isTauriAvailable()
+      ? await ask(message, { title: 'Pascoal', kind: 'warning' })
+      : window.confirm(message)
+    if (!confirmed) return
+    await gitStore.discard(path, isUntracked)
+  }
+
+  async function handleSetRemote() {
+    if (!remoteInput.trim()) return
+    const ok = await gitStore.setRemote(remoteInput.trim())
+    if (ok) remoteInput = ''
   }
 
   async function handleCommit() {
@@ -164,12 +169,61 @@
       </span>
       <button
         class="icon-action"
+        title={$i18n('git.pull')}
+        disabled={!remoteUrl || loading}
+        onclick={() => gitStore.pull()}
+      >
+        ↓
+      </button>
+      <button
+        class="icon-action"
+        title={$i18n('git.push')}
+        disabled={!remoteUrl || loading}
+        onclick={() => gitStore.push()}
+      >
+        ↑
+      </button>
+      <button
+        class="icon-action"
+        title={$i18n('git.sync')}
+        disabled={!remoteUrl || loading}
+        onclick={() => gitStore.sync()}
+      >
+        ⇅
+      </button>
+      <button
+        class="icon-action"
         title={$i18n('explorer.refresh')}
         onclick={() => gitStore.refresh()}
       >
         ↻
       </button>
     </div>
+
+    {#if remoteUrl}
+      <div class="remote-row" title={remoteUrl}>
+        <span class="remote-dot ok"></span>
+        <span class="remote-text">{remoteUrl}</span>
+      </div>
+    {:else}
+      <div class="remote-row remote-missing">
+        <div class="remote-header">
+          <span class="remote-dot"></span>
+          <span class="remote-text">{$i18n('git.remote_missing')}</span>
+        </div>
+        <div class="remote-actions">
+          <input
+            class="remote-input"
+            placeholder={$i18n('git.remote_placeholder')}
+            bind:value={remoteInput}
+            onkeydown={(e) => e.key === 'Enter' && handleSetRemote()}
+          />
+          <button class="remote-link-btn" onclick={handleSetRemote}>
+            {$i18n('git.remote_link')}
+          </button>
+        </div>
+      </div>
+    {/if}
 
     {#if error}
       <p class="error-msg">{error}</p>
@@ -230,10 +284,7 @@
         </div>
         {#each staged as file (file.path)}
           <div class="file-entry">
-            <button
-              class="file-row"
-              onclick={() => toggleDiff(file.path, true)}
-            >
+            <button class="file-row" onclick={() => openDiff(file.path, true)}>
               <span class="status-badge status-{file.status}"
                 >{statusLabel(file.status)}</span
               >
@@ -245,15 +296,6 @@
               onclick={() => gitStore.unstage(file.path)}>−</button
             >
           </div>
-          {#if expandedKey === `staged:${file.path}`}
-            <div class="diff-box">
-              {#if diffLoading}
-                <p class="status-msg">{$i18n('explorer.loading')}</p>
-              {:else}
-                <DiffView original={diffOriginal} modified={diffModified} />
-              {/if}
-            </div>
-          {/if}
         {/each}
       </div>
 
@@ -270,10 +312,7 @@
         </div>
         {#each unstaged as file (file.path)}
           <div class="file-entry">
-            <button
-              class="file-row"
-              onclick={() => toggleDiff(file.path, false)}
-            >
+            <button class="file-row" onclick={() => openDiff(file.path, false)}>
               <span class="status-badge status-{file.status}"
                 >{statusLabel(file.status)}</span
               >
@@ -281,19 +320,16 @@
             </button>
             <button
               class="mini-btn"
+              title={$i18n('git.discard')}
+              onclick={() =>
+                handleDiscard(file.path, file.status === 'untracked')}>↺</button
+            >
+            <button
+              class="mini-btn"
               title={$i18n('git.stage')}
               onclick={() => gitStore.stage(file.path)}>+</button
             >
           </div>
-          {#if expandedKey === `unstaged:${file.path}`}
-            <div class="diff-box">
-              {#if diffLoading}
-                <p class="status-msg">{$i18n('explorer.loading')}</p>
-              {:else}
-                <DiffView original={diffOriginal} modified={diffModified} />
-              {/if}
-            </div>
-          {/if}
         {/each}
       </div>
 
@@ -610,9 +646,78 @@
     white-space: nowrap;
   }
 
-  .diff-box {
-    padding: 4px 8px 8px 24px;
-    background: var(--bg);
+  .remote-row {
+    padding: 6px 12px;
+    font-size: 11px;
     border-bottom: 1px solid var(--border);
+  }
+
+  .remote-row:not(.remote-missing) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .remote-missing {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .remote-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .remote-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--error);
+    flex-shrink: 0;
+  }
+
+  .remote-dot.ok {
+    background: var(--success);
+  }
+
+  .remote-text {
+    color: var(--text-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .remote-missing .remote-text {
+    white-space: normal;
+  }
+
+  .remote-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .remote-input {
+    flex: 1 1 120px;
+    min-width: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  .remote-link-btn {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border: 1px solid var(--accent2);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--accent2);
+    font-size: 11px;
+    cursor: pointer;
   }
 </style>

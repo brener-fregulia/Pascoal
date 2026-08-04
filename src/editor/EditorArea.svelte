@@ -14,7 +14,7 @@
     activePanel === 'git'
 
   const ACTIVITY_BAR_WIDTH = 48
-  const MIN_SIDEBAR_PX = 180
+  const MIN_SIDEBAR_PX = 220
   const EDITOR_RESERVED_PX = 480
   const DEFAULT_SIDEBAR_PX = 220
 

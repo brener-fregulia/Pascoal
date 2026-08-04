@@ -78,3 +78,28 @@ pub fn git_show_file(
 ) -> Result<String, String> {
     git::show_file(&folder_path, &revision, &file_path)
 }
+
+#[tauri::command]
+pub fn git_discard(folder_path: String, file_path: String) -> Result<(), String> {
+    git::discard(&folder_path, &file_path)
+}
+
+#[tauri::command]
+pub fn git_get_remote(folder_path: String) -> Option<String> {
+    git::get_remote(&folder_path)
+}
+
+#[tauri::command]
+pub fn git_set_remote(folder_path: String, url: String) -> Result<(), String> {
+    git::set_remote(&folder_path, &url)
+}
+
+#[tauri::command]
+pub fn git_push(folder_path: String, branch: String) -> Result<String, String> {
+    git::push(&folder_path, &branch)
+}
+
+#[tauri::command]
+pub fn git_pull(folder_path: String) -> Result<String, String> {
+    git::pull(&folder_path)
+}

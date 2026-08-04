@@ -187,6 +187,18 @@
     "identity_name": "Your name",
     "identity_email": "your.email@example.com",
     "identity_global": "Set for all repositories on this machine",
-    "identity_save_commit": "Save and Commit"
+    "identity_save_commit": "Save and Commit",
+    "discard": "Discard changes",
+    "discard_confirm": "Discard changes in {name}? This cannot be undone.",
+    "discard_untracked_confirm": "Delete {name}? This cannot be undone.",
+    "remote_missing": "Not linked to a remote repository",
+    "remote_placeholder": "https://github.com/user/repo.git",
+    "remote_link": "Link",
+    "remote_link_success": "Repository linked",
+    "pull": "Pull",
+    "push": "Push",
+    "sync": "Sync",
+    "pull_success": "Pulled from remote",
+    "push_success": "Pushed to remote"
   }
 }

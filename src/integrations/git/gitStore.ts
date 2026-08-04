@@ -23,6 +23,7 @@ interface GitState {
     commitMessage: string
     needsIdentity: boolean
     notice: GitNotice | null
+    remoteUrl: string | null
 }
 
 const INITIAL: GitState = {
@@ -35,6 +36,7 @@ const INITIAL: GitState = {
     commitMessage: '',
     needsIdentity: false,
     notice: null,
+    remoteUrl: null,
 }
 
 function createGitStore() {
@@ -76,8 +78,100 @@ function createGitStore() {
                 unstaged: GitFileStatus[]
             }>('git_status', { folderPath: folder })
             update(s => ({ ...s, ...result, loading: false }))
+
+            if (result.isRepo) {
+                await checkRemote()
+            }
         } catch (e) {
             update(s => ({ ...s, loading: false, error: errMsg(e) }))
+        }
+    }
+
+    async function checkRemote() {
+        const folder = folderPath()
+        if (!folder || !isTauriAvailable()) return
+        try {
+            const remoteUrl = await invoke<string | null>('git_get_remote', {
+                folderPath: folder,
+            })
+            update(s => ({ ...s, remoteUrl }))
+        } catch {
+            update(s => ({ ...s, remoteUrl: null }))
+        }
+    }
+
+    async function setRemote(url: string): Promise<boolean> {
+        const folder = folderPath()
+        if (!folder || !isTauriAvailable()) return false
+        try {
+            await invoke('git_set_remote', { folderPath: folder, url })
+            await checkRemote()
+            showNotice('success', t('git.remote_link_success'))
+            return true
+        } catch (e) {
+            const msg = errMsg(e)
+            update(s => ({ ...s, error: msg }))
+            showNotice('error', msg)
+            return false
+        }
+    }
+
+    async function push(): Promise<boolean> {
+        const folder = folderPath()
+        const state = get({ subscribe })
+        if (!folder || !isTauriAvailable() || !state.branch) return false
+        update(s => ({ ...s, loading: true }))
+        try {
+            await invoke('git_push', { folderPath: folder, branch: state.branch })
+            update(s => ({ ...s, loading: false }))
+            showNotice('success', t('git.push_success'))
+            return true
+        } catch (e) {
+            const msg = errMsg(e)
+            update(s => ({ ...s, loading: false, error: msg }))
+            showNotice('error', msg)
+            return false
+        }
+    }
+
+    async function pull(): Promise<boolean> {
+        const folder = folderPath()
+        if (!folder || !isTauriAvailable()) return false
+        update(s => ({ ...s, loading: true }))
+        try {
+            await invoke('git_pull', { folderPath: folder })
+            update(s => ({ ...s, loading: false }))
+            showNotice('success', t('git.pull_success'))
+            await refresh()
+            return true
+        } catch (e) {
+            const msg = errMsg(e)
+            update(s => ({ ...s, loading: false, error: msg }))
+            showNotice('error', msg)
+            return false
+        }
+    }
+
+    async function sync(): Promise<boolean> {
+        const pulled = await pull()
+        if (!pulled) return false
+        return await push()
+    }
+
+    async function discard(path: string, isUntracked: boolean) {
+        const folder = folderPath()
+        if (!folder || !isTauriAvailable()) return
+        try {
+            if (isUntracked) {
+                await invoke('delete_file', { path: `${folder}/${path}` })
+            } else {
+                await invoke('git_discard', { folderPath: folder, filePath: path })
+            }
+            await refresh()
+        } catch (e) {
+            const msg = errMsg(e)
+            update(s => ({ ...s, error: msg }))
+            showNotice('error', msg)
         }
     }
 
@@ -213,10 +307,14 @@ function createGitStore() {
         configureIdentity,
         initRepo,
         setCommitMessage,
+        checkRemote,
+        setRemote,
+        push,
+        pull,
+        sync,
+        discard,
         reset,
     }
 }
 
 export const gitStore = createGitStore()
-
-export const diffCache = writable<Record<string, string>>({})

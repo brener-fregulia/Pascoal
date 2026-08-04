@@ -187,6 +187,18 @@
     "identity_name": "Tu nombre",
     "identity_email": "tu.correo@ejemplo.com",
     "identity_global": "Establecer para todos los repositorios en esta máquina",
-    "identity_save_commit": "Guardar y hacer commit"
+    "identity_save_commit": "Guardar y hacer commit",
+    "discard": "Descartar cambios",
+    "discard_confirm": "¿Descartar los cambios en {name}? Esto no se puede deshacer.",
+    "discard_untracked_confirm": "¿Eliminar {name}? Esto no se puede deshacer.",
+    "remote_missing": "No vinculado a un repositorio remoto",
+    "remote_placeholder": "https://github.com/usuario/repo.git",
+    "remote_link": "Vincular",
+    "remote_link_success": "Repositorio vinculado",
+    "pull": "Traer",
+    "push": "Enviar",
+    "sync": "Sincronizar",
+    "pull_success": "Cambios traídos del remoto",
+    "push_success": "Cambios enviados al remoto"
   }
 }

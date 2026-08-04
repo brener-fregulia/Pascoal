@@ -56,3 +56,8 @@ pub fn search_in_folder(
 ) -> Vec<SearchMatch> {
     manage_workspace::search_in_folder(folder_path, query, case_sensitive)
 }
+
+#[tauri::command]
+pub fn delete_file(path: String) -> Result<(), String> {
+    manage_files::delete_file(path)
+}

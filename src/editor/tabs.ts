@@ -19,7 +19,7 @@ export interface Tab {
 interface TabState {
   tabs: Tab[]
   activeTabId: string | null
-  activeView: 'welcome' | 'editor'
+  activeView: 'welcome' | 'editor' | 'diff'
 }
 
 function createTabStore() {
@@ -109,6 +109,25 @@ function createTabStore() {
     update((s) => ({ ...s, activeView: 'welcome' }))
   }
 
+  // Used by diffTabStore - a diff tab isn't part of `tabs`, so it just
+  // points activeTabId at a diff tab's id instead of a file tab's.
+  function activateDiff(id: string) {
+    update((s) => ({ ...s, activeTabId: id, activeView: 'diff' }))
+  }
+
+  // Called by diffTabStore when the active diff tab is closed and no
+  // other diff tab takes its place - falls back to the last file tab,
+  // or welcome if there are none.
+  function fallbackFromDiff() {
+    update((s) => {
+      if (s.tabs.length > 0) {
+        const last = s.tabs[s.tabs.length - 1]
+        return { ...s, activeTabId: last.id, activeView: 'editor' }
+      }
+      return { ...s, activeTabId: null, activeView: 'welcome' }
+    })
+  }
+
   function markDirty(id: string) {
     update((s) => ({
       ...s,
@@ -181,6 +200,8 @@ function createTabStore() {
     openFile,
     updateEditorState,
     activate,
+    activateDiff,
+    fallbackFromDiff,
     showWelcome,
     markDirty,
     markClean,

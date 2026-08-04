@@ -187,6 +187,18 @@
     "identity_name": "Twoje imię",
     "identity_email": "twoj.email@przyklad.com",
     "identity_global": "Ustaw dla wszystkich repozytoriów na tym komputerze",
-    "identity_save_commit": "Zapisz i wykonaj commit"
+    "identity_save_commit": "Zapisz i wykonaj commit",
+    "discard": "Odrzuć zmiany",
+    "discard_confirm": "Odrzucić zmiany w {name}? Tej operacji nie można cofnąć.",
+    "discard_untracked_confirm": "Usunąć {name}? Tej operacji nie można cofnąć.",
+    "remote_missing": "Niepołączone z repozytorium zdalnym",
+    "remote_placeholder": "https://github.com/uzytkownik/repo.git",
+    "remote_link": "Połącz",
+    "remote_link_success": "Repozytorium połączone",
+    "pull": "Pobierz",
+    "push": "Wyślij",
+    "sync": "Synchronizuj",
+    "pull_success": "Pobrano z repozytorium zdalnego",
+    "push_success": "Wysłano do repozytorium zdalnego"
   }
 }

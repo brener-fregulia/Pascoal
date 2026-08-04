@@ -268,3 +268,43 @@ pub fn show_file(folder_path: &str, revision: &str, file_path: &str) -> Result<S
         &["show", &format!("{}:{}", revision, file_path)],
     )
 }
+
+/// Discards unstaged changes in a tracked file, restoring it to match
+/// the index.
+pub fn discard(folder_path: &str, file_path: &str) -> Result<(), String> {
+    run_git(folder_path, &["restore", "--", file_path])?;
+    Ok(())
+}
+
+/// Reads the URL of the "origin" remote, if configured.
+pub fn get_remote(folder_path: &str) -> Option<String> {
+    run_git(folder_path, &["remote", "get-url", "origin"])
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+}
+
+/// Points "origin" at the given URL, adding it if it doesn't exist yet.
+pub fn set_remote(folder_path: &str, url: &str) -> Result<(), String> {
+    if run_git(folder_path, &["remote", "set-url", "origin", url]).is_err() {
+        run_git(folder_path, &["remote", "add", "origin", url])?;
+    }
+    Ok(())
+}
+
+pub fn push(folder_path: &str, branch: &str) -> Result<String, String> {
+    match run_git(folder_path, &["push"]) {
+        Ok(out) => Ok(out),
+        Err(e) => {
+            if e.contains("has no upstream branch") {
+                run_git(folder_path, &["push", "--set-upstream", "origin", branch])
+            } else {
+                Err(e)
+            }
+        }
+    }
+}
+
+pub fn pull(folder_path: &str) -> Result<String, String> {
+    run_git(folder_path, &["pull"])
+}

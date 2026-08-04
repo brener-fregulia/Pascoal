@@ -198,3 +198,7 @@ pub fn list_folder_tree(folder_path: &str) -> Vec<ExplorerNode> {
     let path = std::path::PathBuf::from(folder_path);
     build_tree(&path, &path)
 }
+
+pub fn delete_file(path: &str) -> Result<(), String> {
+    std::fs::remove_file(path).map_err(|e| e.to_string())
+}

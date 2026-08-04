@@ -26,3 +26,7 @@ pub fn file_exists(path: String) -> bool {
 pub fn read_file(path: String) -> Result<String, String> {
     files::read_file(&path)
 }
+
+pub fn delete_file(path: String) -> Result<(), String> {
+    files::delete_file(&path)
+}
