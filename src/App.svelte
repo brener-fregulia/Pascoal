@@ -139,6 +139,7 @@
   #main {
     display: grid;
     grid-template-columns: 48px 1fr;
+    grid-template-rows: 1fr;
     overflow: hidden;
   }
 </style>

@@ -49,6 +49,7 @@
 <style>
   #main-content {
     flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
