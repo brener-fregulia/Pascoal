@@ -69,36 +69,46 @@ pub fn status(folder_path: &str) -> GitStatusResult {
     let mut staged = Vec::new();
     let mut unstaged = Vec::new();
 
-    if let Ok(output) = run_git(folder_path, &["status", "--porcelain=v1"]) {
-        for line in output.lines() {
-            if line.len() < 4 {
-                continue;
-            }
-            let mut chars = line.chars();
-            let x = chars.next().unwrap();
-            let y = chars.next().unwrap();
-            let path = line[3..].to_string();
+    if let Ok(output) = run_git(folder_path, &["status", "--porcelain=v2", "-z"]) {
+        let mut records = output.split('\0').filter(|r| !r.is_empty());
 
-            if x == '?' && y == '?' {
-                unstaged.push(GitFileStatus {
-                    path,
-                    status: "untracked".to_string(),
-                });
-                continue;
-            }
+        while let Some(record) = records.next() {
+            let mut head = record.splitn(2, ' ');
+            let kind = head.next().unwrap_or("");
+            let rest = head.next().unwrap_or("");
 
-            if let Some(label) = status_code_to_label(x) {
-                staged.push(GitFileStatus {
-                    path: path.clone(),
-                    status: label.to_string(),
-                });
-            }
-
-            if let Some(label) = status_code_to_label(y) {
-                unstaged.push(GitFileStatus {
-                    path,
-                    status: label.to_string(),
-                });
+            match kind {
+                // Ordinary changed entry: XY sub mH mI mW hH hI path
+                "1" => {
+                    let mut fields = rest.splitn(8, ' ');
+                    let xy = fields.next().unwrap_or("");
+                    let path = fields.nth(6).unwrap_or("").to_string();
+                    push_status(&mut staged, &mut unstaged, xy, path);
+                }
+                // Renamed/copied entry: XY sub mH mI mW hH hI Xscore path
+                // - origPath follows as its own NUL-terminated record.
+                "2" => {
+                    let mut fields = rest.splitn(9, ' ');
+                    let xy = fields.next().unwrap_or("");
+                    let path = fields.nth(7).unwrap_or("").to_string();
+                    let _orig_path = records.next();
+                    push_status(&mut staged, &mut unstaged, xy, path);
+                }
+                // Unmerged entry: XY sub m1 m2 m3 mW h1 h2 h3 path
+                "u" => {
+                    let mut fields = rest.splitn(10, ' ');
+                    let xy = fields.next().unwrap_or("");
+                    let path = fields.nth(8).unwrap_or("").to_string();
+                    push_status(&mut staged, &mut unstaged, xy, path);
+                }
+                // Untracked: just the path.
+                "?" => {
+                    unstaged.push(GitFileStatus {
+                        path: rest.to_string(),
+                        status: "untracked".to_string(),
+                    });
+                }
+                _ => {}
             }
         }
     }
@@ -111,6 +121,30 @@ pub fn status(folder_path: &str) -> GitStatusResult {
     }
 }
 
+fn push_status(
+    staged: &mut Vec<GitFileStatus>,
+    unstaged: &mut Vec<GitFileStatus>,
+    xy: &str,
+    path: String,
+) {
+    let mut chars = xy.chars();
+    let x = chars.next().unwrap_or('.');
+    let y = chars.next().unwrap_or('.');
+
+    if let Some(label) = status_code_to_label(x) {
+        staged.push(GitFileStatus {
+            path: path.clone(),
+            status: label.to_string(),
+        });
+    }
+
+    if let Some(label) = status_code_to_label(y) {
+        unstaged.push(GitFileStatus {
+            path,
+            status: label.to_string(),
+        });
+    }
+}
 pub fn diff(folder_path: &str, file_path: &str, staged: bool) -> Result<String, String> {
     let mut args = vec!["diff"];
     if staged {
