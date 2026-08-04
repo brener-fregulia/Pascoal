@@ -17,6 +17,7 @@
   import { explorerStore } from './project/explorerStore'
   import { fpcInstallStore } from './toolchain/fpcInstall'
   import { updateStore } from './integrations/updater/updateStore'
+  import { gitStore } from './integrations/git/gitStore'
   import { isTauriAvailable, invoke } from './integrations/tauri/client'
 
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
@@ -27,6 +28,7 @@
 
   onMount(async () => {
     themeStore.init()
+    gitStore.watchFolder()
     await appStore.init()
     await whatsNewStore.checkAfterUpdate()
 

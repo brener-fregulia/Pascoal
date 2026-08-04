@@ -39,7 +39,6 @@
     if (path !== lastFolderPath) {
       lastFolderPath = path
       diffTabStore.reset()
-      gitStore.refresh()
     }
   })
 

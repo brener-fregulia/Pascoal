@@ -7,6 +7,7 @@
   import { explorerStore } from '../project/explorerStore'
   import { pendingJumpLine } from '../project/searchStore'
   import { runActiveFile } from '../toolchain/runner'
+  import { gitStore } from '../integrations/git/gitStore'
   import { themeCompartment } from './editor-extensions'
   import { buildPascoalTheme } from './editor-theme'
   import { i18n } from '../i18n'
@@ -133,6 +134,8 @@
           filePath: tab.filePath,
         })
         tabStore.markClean(tab.id)
+        explorerStore.refresh()
+        gitStore.refresh()
       } catch (e) {
         console.error('save_file failed:', e)
       }
@@ -155,6 +158,8 @@
       if (result) {
         tabStore.updateFilePath(tab.id, result.path)
         tabStore.markClean(tab.id)
+        explorerStore.refresh()
+        gitStore.refresh()
       }
     } catch (e) {
       console.error('save_file_as failed:', e)

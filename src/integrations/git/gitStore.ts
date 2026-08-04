@@ -297,6 +297,17 @@ function createGitStore() {
         set({ ...INITIAL })
     }
 
+    function watchFolder() {
+        let lastPath: string | null = null
+        explorerStore.subscribe(s => {
+            const path = s.folder?.path ?? null
+            if (path !== lastPath) {
+                lastPath = path
+                refresh()
+            }
+        })
+    }
+
     return {
         subscribe,
         refresh,
@@ -314,6 +325,7 @@ function createGitStore() {
         pull,
         sync,
         discard,
+        watchFolder,
         reset,
     }
 }
