@@ -136,10 +136,11 @@ function createGitStore() {
 
     async function pull(): Promise<boolean> {
         const folder = folderPath()
-        if (!folder || !isTauriAvailable()) return false
+        const state = get({ subscribe })
+        if (!folder || !isTauriAvailable() || !state.branch) return false
         update(s => ({ ...s, loading: true }))
         try {
-            await invoke('git_pull', { folderPath: folder })
+            await invoke('git_pull', { folderPath: folder, branch: state.branch })
             update(s => ({ ...s, loading: false }))
             showNotice('success', t('git.pull_success'))
             await refresh()

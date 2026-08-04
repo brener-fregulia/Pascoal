@@ -158,7 +158,7 @@ pub fn commit(folder_path: &str, message: &str) -> Result<(), String> {
 }
 
 pub fn init(folder_path: &str) -> Result<(), String> {
-    run_git(folder_path, &["init"]).map(|_| ())
+    run_git(folder_path, &["init", "-b", "main"]).map(|_| ())
 }
 
 #[derive(serde::Serialize)]
@@ -305,6 +305,50 @@ pub fn push(folder_path: &str, branch: &str) -> Result<String, String> {
     }
 }
 
-pub fn pull(folder_path: &str) -> Result<String, String> {
-    run_git(folder_path, &["pull"])
+pub fn pull(folder_path: &str, branch: &str) -> Result<String, String> {
+    match run_git(folder_path, &["pull"]) {
+        Ok(out) => Ok(out),
+        Err(e) if e.contains("no tracking information") => {
+            // Try the remote branch with the same name first.
+            match run_git(folder_path, &["pull", "origin", branch]) {
+                Ok(out) => {
+                    set_upstream(folder_path, branch, branch);
+                    Ok(out)
+                }
+                // Local and remote default branch names don't match
+                // (e.g. local "master" vs a GitHub repo's "main") -
+                // find the remote's actual default branch and use that.
+                Err(_) => {
+                    let remote_branch = default_remote_branch(folder_path)?;
+                    let out = run_git(folder_path, &["pull", "origin", &remote_branch])?;
+                    set_upstream(folder_path, branch, &remote_branch);
+                    Ok(out)
+                }
+            }
+        }
+        Err(e) => Err(e),
+    }
+}
+
+fn set_upstream(folder_path: &str, local_branch: &str, remote_branch: &str) {
+    let _ = run_git(
+        folder_path,
+        &[
+            "branch",
+            "--set-upstream-to",
+            &format!("origin/{}", remote_branch),
+            local_branch,
+        ],
+    );
+}
+
+fn default_remote_branch(folder_path: &str) -> Result<String, String> {
+    let out = run_git(folder_path, &["ls-remote", "--symref", "origin", "HEAD"])?;
+    out.lines()
+        .find_map(|line| {
+            line.strip_prefix("ref: refs/heads/")
+                .and_then(|s| s.split('\t').next())
+        })
+        .map(|s| s.to_string())
+        .ok_or_else(|| "Could not determine the remote's default branch".to_string())
 }

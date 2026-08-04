@@ -100,6 +100,6 @@ pub fn git_push(folder_path: String, branch: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn git_pull(folder_path: String) -> Result<String, String> {
-    git::pull(&folder_path)
+pub fn git_pull(folder_path: String, branch: String) -> Result<String, String> {
+    git::pull(&folder_path, &branch)
 }
