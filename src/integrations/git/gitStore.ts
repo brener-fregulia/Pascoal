@@ -24,6 +24,8 @@ interface GitState {
     needsIdentity: boolean
     notice: GitNotice | null
     remoteUrl: string | null
+    ahead: number
+    behind: number
 }
 
 const INITIAL: GitState = {
@@ -37,6 +39,8 @@ const INITIAL: GitState = {
     needsIdentity: false,
     notice: null,
     remoteUrl: null,
+    ahead: 0,
+    behind: 0,
 }
 
 function createGitStore() {
@@ -94,9 +98,17 @@ function createGitStore() {
             const remoteUrl = await invoke<string | null>('git_get_remote', {
                 folderPath: folder,
             })
-            update(s => ({ ...s, remoteUrl }))
+            let ahead = 0
+            let behind = 0
+            if (remoteUrl) {
+                const ab = await invoke<[number, number] | null>('git_ahead_behind', {
+                    folderPath: folder,
+                })
+                if (ab) [ahead, behind] = ab
+            }
+            update(s => ({ ...s, remoteUrl, ahead, behind }))
         } catch {
-            update(s => ({ ...s, remoteUrl: null }))
+            update(s => ({ ...s, remoteUrl: null, ahead: 0, behind: 0 }))
         }
     }
 
@@ -125,6 +137,7 @@ function createGitStore() {
             await invoke('git_push', { folderPath: folder, branch: state.branch })
             update(s => ({ ...s, loading: false }))
             showNotice('success', t('git.push_success'))
+            await checkRemote()
             return true
         } catch (e) {
             const msg = errMsg(e)
@@ -297,6 +310,20 @@ function createGitStore() {
         set({ ...INITIAL })
     }
 
+    let fetchIntervalId: ReturnType<typeof setInterval> | null = null
+
+    async function backgroundFetch() {
+        const folder = folderPath()
+        const state = get({ subscribe })
+        if (!folder || !isTauriAvailable() || !state.isRepo || !state.remoteUrl) return
+        try {
+            await invoke('git_fetch', { folderPath: folder })
+            await checkRemote()
+        } catch (e) {
+            console.warn('Background git fetch failed:', e)
+        }
+    }
+
     function watchFolder() {
         let lastPath: string | null = null
         explorerStore.subscribe(s => {
@@ -306,6 +333,10 @@ function createGitStore() {
                 refresh()
             }
         })
+
+        if (fetchIntervalId === null) {
+            fetchIntervalId = setInterval(backgroundFetch, 3 * 60 * 1000)
+        }
     }
 
     return {

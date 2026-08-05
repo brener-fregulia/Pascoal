@@ -386,3 +386,27 @@ fn default_remote_branch(folder_path: &str) -> Result<String, String> {
         .map(|s| s.to_string())
         .ok_or_else(|| "Could not determine the remote's default branch".to_string())
 }
+
+pub fn ahead_behind(folder_path: &str) -> Option<(u32, u32)> {
+    let output = run_git(
+        folder_path,
+        &["status", "--porcelain=v2", "--branch", "-uno"],
+    )
+    .ok()?;
+
+    for line in output.lines() {
+        if let Some(rest) = line.strip_prefix("# branch.ab ") {
+            let mut parts = rest.split_whitespace();
+            let ahead = parts.next()?.strip_prefix('+')?.parse().ok()?;
+            let behind = parts.next()?.strip_prefix('-')?.parse().ok()?;
+            return Some((ahead, behind));
+        }
+    }
+
+    None
+}
+
+pub fn fetch(folder_path: &str) -> Result<(), String> {
+    run_git(folder_path, &["fetch"])?;
+    Ok(())
+}

@@ -103,3 +103,13 @@ pub fn git_push(folder_path: String, branch: String) -> Result<String, String> {
 pub fn git_pull(folder_path: String, branch: String) -> Result<String, String> {
     git::pull(&folder_path, &branch)
 }
+
+#[tauri::command]
+pub fn git_ahead_behind(folder_path: String) -> Option<(u32, u32)> {
+    git::ahead_behind(&folder_path)
+}
+
+#[tauri::command]
+pub fn git_fetch(folder_path: String) -> Result<(), String> {
+    git::fetch(&folder_path)
+}
