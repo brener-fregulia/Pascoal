@@ -50,13 +50,15 @@
 
 <style>
   #diff-view {
-    max-height: 400px;
-    overflow: auto;
+    flex: 1;
+    overflow: hidden;
     border: 1px solid var(--border);
     border-radius: 4px;
   }
 
-  #diff-view :global(.cm-editor) {
+  #diff-view :global(.cm-mergeView) {
+    height: 100%;
+    overflow: auto;
     font-family: var(--font-mono);
     font-size: 12px;
   }
