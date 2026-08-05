@@ -9,6 +9,9 @@
   import { consoleStore } from '../toolchain/console'
 
   $: hasOpenTabs = $tabStore.tabs.length > 0
+  $: hasOpenDiffTabs = $diffTabStore.length > 0
+  $: showWelcome =
+    $tabStore.activeView === 'welcome' || (!hasOpenTabs && !hasOpenDiffTabs)
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
   $: activeDiffTab =
@@ -19,7 +22,7 @@
   <TabBar />
   <div id="content-row">
     <div id="view-area">
-      {#if !hasOpenTabs || $tabStore.activeView === 'welcome'}
+      {#if showWelcome}
         <Welcome />
       {/if}
       <div
@@ -30,10 +33,12 @@
       </div>
       {#if $tabStore.activeView === 'diff' && activeDiffTab}
         <div id="diff-wrapper">
-          <DiffView
-            original={activeDiffTab.original}
-            modified={activeDiffTab.modified}
-          />
+          {#key activeDiffTab.id}
+            <DiffView
+              original={activeDiffTab.original}
+              modified={activeDiffTab.modified}
+            />
+          {/key}
         </div>
       {/if}
     </div>
