@@ -4,10 +4,13 @@
   import { gitStore, type GitFileStatus } from './gitStore'
   import { explorerStore } from '../../project/explorerStore'
   import { diffTabStore } from '../../editor/diffTabs'
+  import { settingsStore } from '../../settings/settingsStore'
   import { i18n } from '../../i18n'
   import { isTauriAvailable, invoke } from '../tauri/client'
+  import StageAllPromptModal from './StageAllPromptModal.svelte'
 
   let remoteInput = $state('')
+  let showStagePrompt = $state(false)
   let remoteUrl = $derived($gitStore.remoteUrl)
 
   let identityName = $state('')
@@ -23,8 +26,14 @@
   let commitMessage = $derived($gitStore.commitMessage)
   let needsIdentity = $derived($gitStore.needsIdentity)
   let notice = $derived($gitStore.notice)
+  let ahead = $derived($gitStore.ahead)
+  let behind = $derived($gitStore.behind)
+
   let folder = $derived($explorerStore.folder)
-  let canCommit = $derived(staged.length > 0 && commitMessage.trim().length > 0)
+  let canCommit = $derived(
+    (staged.length > 0 || unstaged.length > 0) &&
+      commitMessage.trim().length > 0,
+  )
   let canSaveIdentity = $derived(
     identityName.trim().length > 0 && identityEmail.trim().length > 0,
   )
@@ -128,9 +137,33 @@
   }
 
   async function handleCommit() {
+    if (staged.length === 0 && unstaged.length > 0) {
+      const mode = $settingsStore.gitAutoStageOnCommit
+      if (mode === 'never') return
+      if (mode === 'ask') {
+        showStagePrompt = true
+        return
+      }
+      // mode === 'always'
+      await gitStore.stageAll()
+      await gitStore.commit()
+      return
+    }
     await gitStore.commit()
   }
 
+  async function handleStagePromptChoice(
+    choice: 'yes' | 'always' | 'never' | 'cancel',
+  ) {
+    showStagePrompt = false
+    if (choice === 'cancel') return
+    if (choice === 'always' || choice === 'never') {
+      settingsStore.updateSetting('gitAutoStageOnCommit', choice)
+    }
+    if (choice === 'never') return
+    await gitStore.stageAll()
+    await gitStore.commit()
+  }
   async function handleSaveIdentity() {
     if (!canSaveIdentity) return
     const ok = await gitStore.configureIdentity(
@@ -146,6 +179,10 @@
 </script>
 
 <div class="git-panel">
+  {#if showStagePrompt}
+    <StageAllPromptModal onChoice={handleStagePromptChoice} />
+  {/if}
+
   {#if notice}
     <div class="notice notice-{notice.type}">{notice.message}</div>
   {/if}
@@ -166,6 +203,16 @@
       <span class="branch-name" title={branch ?? ''}>
         {branch ?? $i18n('git.no_branch')}
       </span>
+      {#if behind > 0}
+        <span class="ab-badge ab-badge-behind" title={$i18n('git.behind_hint')}
+          >↓{behind}</span
+        >
+      {/if}
+      {#if ahead > 0}
+        <span class="ab-badge ab-badge-ahead" title={$i18n('git.ahead_hint')}
+          >↑{ahead}</span
+        >
+      {/if}
       <button
         class="icon-action"
         title={$i18n('git.pull')}
@@ -718,5 +765,21 @@
     color: var(--accent2);
     font-size: 11px;
     cursor: pointer;
+  }
+
+  .ab-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+    padding: 0 2px;
+  }
+
+  .ab-badge-behind {
+    color: var(--accent2);
+  }
+
+  .ab-badge-ahead {
+    color: var(--accent);
   }
 </style>

@@ -5,11 +5,13 @@ import type { Theme } from '../shared/theme'
 export interface Settings {
   autoSaveBeforeRun: boolean
   theme: Theme | null
+  gitAutoStageOnCommit: 'ask' | 'always' | 'never'
 }
 
 const DEFAULTS: Settings = {
   autoSaveBeforeRun: true,
   theme: null,
+  gitAutoStageOnCommit: 'ask',
 }
 
 function createSettingsStore() {

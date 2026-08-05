@@ -199,6 +199,17 @@
     "push": "Enviar",
     "sync": "Sincronizar",
     "pull_success": "Alterações trazidas do remoto",
-    "push_success": "Alterações enviadas ao remoto"
+    "push_success": "Alterações enviadas ao remoto",
+    "stage_prompt_message": "Nada está staged. Colocar todas as alterações em stage e commitar?",
+    "stage_prompt_yes": "Sim",
+    "stage_prompt_always": "Sempre",
+    "stage_prompt_never": "Nunca",
+    "stage_prompt_cancel": "Cancelar",
+    "auto_stage_label": "Quando nada está staged",
+    "auto_stage_ask": "Perguntar",
+    "auto_stage_always": "Sempre colocar tudo em stage",
+    "auto_stage_never": "Nunca fazer stage automático",
+    "behind_hint": "Atrás do remoto - dê pull ou sync pra se atualizar",
+    "ahead_hint": "À frente do remoto - dê push pra publicar seus commits"
   }
 }

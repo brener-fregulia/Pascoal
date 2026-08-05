@@ -199,6 +199,17 @@
     "push": "Push",
     "sync": "Sync",
     "pull_success": "Pulled from remote",
-    "push_success": "Pushed to remote"
+    "push_success": "Pushed to remote",
+    "stage_prompt_message": "Nothing is staged. Stage all changes and commit?",
+    "stage_prompt_yes": "Yes",
+    "stage_prompt_always": "Always",
+    "stage_prompt_never": "Never",
+    "stage_prompt_cancel": "Cancel",
+    "auto_stage_label": "When nothing is staged",
+    "auto_stage_ask": "Ask",
+    "auto_stage_always": "Always stage all",
+    "auto_stage_never": "Never auto-stage",
+    "behind_hint": "Behind the remote - pull or sync to catch up",
+    "ahead_hint": "Ahead of the remote - push to publish your commits"
   }
 }

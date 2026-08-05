@@ -199,6 +199,17 @@
     "push": "Wyślij",
     "sync": "Synchronizuj",
     "pull_success": "Pobrano z repozytorium zdalnego",
-    "push_success": "Wysłano do repozytorium zdalnego"
+    "push_success": "Wysłano do repozytorium zdalnego",
+    "stage_prompt_message": "Nic nie jest w stage. Dodać wszystkie zmiany do stage i zatwierdzić?",
+    "stage_prompt_yes": "Tak",
+    "stage_prompt_always": "Zawsze",
+    "stage_prompt_never": "Nigdy",
+    "stage_prompt_cancel": "Anuluj",
+    "auto_stage_label": "Gdy nic nie jest w stage",
+    "auto_stage_ask": "Pytaj",
+    "auto_stage_always": "Zawsze dodawaj wszystko do stage",
+    "auto_stage_never": "Nigdy nie dodawaj automatycznie",
+    "behind_hint": "Za repozytorium zdalnym - zrób pull lub sync, aby nadążyć",
+    "ahead_hint": "Przed repozytorium zdalnym - zrób push, aby opublikować commity"
   }
 }

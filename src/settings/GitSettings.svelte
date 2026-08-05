@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { i18n } from '../i18n'
   import { explorerStore } from '../project/explorerStore'
+  import { settingsStore } from './settingsStore'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   type Scope = 'user' | 'workspace'
@@ -120,6 +121,24 @@
   {#if !folder}
     <p class="hint">{$i18n('settings.git_workspace_hint')}</p>
   {/if}
+
+  <div class="field">
+    <label for="git-auto-stage">{$i18n('git.auto_stage_label')}</label>
+    <select
+      id="git-auto-stage"
+      class="field-input"
+      value={$settingsStore.gitAutoStageOnCommit}
+      onchange={(e) =>
+        settingsStore.updateSetting(
+          'gitAutoStageOnCommit',
+          (e.target as HTMLSelectElement).value as 'ask' | 'always' | 'never',
+        )}
+    >
+      <option value="ask">{$i18n('git.auto_stage_ask')}</option>
+      <option value="always">{$i18n('git.auto_stage_always')}</option>
+      <option value="never">{$i18n('git.auto_stage_never')}</option>
+    </select>
+  </div>
 </section>
 
 <style>
