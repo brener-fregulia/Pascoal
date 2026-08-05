@@ -5,6 +5,7 @@ import { settingsStore, type Settings } from '../../../src/settings/settingsStor
 const DEFAULTS: Settings = {
     autoSaveBeforeRun: true,
     theme: null,
+    gitAutoStageOnCommit: 'ask',
 }
 
 describe('settingsStore', () => {
