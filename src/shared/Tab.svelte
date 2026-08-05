@@ -1,11 +1,14 @@
 <script lang="ts">
   import X from '../icons/X.svelte'
+  import Lock from '../icons/Lock.svelte'
 
   export let label: string
   export let active: boolean = false
   export let isDirty: boolean = false
   export let closable: boolean = false
   export let onClose: (() => void) | null = null
+  export let readOnly: boolean = false
+  export let readOnlyLabel: string = 'Read-only'
 </script>
 
 <div class="tab" class:active role="tab" tabindex="0" on:click on:keydown>
@@ -14,6 +17,12 @@
   <span class="tab-label">
     {isDirty ? `● ${label}` : label}
   </span>
+
+  {#if readOnly}
+    <span class="tab-readonly" title={readOnlyLabel}>
+      <Lock size={11} />
+    </span>
+  {/if}
 
   {#if closable}
     <button
@@ -87,5 +96,12 @@
   .tab-close:hover {
     background: rgba(255, 255, 255, 0.12);
     color: var(--text);
+  }
+
+  .tab-readonly {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    flex-shrink: 0;
   }
 </style>

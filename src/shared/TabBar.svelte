@@ -42,6 +42,8 @@
       label={tab.fileName}
       active={tab.id === activeTabId && activeView === 'diff'}
       closable
+      readOnly
+      readOnlyLabel={$i18n('tabs.read_only')}
       onClose={() => diffTabStore.close(tab.id)}
       on:click={() => tabStore.activateDiff(tab.id)}
       on:keydown={(e) => e.key === 'Enter' && tabStore.activateDiff(tab.id)}

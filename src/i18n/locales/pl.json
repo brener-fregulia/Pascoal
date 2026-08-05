@@ -126,7 +126,8 @@
   },
   "tabs": {
     "welcome": "Start",
-    "unsaved_confirm": "\"{name}\" ma niezapisane zmiany. Czy mimo to zamknąć?"
+    "unsaved_confirm": "\"{name}\" ma niezapisane zmiany. Czy mimo to zamknąć?",
+    "read_only": "Tylko do odczytu"
   },
   "explorer": {
     "no_folder": "Brak otwartego folderu.",

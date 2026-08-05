@@ -126,7 +126,8 @@
   },
   "tabs": {
     "welcome": "Inicio",
-    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar. ¿Cerrar de todos modos?"
+    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar. ¿Cerrar de todos modos?",
+    "read_only": "Solo lectura"
   },
   "explorer": {
     "no_folder": "No hay ninguna carpeta abierta.",

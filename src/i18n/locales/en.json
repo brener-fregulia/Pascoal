@@ -126,7 +126,8 @@
   },
   "tabs": {
     "welcome": "Welcome",
-    "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?"
+    "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?",
+    "read_only": "Read-only"
   },
   "explorer": {
     "no_folder": "No folder open.",

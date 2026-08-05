@@ -126,7 +126,8 @@
   },
   "tabs": {
     "welcome": "Início",
-    "unsaved_confirm": "\"{name}\" tem alterações não salvas. Fechar mesmo assim?"
+    "unsaved_confirm": "\"{name}\" tem alterações não salvas. Fechar mesmo assim?",
+    "read_only": "Somente leitura"
   },
   "explorer": {
     "no_folder": "Nenhuma pasta aberta.",
