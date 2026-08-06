@@ -51,4 +51,15 @@ describe('Tab', () => {
         await fireEvent.click(getByLabelText('Close main.pas'))
         expect(onClose).toHaveBeenCalledTimes(1)
     })
+    it('does not show the read-only badge by default', () => {
+        const { queryByTitle } = render(Tab, { props: { label: 'main.pas' } })
+        expect(queryByTitle('Read-only')).not.toBeInTheDocument()
+    })
+
+    it('shows the read-only badge when readOnly is true', () => {
+        const { getByTitle } = render(Tab, {
+            props: { label: 'main.pas', readOnly: true, readOnlyLabel: 'Read-only' },
+        })
+        expect(getByTitle('Read-only')).toBeInTheDocument()
+    })
 })

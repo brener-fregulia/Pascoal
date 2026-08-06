@@ -295,4 +295,202 @@ describe('gitStore', () => {
             expect(state().notice).toBeNull()
         })
     })
+
+    describe('discard', () => {
+        it('deletes untracked files instead of restoring them', async () => {
+            await openMockFolder()
+            let deleteCalled = false
+            mockTauri({
+                delete_file: () => { deleteCalled = true; return Promise.resolve() },
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+
+            await gitStore.discard('new.pas', true)
+
+            expect(deleteCalled).toBe(true)
+        })
+
+        it('restores tracked files via git_discard', async () => {
+            await openMockFolder()
+            let discardCalled = false
+            mockTauri({
+                git_discard: () => { discardCalled = true; return Promise.resolve() },
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+
+            await gitStore.discard('main.pas', false)
+
+            expect(discardCalled).toBe(true)
+        })
+
+        it('sets an error notice on failure', async () => {
+            await openMockFolder()
+            mockTauri({ git_discard: () => Promise.reject(new Error('cannot restore')) })
+
+            await gitStore.discard('main.pas', false)
+
+            expect(state().error).toBe('cannot restore')
+            expect(state().notice?.type).toBe('error')
+        })
+    })
+
+    describe('checkRemote', () => {
+        it('sets remoteUrl and ahead/behind when a remote is configured', async () => {
+            await openMockFolder()
+            mockTauri({
+                git_get_remote: () => Promise.resolve('https://github.com/user/repo.git'),
+                git_ahead_behind: () => Promise.resolve([2, 1]),
+            })
+
+            await gitStore.checkRemote()
+
+            expect(state().remoteUrl).toBe('https://github.com/user/repo.git')
+            expect(state().ahead).toBe(2)
+            expect(state().behind).toBe(1)
+        })
+
+        it('leaves ahead/behind at zero when there is no remote', async () => {
+            await openMockFolder()
+            mockTauri({ git_get_remote: () => Promise.resolve(null) })
+
+            await gitStore.checkRemote()
+
+            expect(state().remoteUrl).toBeNull()
+            expect(state().ahead).toBe(0)
+            expect(state().behind).toBe(0)
+        })
+    })
+
+    describe('setRemote', () => {
+        it('sets the remote and refreshes remote status', async () => {
+            await openMockFolder()
+            mockTauri({
+                git_set_remote: () => Promise.resolve(),
+                git_get_remote: () => Promise.resolve('https://github.com/user/repo.git'),
+                git_ahead_behind: () => Promise.resolve([0, 0]),
+            })
+
+            const result = await gitStore.setRemote('https://github.com/user/repo.git')
+
+            expect(result).toBe(true)
+            expect(state().remoteUrl).toBe('https://github.com/user/repo.git')
+            expect(state().notice?.type).toBe('success')
+        })
+
+        it('sets an error notice on failure', async () => {
+            await openMockFolder()
+            mockTauri({ git_set_remote: () => Promise.reject(new Error('invalid url')) })
+
+            const result = await gitStore.setRemote('not-a-url')
+
+            expect(result).toBe(false)
+            expect(state().error).toBe('invalid url')
+            expect(state().notice?.type).toBe('error')
+        })
+    })
+
+    describe('push / pull / sync', () => {
+        async function withBranch() {
+            await openMockFolder()
+            mockTauri({
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+            await gitStore.refresh()
+        }
+
+        it('push does nothing without a known branch', async () => {
+            await openMockFolder()
+            const result = await gitStore.push()
+            expect(result).toBe(false)
+        })
+
+        it('push succeeds and refreshes remote status', async () => {
+            await withBranch()
+            mockTauri({
+                git_push: () => Promise.resolve(),
+                git_get_remote: () => Promise.resolve('https://github.com/user/repo.git'),
+                git_ahead_behind: () => Promise.resolve([0, 0]),
+            })
+
+            const result = await gitStore.push()
+
+            expect(result).toBe(true)
+            expect(state().notice?.type).toBe('success')
+        })
+
+        it('push sets an error notice on failure', async () => {
+            await withBranch()
+            mockTauri({ git_push: () => Promise.reject(new Error('rejected')) })
+
+            const result = await gitStore.push()
+
+            expect(result).toBe(false)
+            expect(state().notice?.type).toBe('error')
+        })
+
+        it('pull succeeds and does a full refresh', async () => {
+            await withBranch()
+            mockTauri({
+                git_pull: () => Promise.resolve(),
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+            })
+
+            const result = await gitStore.pull()
+
+            expect(result).toBe(true)
+            expect(state().notice?.type).toBe('success')
+        })
+
+        it('sync stops after a failed pull without attempting push', async () => {
+            await withBranch()
+            let pushCalled = false
+            mockTauri({
+                git_pull: () => Promise.reject(new Error('conflict')),
+                git_push: () => { pushCalled = true; return Promise.resolve() },
+            })
+
+            const result = await gitStore.sync()
+
+            expect(result).toBe(false)
+            expect(pushCalled).toBe(false)
+        })
+
+        it('sync pulls then pushes on success', async () => {
+            await withBranch()
+            let pullCalled = false
+            let pushCalled = false
+            mockTauri({
+                git_pull: () => { pullCalled = true; return Promise.resolve() },
+                git_status: () => Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] }),
+                git_push: () => { pushCalled = true; return Promise.resolve() },
+                git_get_remote: () => Promise.resolve('https://github.com/user/repo.git'),
+                git_ahead_behind: () => Promise.resolve([0, 0]),
+            })
+
+            const result = await gitStore.sync()
+
+            expect(result).toBe(true)
+            expect(pullCalled).toBe(true)
+            expect(pushCalled).toBe(true)
+        })
+    })
+
+    describe('watchFolder', () => {
+        it('refreshes git status when the open folder changes', async () => {
+            let statusCalls = 0
+            mockTauri({
+                open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }),
+                git_status: () => {
+                    statusCalls++
+                    return Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] })
+                },
+            })
+
+            gitStore.watchFolder()
+            await explorerStore.openFolder()
+            await new Promise((resolve) => setTimeout(resolve, 0))
+
+            expect(statusCalls).toBeGreaterThan(0)
+        })
+    })
 })
