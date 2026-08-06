@@ -7,6 +7,32 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 
 ## [Unreleased]
 
+### Added
+- Git panel (Source Control), reachable from the sidebar: view,
+  stage/unstage/discard changes, commit, and initialize a repository.
+  Diffs open as their own read-only tab in the editor, side by side,
+  instead of inline in the panel.
+- Link a project folder to an existing GitHub repository, plus Push,
+  Pull, and Sync. An indicator next to the branch name shows how many
+  commits you're ahead or behind, kept current by a background check
+  every few minutes.
+- When committing with nothing staged, Pascoal offers to stage
+  everything for you - configurable in Settings to always ask, always
+  stage, or never.
+- The Explorer/Search/Git side panel can be resized by dragging its
+  edge, and remembers its width between sessions. Drag it far enough
+  left and it collapses, like VS Code.
+- The app window remembers its size and position between launches,
+  starting maximized on the very first run.
+
+### Fixed
+- The code editor lost its scrollbar on longer files.
+- Typing into a running program's console showed each character
+  twice, on Linux only.
+- `git status` parsing now uses a more reliable format, fixing file
+  names with accented characters and renamed files being handled
+  incorrectly.
+
 ## [2026.3.0]
 
 ### Added
