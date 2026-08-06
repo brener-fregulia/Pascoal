@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 
 # Electron build output
 build/
+
+# AI local
+.claude/settings.local.json
