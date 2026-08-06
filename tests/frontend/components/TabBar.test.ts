@@ -1,14 +1,15 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 
-const { mockShowWelcome, mockActivate, mockClose, mockTabState } = vi.hoisted(() => ({
+const { mockShowWelcome, mockActivate, mockActivateDiff, mockClose, mockTabState } = vi.hoisted(() => ({
     mockShowWelcome: vi.fn(),
     mockActivate: vi.fn(),
+    mockActivateDiff: vi.fn(),
     mockClose: vi.fn(),
     mockTabState: {
         tabs: [] as Array<{ id: string; fileName: string; isDirty: boolean }>,
         activeTabId: null as string | null,
-        activeView: 'welcome' as 'welcome' | 'editor',
+        activeView: 'welcome' as 'welcome' | 'editor' | 'diff',
     },
 }))
 
@@ -20,17 +21,21 @@ vi.mock('../../../src/editor/tabs', () => ({
         },
         showWelcome: mockShowWelcome,
         activate: mockActivate,
+        activateDiff: mockActivateDiff,
         close: mockClose,
     },
 }))
 
 import TabBar from '../../../src/shared/TabBar.svelte'
+import { diffTabStore } from '../../../src/editor/diffTabs'
 
 afterEach(() => {
     cleanup()
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     mockTabState.activeView = 'welcome'
+    diffTabStore.reset()
+    vi.clearAllMocks()
 })
 
 describe('TabBar', () => {
@@ -74,5 +79,56 @@ describe('TabBar', () => {
         const { getByLabelText } = render(TabBar)
         await fireEvent.click(getByLabelText('Close main.pas'))
         expect(mockClose).toHaveBeenCalledWith('a')
+    })
+
+    it('renders one tab per open diff', () => {
+        diffTabStore.open({
+            filePath: 'a.pas',
+            fileName: 'a.pas',
+            staged: false,
+            original: 'old',
+            modified: 'new',
+        })
+        const { getByText } = render(TabBar)
+        expect(getByText('a.pas')).toBeInTheDocument()
+    })
+
+    it('marks diff tabs as read-only', () => {
+        diffTabStore.open({
+            filePath: 'a.pas',
+            fileName: 'a.pas',
+            staged: false,
+            original: 'old',
+            modified: 'new',
+        })
+        const { getByTitle } = render(TabBar)
+        expect(getByTitle('Read-only')).toBeInTheDocument()
+    })
+
+    it('calls tabStore.activateDiff when a diff tab is clicked', async () => {
+        const tab = diffTabStore.open({
+            filePath: 'a.pas',
+            fileName: 'a.pas',
+            staged: false,
+            original: 'old',
+            modified: 'new',
+        })
+        mockActivateDiff.mockClear()
+        const { getByText } = render(TabBar)
+        await fireEvent.click(getByText('a.pas'))
+        expect(mockActivateDiff).toHaveBeenCalledWith(tab.id)
+    })
+
+    it('calls diffTabStore.close when a diff tab close button is clicked', async () => {
+        diffTabStore.open({
+            filePath: 'a.pas',
+            fileName: 'a.pas',
+            staged: false,
+            original: 'old',
+            modified: 'new',
+        })
+        const { getByLabelText, queryByText } = render(TabBar)
+        await fireEvent.click(getByLabelText('Close a.pas'))
+        expect(queryByText('a.pas')).not.toBeInTheDocument()
     })
 })

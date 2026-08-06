@@ -5,7 +5,7 @@ import { tabStore, type Tab } from '../../../src/editor/tabs'
 interface TabState {
   tabs: Tab[]
   activeTabId: string | null
-  activeView: 'welcome' | 'editor'
+  activeView: 'welcome' | 'editor' | 'diff'
 }
 
 function state(): TabState {
@@ -179,6 +179,31 @@ describe('tabStore', () => {
       tabStore.updateEditorState(tab.id, newState)
       const found = state().tabs.find((t) => t.id === tab.id)
       expect(found?.state.doc.toString()).toBe('updated')
+    })
+  })
+
+  describe('activateDiff', () => {
+    it('sets activeTabId and switches view to diff', () => {
+      tabStore.activateDiff('diff-1')
+      expect(state().activeTabId).toBe('diff-1')
+      expect(state().activeView).toBe('diff')
+    })
+  })
+
+  describe('fallbackFromDiff', () => {
+    it('falls back to the last file tab if any are open', async () => {
+      const tab = await tabStore.newTab('content')
+      tabStore.activateDiff('diff-1')
+      tabStore.fallbackFromDiff()
+      expect(state().activeTabId).toBe(tab.id)
+      expect(state().activeView).toBe('editor')
+    })
+
+    it('falls back to welcome when no file tabs are open', () => {
+      tabStore.activateDiff('diff-1')
+      tabStore.fallbackFromDiff()
+      expect(state().activeTabId).toBeNull()
+      expect(state().activeView).toBe('welcome')
     })
   })
 })
