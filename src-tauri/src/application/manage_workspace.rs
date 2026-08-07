@@ -1,10 +1,16 @@
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 use crate::project::files::{self, ExplorerNode, OpenFolderResult};
 use crate::project::search::{self, SearchMatch};
+use crate::state::WorkspaceState;
 
-pub async fn open_folder(app: AppHandle) -> Option<OpenFolderResult> {
-    files::open_folder(&app).await
+pub async fn open_workspace(app: AppHandle) -> Option<OpenFolderResult> {
+    let result = files::open_workspace(&app).await?;
+
+    let state = app.state::<WorkspaceState>();
+    *state.root.lock().unwrap() = Some(std::path::PathBuf::from(&result.folder.path));
+
+    Some(result)
 }
 
 pub fn list_folder_tree(folder_path: String) -> Vec<ExplorerNode> {

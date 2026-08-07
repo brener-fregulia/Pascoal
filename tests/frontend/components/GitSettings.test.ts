@@ -18,7 +18,7 @@ function mockTauri(handlers: Record<string, (...args: any[]) => any>) {
 }
 
 async function openMockFolder() {
-    mockTauri({ open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }) })
+    mockTauri({ open_workspace: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }) })
     await explorerStore.openFolder()
 }
 

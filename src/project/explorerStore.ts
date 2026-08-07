@@ -38,7 +38,7 @@ function createExplorerStore() {
             const result = await invoke<{
                 folder: ExplorerFolder
                 tree: ExplorerNode[]
-            } | null>('open_folder')
+            } | null>('open_workspace')
 
             if (!result) {
                 update(s => ({ ...s, loading: false }))

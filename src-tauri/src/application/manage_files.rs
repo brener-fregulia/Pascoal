@@ -1,5 +1,6 @@
 use tauri::AppHandle;
 
+use crate::infrastructure::filesystem;
 use crate::project::files::{self, SaveResult};
 
 pub async fn open_file(app: AppHandle) -> Option<(String, String)> {
@@ -29,4 +30,12 @@ pub fn read_file(path: String) -> Result<String, String> {
 
 pub fn delete_file(path: String) -> Result<(), String> {
     files::delete_file(&path)
+}
+
+pub fn open_url(app: AppHandle, url: String) -> Result<(), String> {
+    filesystem::open_url(&app, &url)
+}
+
+pub fn reveal_in_file_manager(app: AppHandle, path: String) -> Result<(), String> {
+    filesystem::reveal_in_file_manager(&app, &path)
 }

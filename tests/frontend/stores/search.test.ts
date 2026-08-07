@@ -58,7 +58,7 @@ describe('searchStore', () => {
 
         it('sets results when folder is open and search succeeds', async () => {
             mockTauri((cmd: string) => {
-                if (cmd === 'open_folder') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
+                if (cmd === 'open_workspace') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
                 if (cmd === 'search_in_folder') return Promise.resolve(MOCK_RESULTS)
             })
 
@@ -71,7 +71,7 @@ describe('searchStore', () => {
 
         it('clears loading state after search', async () => {
             mockTauri((cmd: string) => {
-                if (cmd === 'open_folder') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
+                if (cmd === 'open_workspace') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
                 if (cmd === 'search_in_folder') return Promise.resolve(MOCK_RESULTS)
             })
 
@@ -83,7 +83,7 @@ describe('searchStore', () => {
 
         it('handles search failure gracefully', async () => {
             mockTauri((cmd: string) => {
-                if (cmd === 'open_folder') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
+                if (cmd === 'open_workspace') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
                 if (cmd === 'search_in_folder') return Promise.reject(new Error('search failed'))
             })
 
@@ -107,7 +107,7 @@ describe('searchStore', () => {
     describe('clear / reset', () => {
         it('restores initial state', async () => {
             mockTauri((cmd: string) => {
-                if (cmd === 'open_folder') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
+                if (cmd === 'open_workspace') return Promise.resolve({ folder: MOCK_FOLDER, files: [] })
                 if (cmd === 'search_in_folder') return Promise.resolve(MOCK_RESULTS)
             })
 

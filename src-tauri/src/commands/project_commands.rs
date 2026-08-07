@@ -1,5 +1,4 @@
 use crate::application::{manage_files, manage_workspace};
-use crate::infrastructure::filesystem;
 use crate::project::files::{ExplorerNode, OpenFolderResult, SaveResult};
 use crate::project::search::SearchMatch;
 
@@ -34,13 +33,18 @@ pub fn read_file(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn open_url(url: String) {
-    filesystem::open_url(&url)
+pub fn open_url(app: tauri::AppHandle, url: String) -> Result<(), String> {
+    manage_files::open_url(app, url)
 }
 
 #[tauri::command]
-pub async fn open_folder(app: tauri::AppHandle) -> Option<OpenFolderResult> {
-    manage_workspace::open_folder(app).await
+pub fn reveal_in_file_manager(app: tauri::AppHandle, path: String) -> Result<(), String> {
+    manage_files::reveal_in_file_manager(app, path)
+}
+
+#[tauri::command]
+pub async fn open_workspace(app: tauri::AppHandle) -> Option<OpenFolderResult> {
+    manage_workspace::open_workspace(app).await
 }
 
 #[tauri::command]

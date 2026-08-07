@@ -171,11 +171,15 @@ pub fn build_tree(dir: &std::path::Path, root: &std::path::Path) -> Vec<Explorer
     nodes
 }
 
-pub async fn open_folder(app: &tauri::AppHandle) -> Option<OpenFolderResult> {
+pub async fn open_workspace(app: &tauri::AppHandle) -> Option<OpenFolderResult> {
     use tauri_plugin_dialog::DialogExt;
 
     let path = app.dialog().file().blocking_pick_folder()?;
-    let folder_path = std::path::PathBuf::from(path.to_string());
+    let picked_path = std::path::PathBuf::from(path.to_string());
+    // dunce::canonicalize, not std::fs::canonicalize - the std version
+    // prefixes Windows paths with `\\?\`, which git (and other external
+    // tools invoked with this path as a working directory) doesn't handle.
+    let folder_path = dunce::canonicalize(&picked_path).ok()?;
 
     let name = folder_path
         .file_name()

@@ -7,7 +7,7 @@ mod state;
 mod toolchain;
 
 use infrastructure::environment::{detect_fpc, get_documents_dir};
-use state::ProcessState;
+use state::{ProcessState, WorkspaceState};
 use tauri::Manager;
 
 // ── Structs ───────────────────────────────────────────────────────────────────
@@ -43,6 +43,7 @@ fn get_app_info(app: tauri::AppHandle) -> AppInfo {
 pub fn run() {
     tauri::Builder::default()
         .manage(ProcessState::new())
+        .manage(WorkspaceState::new())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -55,6 +56,7 @@ pub fn run() {
             app.handle()
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.handle().plugin(tauri_plugin_process::init())?;
+            app.handle().plugin(tauri_plugin_opener::init())?;
             app.handle()
                 .plugin(tauri_plugin_window_state::Builder::default().build())?;
 
@@ -85,9 +87,10 @@ pub fn run() {
             commands::project_commands::save_file_as,
             commands::project_commands::file_exists,
             commands::project_commands::read_file,
-            commands::project_commands::open_folder,
+            commands::project_commands::open_workspace,
             commands::project_commands::list_folder_tree,
             commands::project_commands::open_url,
+            commands::project_commands::reveal_in_file_manager,
             commands::project_commands::search_in_folder,
             commands::git_commands::git_status,
             commands::git_commands::git_diff,

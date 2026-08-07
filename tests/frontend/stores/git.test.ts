@@ -23,7 +23,7 @@ function mockTauri(handlers: Record<string, (...args: any[]) => any>) {
 }
 
 async function openMockFolder() {
-    mockTauri({ open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }) })
+    mockTauri({ open_workspace: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }) })
     await explorerStore.openFolder()
 }
 
@@ -479,7 +479,7 @@ describe('gitStore', () => {
         it('refreshes git status when the open folder changes', async () => {
             let statusCalls = 0
             mockTauri({
-                open_folder: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }),
+                open_workspace: () => Promise.resolve({ folder: MOCK_FOLDER, tree: [] }),
                 git_status: () => {
                     statusCalls++
                     return Promise.resolve({ isRepo: true, branch: 'main', staged: [], unstaged: [] })
