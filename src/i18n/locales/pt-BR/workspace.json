@@ -1,9 +1,9 @@
 {
   "workspace": {
-    "section_recent_workspaces": "Recent Workspaces",
-    "no_recent_workspaces": "No recent workspaces.",
-    "open_recent": "Open recent workspace",
-    "remove_recent": "Remove from recents",
-    "switch_confirm": "You have unsaved changes. Switching workspaces will change the open project folder. Continue?"
+    "section_recent_workspaces": "Espaços de trabalho recentes",
+    "no_recent_workspaces": "Nenhum espaço de trabalho recente.",
+    "open_recent": "Abrir espaço de trabalho recente",
+    "remove_recent": "Remover dos recentes",
+    "switch_confirm": "Há alterações não salvas. Trocar de espaço de trabalho vai alterar a pasta de projeto aberta. Continuar?"
   }
 }

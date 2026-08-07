@@ -6,7 +6,7 @@
     "category_language": "Język",
     "category_git": "Git",
     "category_toolchain": "Toolchain",
-    "category_workspace": "Workspace",
+    "category_workspace": "Obszar roboczy",
     "coming_soon": "Wkrótce.",
     "section_themes": "Motywy",
     "theme_dark": "Ciemny",
@@ -20,7 +20,7 @@
     "toolchain_not_found": "Nie znaleziono",
     "toolchain_install": "Zainstaluj",
     "toolchain_download": "Pobierz",
-    "reopen_last_workspace_label": "Reopen last workspace on startup",
-    "reopen_last_workspace_hint": "Automatically opens the most recently used project folder when Pascoal starts."
+    "reopen_last_workspace_label": "Ponownie otwieraj ostatni obszar roboczy przy starcie",
+    "reopen_last_workspace_hint": "Automatycznie otwiera ostatnio używany folder projektu przy starcie Pascoal."
   }
 }
