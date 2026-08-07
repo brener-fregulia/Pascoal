@@ -40,18 +40,6 @@ vi.mock('../../../src/toolchain/runner', () => ({
     runActiveFile: vi.fn(),
 }))
 
-vi.mock('../../../src/project/recent', () => ({
-    recentStore: {
-        subscribe: (fn: (v: unknown[]) => void) => {
-            fn([])
-            return () => { }
-        },
-        validate: vi.fn(),
-        add: vi.fn(),
-        remove: vi.fn(),
-    },
-}))
-
 const { mockExplorerState } = vi.hoisted(() => ({
     mockExplorerState: {
         folder: null as { name: string; path: string } | null,

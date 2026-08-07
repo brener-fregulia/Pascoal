@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, cleanup, fireEvent, waitFor } from '@testing-library/svelte'
+import { render, cleanup, fireEvent } from '@testing-library/svelte'
 
 const { mockExplorerState, mockOpenFolder, mockRefresh, mockCloseFolder } =
     vi.hoisted(() => ({
@@ -30,16 +30,6 @@ vi.mock('../../../src/editor/tabs', () => ({
     tabStore: {
         openFile: vi.fn().mockResolvedValue({ id: 'tab-1' }),
         activate: vi.fn(),
-    },
-}))
-
-const { mockRecentAdd } = vi.hoisted(() => ({
-    mockRecentAdd: vi.fn(),
-}))
-
-vi.mock('../../../src/project/recent', () => ({
-    recentStore: {
-        add: mockRecentAdd,
     },
 }))
 
@@ -116,29 +106,5 @@ describe('FileTree', () => {
         const { getByTitle } = render(FileTree)
         await fireEvent.click(getByTitle('Close folder'))
         expect(mockCloseFolder).toHaveBeenCalled()
-    })
-
-    it('adds the opened file to recentStore, scoped to the open workspace', async () => {
-        ; (window as any).__TAURI__ = {
-            core: { invoke: vi.fn().mockResolvedValue('program Test;') },
-        }
-        mockExplorerState.folder = { name: 'MyProject', path: '/tmp/MyProject' }
-        mockExplorerState.tree = [
-            {
-                name: 'main.pas',
-                path: '/tmp/MyProject/main.pas',
-                relativePath: 'main.pas',
-                isDirectory: false,
-                children: null,
-            },
-        ]
-        const { getByText } = render(FileTree)
-        await fireEvent.click(getByText('main.pas'))
-        await waitFor(() =>
-            expect(mockRecentAdd).toHaveBeenCalledWith(
-                '/tmp/MyProject/main.pas',
-                '/tmp/MyProject',
-            ),
-        )
     })
 })

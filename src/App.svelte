@@ -16,7 +16,6 @@
   import { themeStore } from './shared/theme'
   import { tabStore } from './editor/tabs'
   import { explorerStore } from './project/explorerStore'
-  import { recentStore } from './project/recent'
   import { recentWorkspacesStore } from './project/recentWorkspaces'
   import { settingsStore } from './settings/settingsStore'
   import { fpcInstallStore } from './toolchain/fpcInstall'
@@ -68,7 +67,6 @@
           const [filePath, content] = result
           const tab = await tabStore.openFile(filePath, content)
           tabStore.activate(tab.id)
-          recentStore.add(filePath, get(explorerStore).folder?.path ?? null)
         }
       } catch (e) {
         console.error('open_file failed:', e)

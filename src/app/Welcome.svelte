@@ -1,15 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { get } from 'svelte/store'
-  import { ask } from '@tauri-apps/plugin-dialog'
   import { tabStore } from '../editor/tabs'
-  import { recentStore, type RecentFile } from '../project/recent'
   import {
     recentWorkspacesStore,
     type RecentWorkspace,
   } from '../project/recentWorkspaces'
-  import { explorerStore } from '../project/explorerStore'
-  import { i18n, t } from '../i18n'
+  import { i18n } from '../i18n'
   import FileNew from '../icons/FileNew.svelte'
   import File from '../icons/File.svelte'
   import Folder from '../icons/Folder.svelte'
@@ -21,7 +17,6 @@
   const PASCAL_TEMPLATE = `program Untitled;\n\nbegin\n\nend.\n`
 
   onMount(() => {
-    recentStore.validate()
     recentWorkspacesStore.validate()
   })
 
@@ -38,7 +33,6 @@
         const [filePath, content] = result
         const tab = await tabStore.openFile(filePath, content)
         tabStore.activate(tab.id)
-        recentStore.add(filePath, get(explorerStore).folder?.path ?? null)
       }
     } catch (e) {
       console.error('open_file failed:', e)
@@ -51,52 +45,15 @@
     await emit('menu-open-folder')
   }
 
-  // Opening a recent file whose workspacePath differs from the currently
-  // open folder is a disruptive context switch when there's unsaved work
-  // in progress (even though swapping explorerStore.folder itself doesn't
-  // touch any open tab) - confirm before doing it, same pattern tabStore.
-  // close() already uses for unsaved-changes prompts.
-  async function openRecent(entry: RecentFile) {
-    if (!isTauriAvailable()) return
-
-    const currentWorkspace = get(explorerStore).folder?.path ?? null
-    const targetWorkspace = entry.workspacePath ?? null
-
-    if (targetWorkspace && targetWorkspace !== currentWorkspace) {
-      const hasDirtyTabs = get(tabStore).tabs.some((tab) => tab.isDirty)
-      if (hasDirtyTabs) {
-        const confirmed = await ask(t('workspace.switch_confirm'), {
-          title: 'Pascoal',
-          kind: 'warning',
-        })
-        if (!confirmed) return
-      }
-
-      const opened = await explorerStore.openFolderAtPath(targetWorkspace)
-      if (!opened) {
-        recentStore.remove(entry.filePath)
-        return
-      }
-    }
-
-    try {
-      const content = await invoke<string>('read_file', {
-        path: entry.filePath,
-      })
-      const tab = await tabStore.openFile(entry.filePath, content)
-      tabStore.activate(tab.id)
-      recentStore.add(entry.filePath, get(explorerStore).folder?.path ?? null)
-    } catch {
-      recentStore.remove(entry.filePath)
-    }
-  }
-
+  // Routed through the same menu-open-recent-workspace event the File
+  // menu uses (handled in App.svelte) instead of calling explorerStore
+  // directly - that listener already switches activePanel to 'explorer'
+  // on success, which is what makes opening a workspace from here visibly
+  // show the folder, not just update state silently in the background.
   async function openRecentWorkspace(entry: RecentWorkspace) {
     if (!isTauriAvailable()) return
-    const opened = await explorerStore.openFolderAtPath(entry.path)
-    if (!opened) {
-      recentWorkspacesStore.remove(entry.path)
-    }
+    const { emit } = await import('@tauri-apps/api/event')
+    await emit('menu-open-recent-workspace', entry.path)
   }
 
   function formatDate(ts: number): string {
@@ -164,36 +121,6 @@
   </div>
 
   <div class="welcome-section">
-    <h2>{$i18n('welcome.section_recent')}</h2>
-    {#if $recentStore.length === 0}
-      <p class="empty">{$i18n('welcome.no_recent')}</p>
-    {:else}
-      {#each $recentStore as entry (entry.filePath)}
-        <div class="recent-entry">
-          <button
-            class="welcome-action recent-action"
-            title={entry.filePath}
-            on:click={() => openRecent(entry)}
-            aria-label={$i18n('welcome.open_recent')}
-          >
-            <File size={16} />
-            <span class="recent-name">{entry.fileName}</span>
-            <span class="recent-date">{formatDate(entry.openedAt)}</span>
-          </button>
-          <button
-            class="recent-remove"
-            title={$i18n('welcome.remove_recent')}
-            aria-label={$i18n('welcome.remove_recent')}
-            on:click={() => recentStore.remove(entry.filePath)}
-          >
-            <X size={10} />
-          </button>
-        </div>
-      {/each}
-    {/if}
-  </div>
-
-  <div class="welcome-section">
     <h2>{$i18n('workspace.section_recent_workspaces')}</h2>
     {#if $recentWorkspacesStore.length === 0}
       <p class="empty">{$i18n('workspace.no_recent_workspaces')}</p>
@@ -207,7 +134,10 @@
             aria-label={$i18n('workspace.open_recent')}
           >
             <Folder size={16} />
-            <span class="recent-name">{entry.name}</span>
+            <span class="recent-info">
+              <span class="recent-name">{entry.name}</span>
+              <span class="recent-path">{entry.path}</span>
+            </span>
             <span class="recent-date">{formatDate(entry.openedAt)}</span>
           </button>
           <button
@@ -306,8 +236,23 @@
     min-width: 0;
   }
 
-  .recent-name {
+  .recent-info {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .recent-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .recent-path {
+    font-size: 11px;
+    color: var(--text-dim);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

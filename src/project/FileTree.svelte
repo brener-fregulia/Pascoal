@@ -1,7 +1,6 @@
 <script lang="ts">
   import { explorerStore, type ExplorerNode } from './explorerStore'
   import { tabStore } from '../editor/tabs'
-  import { recentStore } from './recent'
   import { i18n } from '../i18n'
   import FileTreeNode from './FileTreeNode.svelte'
   import Folder from '../icons/Folder.svelte'
@@ -33,7 +32,6 @@
       })
       const tab = await tabStore.openFile(node.path, content)
       tabStore.activate(tab.id)
-      recentStore.add(node.path, folder?.path ?? null)
     } catch (e) {
       console.error('read_file failed:', e)
     }
