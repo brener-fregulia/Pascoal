@@ -309,3 +309,218 @@ describe('FileTree selection and context menu', () => {
         expect(queryByText('Open')).not.toBeInTheDocument()
     })
 })
+
+describe('FileTree create file and folder', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('creates at the workspace root when nothing is selected and the toolbar "New File" button is clicked', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/new.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByTitle, container } = render(FileTree)
+
+        await fireEvent.click(getByTitle('New File'))
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+
+        await fireEvent.input(input, { target: { value: 'new.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('create_file', {
+                parentPath: '/tmp/MyProject',
+                name: 'new.pas',
+            })
+        })
+    })
+
+    it('creates inside the selected folder, expanding it, when the toolbar "New File" button is clicked', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/src/new.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, getByTitle, container } = render(FileTree)
+
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        // Selecting via the context menu (rather than a plain click) leaves
+        // the folder collapsed, so this also exercises the "expand it if
+        // collapsed" behavior of the toolbar action below.
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        expect(folderRow.querySelector('.chevron')?.textContent).toBe('▸')
+
+        await fireEvent.click(getByTitle('New File'))
+
+        expect(folderRow.querySelector('.chevron')?.textContent).toBe('▾')
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+
+        await fireEvent.input(input, { target: { value: 'new.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('create_file', {
+                parentPath: '/tmp/MyProject/src',
+                name: 'new.pas',
+            })
+        })
+    })
+
+    it('creates at the workspace root, not at the selected file’s own folder, when a file is selected', async () => {
+        mockExplorerState.folder = { name: 'MyProject', path: '/tmp/MyProject' }
+        mockExplorerState.tree = [
+            {
+                name: 'main.pas',
+                path: '/tmp/MyProject/main.pas',
+                relativePath: 'main.pas',
+                isDirectory: false,
+                children: null,
+            },
+            {
+                name: 'src',
+                path: '/tmp/MyProject/src',
+                relativePath: 'src',
+                isDirectory: true,
+                children: [
+                    {
+                        name: 'inner.pas',
+                        path: '/tmp/MyProject/src/inner.pas',
+                        relativePath: 'src/inner.pas',
+                        isDirectory: false,
+                        children: null,
+                    },
+                ],
+            },
+        ]
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/root.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, getByTitle, container } = render(FileTree)
+
+        await fireEvent.click(getByText('src')) // expands and selects the folder
+        await fireEvent.click(getByText('inner.pas')) // selects the nested file
+
+        await fireEvent.click(getByTitle('New File'))
+
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+        await fireEvent.input(input, { target: { value: 'root.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('create_file', {
+                parentPath: '/tmp/MyProject',
+                name: 'root.pas',
+            })
+        })
+    })
+
+    it('clears the input, refreshes the tree, and opens the created file on success', async () => {
+        setupTree()
+        const mockInvoke = vi.fn((cmd: string) => {
+            if (cmd === 'create_file') return Promise.resolve('/tmp/MyProject/new.pas')
+            if (cmd === 'read_file') return Promise.resolve('program New;')
+            return Promise.resolve(undefined)
+        })
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByTitle, container } = render(FileTree)
+
+        await fireEvent.click(getByTitle('New File'))
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'new.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(container.querySelector('.new-entry-input')).not.toBeInTheDocument()
+        })
+        expect(mockRefresh).toHaveBeenCalled()
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('read_file', {
+                path: '/tmp/MyProject/new.pas',
+            })
+            expect(mockTabStoreOpenFile).toHaveBeenCalledWith(
+                '/tmp/MyProject/new.pas',
+                'program New;',
+            )
+            expect(mockTabStoreActivate).toHaveBeenCalledWith('tab-1')
+        })
+    })
+
+    it('keeps the input open and shows the error message when the name conflicts with an existing entry', async () => {
+        setupTree()
+        const mockInvoke = vi
+            .fn()
+            .mockRejectedValue(new Error('A file or folder with this name already exists'))
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByTitle, getByText, container } = render(FileTree)
+
+        await fireEvent.click(getByTitle('New File'))
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'main.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(
+                getByText('A file or folder with this name already exists'),
+            ).toBeInTheDocument()
+        })
+        expect(container.querySelector('.new-entry-input')).toBeInTheDocument()
+    })
+
+    it('cancels without calling the backend when Escape is pressed', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByTitle, container } = render(FileTree)
+
+        await fireEvent.click(getByTitle('New File'))
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'new.pas' } })
+        await fireEvent.keyDown(input, { key: 'Escape' })
+
+        expect(container.querySelector('.new-entry-input')).not.toBeInTheDocument()
+        expect(mockInvoke).not.toHaveBeenCalledWith('create_file', expect.anything())
+    })
+
+    // Regression test for a real bug caught by this exact test while it was
+    // being written: NewEntryRow's `parentPath` prop was originally bound to
+    // `pendingCreate.parentPath` (a live reference to the *shared* state) in
+    // FileTree.svelte/FileTreeNode.svelte, instead of the row's own stable
+    // `node.path`/`folder.path`. That made a stale blur from a replaced
+    // request clobber the request that replaced it, since the shared
+    // parentPath had already moved on to the new target by the time the old
+    // row's blur fired. Fixed by passing `node.path`/`folder.path` instead -
+    // see the comment on NewEntryRow's handleBlur for the full explanation.
+    it('keeps a newer pending create request alive when a stale blur from the request it replaced fires', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+
+        // Start a pending create for the "src" folder via its context menu.
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.click(getByText('New File'))
+        const staleInput = container.querySelector('.new-entry-input') as HTMLInputElement
+        expect(staleInput).toBeInTheDocument()
+
+        // A new create request for the workspace root replaces the pending
+        // one for "src" - this is the request that must survive below.
+        await fireEvent.contextMenu(container.querySelector('.tree-body') as HTMLElement)
+        await fireEvent.click(getByText('New File'))
+        const freshInput = container.querySelector('.new-entry-input') as HTMLInputElement
+        expect(freshInput).toBeInTheDocument()
+        expect(freshInput).not.toBe(staleInput)
+
+        // A stale blur from the now-detached "src" row (e.g. fired as a
+        // side effect of it being unmounted) must not clear the request
+        // that already replaced it.
+        await fireEvent.blur(staleInput)
+
+        expect(container.querySelector('.new-entry-input')).toBe(freshInput)
+        expect(mockInvoke).not.toHaveBeenCalledWith('create_file', expect.anything())
+    })
+})

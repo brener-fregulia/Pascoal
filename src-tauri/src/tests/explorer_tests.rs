@@ -1,4 +1,4 @@
-use crate::project::files::{list_folder_tree, open_workspace_at_path};
+use crate::project::files::{create_directory, create_file, list_folder_tree, open_workspace_at_path};
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -139,4 +139,87 @@ fn open_workspace_at_path_fails_when_path_is_a_file() {
     let result = open_workspace_at_path(&file_path.to_string_lossy());
 
     assert!(result.is_err());
+}
+
+#[test]
+fn create_file_writes_an_empty_file_to_disk() {
+    let dir = tmp_dir("create_file_success");
+    let target = dir.join("new.pas");
+
+    let result = create_file(&target);
+
+    assert!(result.is_ok());
+    assert!(target.is_file());
+    assert_eq!(fs::read_to_string(&target).unwrap(), "");
+}
+
+#[test]
+fn create_directory_creates_a_new_folder() {
+    let dir = tmp_dir("create_directory_success");
+    let target = dir.join("new_folder");
+
+    let result = create_directory(&target);
+
+    assert!(result.is_ok());
+    assert!(target.is_dir());
+}
+
+#[test]
+fn create_file_fails_with_conflict_message_when_a_file_already_exists() {
+    let dir = tmp_dir("create_file_conflict_file");
+    let target = dir.join("existing.pas");
+    fs::write(&target, "original content").unwrap();
+
+    let result = create_file(&target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+    // The existing file must not have been truncated.
+    assert_eq!(fs::read_to_string(&target).unwrap(), "original content");
+}
+
+#[test]
+fn create_directory_fails_with_conflict_message_when_a_directory_already_exists() {
+    let dir = tmp_dir("create_directory_conflict_dir");
+    let target = dir.join("existing_folder");
+    fs::create_dir(&target).unwrap();
+
+    let result = create_directory(&target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+}
+
+#[test]
+fn create_file_fails_with_conflict_message_when_a_directory_with_the_same_name_exists() {
+    let dir = tmp_dir("create_file_conflict_dir");
+    let target = dir.join("same_name");
+    fs::create_dir(&target).unwrap();
+
+    let result = create_file(&target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+    assert!(target.is_dir());
+}
+
+#[test]
+fn create_directory_fails_with_conflict_message_when_a_file_with_the_same_name_exists() {
+    let dir = tmp_dir("create_directory_conflict_file");
+    let target = dir.join("same_name");
+    fs::write(&target, "content").unwrap();
+
+    let result = create_directory(&target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+    assert!(target.is_file());
 }
