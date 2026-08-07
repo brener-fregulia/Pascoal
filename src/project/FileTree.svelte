@@ -248,10 +248,11 @@
         <p class="status-msg error">{error}</p>
       {:else}
         {#if pendingCreate && pendingCreate.parentPath === folder.path}
+          <!-- parentPath={folder.path}, not {pendingCreate.parentPath} - see the comment in NewEntryRow.svelte's handleBlur -->
           <NewEntryRow
             depth={0}
             isDirectory={pendingCreate.isDirectory}
-            parentPath={pendingCreate.parentPath}
+            parentPath={folder.path}
             error={pendingCreate.error}
             onConfirm={confirmCreate}
             onCancel={cancelCreate}

@@ -59,10 +59,11 @@
 
   {#if isExpanded && node.children}
     {#if pendingCreate?.parentPath === node.path}
+      <!-- parentPath={node.path}, not {pendingCreate.parentPath} - see the comment in NewEntryRow.svelte's handleBlur -->
       <NewEntryRow
         depth={depth + 1}
         isDirectory={pendingCreate.isDirectory}
-        parentPath={pendingCreate.parentPath}
+        parentPath={node.path}
         error={pendingCreate.error}
         onConfirm={onCreateConfirm}
         onCancel={onCreateCancel}

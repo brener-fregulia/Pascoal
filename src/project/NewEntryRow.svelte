@@ -26,15 +26,19 @@
     inputEl?.focus()
   })
 
-  // `onCancel` reports which pendingCreate this row belongs to (`parentPath`
-  // is this component's own prop, frozen relative to this instance - not a
-  // live read of the parent's current state). Blur fires as a side effect of
-  // this row being unmounted when a *different* create request replaces this
-  // one (e.g. clicking "New File" on the toolbar while this row, for another
-  // folder, is still open and focused) - without this, that stale blur would
-  // cancel the *new* pendingCreate instead of being a harmless no-op, since
-  // the parent only clears its state when the reported parentPath still
-  // matches what's currently pending.
+  // `onCancel` reports which pendingCreate this row belongs to, via
+  // `parentPath`. The parent MUST pass this component's own stable node/root
+  // path here (see the call sites in FileTree.svelte/FileTreeNode.svelte) -
+  // never `pendingCreate.parentPath` itself. That field is a reactive read
+  // of the *shared* parent state, so it changes to reflect a newer request
+  // even for a row that's mid-unmount because that newer request replaced
+  // it; passing it here would make this guard always match and defeat the
+  // point of the check. Blur fires as a side effect of this row being
+  // unmounted when a *different* create request replaces this one (e.g.
+  // clicking "New File" on the toolbar while this row, for another folder,
+  // is still open and focused) - the parent only clears its state when the
+  // reported parentPath still matches what's currently pending, so a stale
+  // blur becomes a harmless no-op instead of clobbering the new request.
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
       const trimmed = name.trim()
