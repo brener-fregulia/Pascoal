@@ -116,6 +116,8 @@ pub fn run() {
             commands::git_commands::git_fetch,
             commands::git_commands::git_ahead_behind,
             commands::project_commands::delete_file,
+            commands::project_commands::create_file,
+            commands::project_commands::create_directory,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
             commands::installer_commands::detect_installer,

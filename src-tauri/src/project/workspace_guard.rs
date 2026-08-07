@@ -1,9 +1,8 @@
 use std::path::{Path, PathBuf};
 
-// Neither entry point is called anywhere yet in this pass - `open_workspace`
-// establishes the workspace root itself, so there is nothing to authorize a
-// picked folder against. The future explorer CRUD stage is what will call
-// these against an already-registered `WorkspaceState` root.
+// `authorize_new` is used by the create-file/create-directory commands in
+// `application::manage_workspace`. Its sibling `authorize_existing` is still
+// unused - it's reserved for the future rename/delete explorer CRUD stage.
 
 /// Characters rejected in a new leaf name, regardless of platform. Windows
 /// reserves all of these; we reject them everywhere rather than branching
@@ -37,7 +36,6 @@ pub fn authorize_existing(root: &Path, candidate: &Path) -> Result<PathBuf, Stri
 /// rename/copy/move destination). `parent` must already exist - it's the
 /// directory the new entry will live in. `new_name` must be a single safe
 /// leaf name; it cannot contain path separators or otherwise escape `parent`.
-#[allow(dead_code)]
 pub fn authorize_new(root: &Path, parent: &Path, new_name: &str) -> Result<PathBuf, String> {
     // dunce::canonicalize - see the note in authorize_existing above.
     let root_canonical = dunce::canonicalize(root)

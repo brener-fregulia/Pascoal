@@ -4,15 +4,23 @@
   import { i18n } from '../i18n'
   import { appStore } from '../app/app'
   import FileTreeNode from './FileTreeNode.svelte'
+  import NewEntryRow from './NewEntryRow.svelte'
   import Folder from '../icons/Folder.svelte'
+  import FileNew from '../icons/FileNew.svelte'
+  import FolderNew from '../icons/FolderNew.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
   let expandedPaths = $state(new Set<string>())
   let selectedPath = $state<string | null>(null)
-  let contextMenu = $state<{
-    node: ExplorerNode
-    x: number
-    y: number
+  let menu = $state<
+    | { kind: 'node'; node: ExplorerNode; x: number; y: number }
+    | { kind: 'empty'; x: number; y: number }
+    | null
+  >(null)
+  let pendingCreate = $state<{
+    parentPath: string
+    isDirectory: boolean
+    error: string | null
   } | null>(null)
 
   let folder = $derived($explorerStore.folder)
@@ -41,36 +49,43 @@
     expandedPaths = next
   }
 
-  async function openFile(node: ExplorerNode) {
-    selectedPath = node.path
+  async function openFilePath(path: string) {
+    selectedPath = path
     if (!isTauriAvailable()) return
     try {
-      const content = await invoke<string>('read_file', {
-        path: node.path,
-      })
-      const tab = await tabStore.openFile(node.path, content)
+      const content = await invoke<string>('read_file', { path })
+      const tab = await tabStore.openFile(path, content)
       tabStore.activate(tab.id)
     } catch (e) {
       console.error('read_file failed:', e)
     }
   }
 
-  function handleContextMenu(node: ExplorerNode, x: number, y: number) {
-    selectedPath = node.path
-    contextMenu = { node, x, y }
+  async function openFile(node: ExplorerNode) {
+    await openFilePath(node.path)
   }
 
-  function closeContextMenu() {
-    contextMenu = null
+  function handleContextMenu(node: ExplorerNode, x: number, y: number) {
+    selectedPath = node.path
+    menu = { kind: 'node', node, x, y }
+  }
+
+  function handleEmptyContextMenu(e: MouseEvent) {
+    e.preventDefault()
+    menu = { kind: 'empty', x: e.clientX, y: e.clientY }
+  }
+
+  function closeMenu() {
+    menu = null
   }
 
   function menuOpen(node: ExplorerNode) {
-    closeContextMenu()
+    closeMenu()
     openFile(node)
   }
 
   async function menuReveal(node: ExplorerNode) {
-    closeContextMenu()
+    closeMenu()
     if (!isTauriAvailable()) return
     try {
       await invoke('reveal_in_file_manager', { path: node.path })
@@ -80,17 +95,87 @@
   }
 
   function menuCopyPath(node: ExplorerNode) {
-    closeContextMenu()
+    closeMenu()
     navigator.clipboard.writeText(node.path)
   }
 
   function menuCopyRelativePath(node: ExplorerNode) {
-    closeContextMenu()
+    closeMenu()
     navigator.clipboard.writeText(node.relativePath)
   }
 
+  function expandFolder(path: string) {
+    if (expandedPaths.has(path)) return
+    const next = new Set(expandedPaths)
+    next.add(path)
+    expandedPaths = next
+  }
+
+  function startCreate(parentPath: string, isDirectory: boolean) {
+    pendingCreate = { parentPath, isDirectory, error: null }
+  }
+
+  // Only clears state if `pendingCreate` is still the one this cancel call
+  // came from - see the comment in NewEntryRow.svelte's handleBlur for why
+  // this guard matters (a stale unmount-triggered blur from a replaced
+  // create request must not clobber the request that replaced it).
+  function cancelCreate(parentPath: string) {
+    if (pendingCreate?.parentPath === parentPath) pendingCreate = null
+  }
+
+  async function confirmCreate(name: string) {
+    if (!pendingCreate) return
+    const { parentPath, isDirectory } = pendingCreate
+    if (!isTauriAvailable()) return
+    try {
+      const path = await invoke<string>(
+        isDirectory ? 'create_directory' : 'create_file',
+        { parentPath, name },
+      )
+      pendingCreate = null
+      await explorerStore.refresh()
+      selectedPath = path
+      if (!isDirectory) {
+        await openFilePath(path)
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      pendingCreate = { parentPath, isDirectory, error: msg }
+    }
+  }
+
+  function menuNewFile(node: ExplorerNode) {
+    closeMenu()
+    expandFolder(node.path)
+    startCreate(node.path, false)
+  }
+
+  function menuNewFolder(node: ExplorerNode) {
+    closeMenu()
+    expandFolder(node.path)
+    startCreate(node.path, true)
+  }
+
+  function menuNewFileRoot() {
+    closeMenu()
+    if (folder) startCreate(folder.path, false)
+  }
+
+  function menuNewFolderRoot() {
+    closeMenu()
+    if (folder) startCreate(folder.path, true)
+  }
+
+  function toolbarNewFile() {
+    if (folder) startCreate(folder.path, false)
+  }
+
+  function toolbarNewFolder() {
+    if (folder) startCreate(folder.path, true)
+  }
+
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') closeContextMenu()
+    if (e.key === 'Escape') closeMenu()
   }
 </script>
 
@@ -110,6 +195,20 @@
       <span class="folder-name" title={folder.path}>{folder.name}</span>
       <button
         class="icon-action"
+        title={$i18n('explorer.new_file')}
+        onclick={toolbarNewFile}
+      >
+        <FileNew size={14} />
+      </button>
+      <button
+        class="icon-action"
+        title={$i18n('explorer.new_folder')}
+        onclick={toolbarNewFolder}
+      >
+        <FolderNew size={14} />
+      </button>
+      <button
+        class="icon-action"
         title={$i18n('explorer.refresh')}
         onclick={() => explorerStore.refresh()}
       >
@@ -124,39 +223,63 @@
       </button>
     </div>
 
-    {#if loading}
-      <p class="status-msg">{$i18n('explorer.loading')}</p>
-    {:else if error}
-      <p class="status-msg error">{error}</p>
-    {:else if tree.length === 0}
-      <p class="status-msg">{$i18n('explorer.no_files')}</p>
-    {:else}
-      <div class="tree-body">
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="tree-body" oncontextmenu={handleEmptyContextMenu}>
+      {#if loading}
+        <p class="status-msg">{$i18n('explorer.loading')}</p>
+      {:else if error}
+        <p class="status-msg error">{error}</p>
+      {:else}
+        {#if pendingCreate && pendingCreate.parentPath === folder.path}
+          <NewEntryRow
+            depth={0}
+            isDirectory={pendingCreate.isDirectory}
+            parentPath={pendingCreate.parentPath}
+            error={pendingCreate.error}
+            onConfirm={confirmCreate}
+            onCancel={cancelCreate}
+          />
+        {/if}
+        {#if tree.length === 0 && !(pendingCreate && pendingCreate.parentPath === folder.path)}
+          <p class="status-msg">{$i18n('explorer.no_files')}</p>
+        {/if}
         {#each tree as node (node.path)}
           <FileTreeNode
             {node}
             depth={0}
             {expandedPaths}
             {selectedPath}
+            {pendingCreate}
             onToggle={toggle}
             onFileClick={openFile}
             onContextMenu={handleContextMenu}
+            onCreateConfirm={confirmCreate}
+            onCreateCancel={cancelCreate}
           />
         {/each}
-      </div>
-    {/if}
+      {/if}
+    </div>
   {/if}
 </div>
 
-{#if contextMenu}
-  {@const menuNode = contextMenu.node}
+{#if menu?.kind === 'node'}
+  {@const menuNode = menu.node}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div class="menu-backdrop" onclick={closeContextMenu}></div>
+  <div class="menu-backdrop" onclick={closeMenu}></div>
   <div
     class="menu-dropdown context-menu"
-    style="left: {contextMenu.x}px; top: {contextMenu.y}px"
+    style="left: {menu.x}px; top: {menu.y}px"
   >
+    {#if menuNode.isDirectory}
+      <button class="menu-item" onclick={() => menuNewFile(menuNode)}>
+        {$i18n('explorer.new_file')}
+      </button>
+      <button class="menu-item" onclick={() => menuNewFolder(menuNode)}>
+        {$i18n('explorer.new_folder')}
+      </button>
+      <hr class="menu-sep" />
+    {/if}
     {#if !menuNode.isDirectory}
       <button class="menu-item" onclick={() => menuOpen(menuNode)}>
         {$i18n('explorer.open')}
@@ -172,6 +295,21 @@
     </button>
     <button class="menu-item" onclick={() => menuCopyRelativePath(menuNode)}>
       {$i18n('explorer.copy_relative_path')}
+    </button>
+  </div>
+{:else if menu?.kind === 'empty'}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div class="menu-backdrop" onclick={closeMenu}></div>
+  <div
+    class="menu-dropdown context-menu"
+    style="left: {menu.x}px; top: {menu.y}px"
+  >
+    <button class="menu-item" onclick={menuNewFileRoot}>
+      {$i18n('explorer.new_file')}
+    </button>
+    <button class="menu-item" onclick={menuNewFolderRoot}>
+      {$i18n('explorer.new_folder')}
     </button>
   </div>
 {/if}
@@ -246,6 +384,9 @@
   }
 
   .icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     color: var(--text-dim);

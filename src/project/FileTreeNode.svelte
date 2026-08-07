@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ExplorerNode } from './explorerStore'
   import FileTreeNode from './FileTreeNode.svelte'
+  import NewEntryRow from './NewEntryRow.svelte'
   import File from '../icons/File.svelte'
   import Folder from '../icons/Folder.svelte'
 
@@ -9,17 +10,27 @@
     depth,
     expandedPaths,
     selectedPath = null,
+    pendingCreate = null,
     onToggle,
     onFileClick,
     onContextMenu = () => {},
+    onCreateConfirm = () => {},
+    onCreateCancel = () => {},
   }: {
     node: ExplorerNode
     depth: number
     expandedPaths: Set<string>
     selectedPath?: string | null
+    pendingCreate?: {
+      parentPath: string
+      isDirectory: boolean
+      error: string | null
+    } | null
     onToggle: (path: string) => void
     onFileClick: (node: ExplorerNode) => void
     onContextMenu?: (node: ExplorerNode, x: number, y: number) => void
+    onCreateConfirm?: (name: string) => void
+    onCreateCancel?: (parentPath: string) => void
   } = $props()
 
   let isExpanded = $derived(expandedPaths.has(node.path))
@@ -27,6 +38,7 @@
 
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault()
+    e.stopPropagation()
     onContextMenu(node, e.clientX, e.clientY)
   }
 </script>
@@ -46,15 +58,28 @@
   </button>
 
   {#if isExpanded && node.children}
+    {#if pendingCreate?.parentPath === node.path}
+      <NewEntryRow
+        depth={depth + 1}
+        isDirectory={pendingCreate.isDirectory}
+        parentPath={pendingCreate.parentPath}
+        error={pendingCreate.error}
+        onConfirm={onCreateConfirm}
+        onCancel={onCreateCancel}
+      />
+    {/if}
     {#each node.children as child (child.path)}
       <FileTreeNode
         node={child}
         depth={depth + 1}
         {expandedPaths}
         {selectedPath}
+        {pendingCreate}
         {onToggle}
         {onFileClick}
         {onContextMenu}
+        {onCreateConfirm}
+        {onCreateCancel}
       />
     {/each}
   {/if}

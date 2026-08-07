@@ -73,3 +73,21 @@ pub fn search_in_folder(
 pub fn delete_file(path: String) -> Result<(), String> {
     manage_files::delete_file(path)
 }
+
+#[tauri::command]
+pub fn create_file(
+    app: tauri::AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<String, String> {
+    manage_workspace::create_file(app, parent_path, name)
+}
+
+#[tauri::command]
+pub fn create_directory(
+    app: tauri::AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<String, String> {
+    manage_workspace::create_directory(app, parent_path, name)
+}

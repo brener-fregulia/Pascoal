@@ -2,6 +2,7 @@ use tauri::{AppHandle, Manager};
 
 use crate::project::files::{self, ExplorerNode, OpenFolderResult};
 use crate::project::search::{self, SearchMatch};
+use crate::project::workspace_guard;
 use crate::state::WorkspaceState;
 
 pub async fn open_workspace(app: AppHandle) -> Option<OpenFolderResult> {
@@ -32,4 +33,32 @@ pub fn search_in_folder(
     case_sensitive: bool,
 ) -> Vec<SearchMatch> {
     search::search_in_folder(&folder_path, &query, case_sensitive)
+}
+
+/// Resolves the currently open workspace root, or an error if none is open.
+fn current_root(app: &AppHandle) -> Result<std::path::PathBuf, String> {
+    app.state::<WorkspaceState>()
+        .root
+        .lock()
+        .unwrap()
+        .clone()
+        .ok_or_else(|| "No workspace is open".to_string())
+}
+
+pub fn create_file(app: AppHandle, parent_path: String, name: String) -> Result<String, String> {
+    let root = current_root(&app)?;
+    let target = workspace_guard::authorize_new(&root, std::path::Path::new(&parent_path), &name)?;
+    files::create_file(&target)?;
+    Ok(target.to_string_lossy().to_string())
+}
+
+pub fn create_directory(
+    app: AppHandle,
+    parent_path: String,
+    name: String,
+) -> Result<String, String> {
+    let root = current_root(&app)?;
+    let target = workspace_guard::authorize_new(&root, std::path::Path::new(&parent_path), &name)?;
+    files::create_directory(&target)?;
+    Ok(target.to_string_lossy().to_string())
 }

@@ -237,3 +237,24 @@ pub fn list_folder_tree(folder_path: &str) -> Vec<ExplorerNode> {
 pub fn delete_file(path: &str) -> Result<(), String> {
     std::fs::remove_file(path).map_err(|e| e.to_string())
 }
+
+/// Creates a new empty file at `target`. Fails explicitly if something
+/// already exists there rather than silently overwriting it - unlike a bare
+/// `std::fs::write`, which would truncate an existing file with the same name.
+pub fn create_file(target: &std::path::Path) -> Result<(), String> {
+    if target.exists() {
+        return Err("A file or folder with this name already exists".to_string());
+    }
+    std::fs::write(target, "").map_err(|e| e.to_string())
+}
+
+/// Creates a new empty directory at `target`. `std::fs::create_dir` already
+/// fails on its own if the directory exists, but the explicit check keeps
+/// the error message identical to `create_file`'s, which the frontend relies
+/// on to detect a name conflict.
+pub fn create_directory(target: &std::path::Path) -> Result<(), String> {
+    if target.exists() {
+        return Err("A file or folder with this name already exists".to_string());
+    }
+    std::fs::create_dir(target).map_err(|e| e.to_string())
+}

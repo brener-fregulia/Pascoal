@@ -11,6 +11,10 @@
     "reveal_macos": "Reveal in Finder",
     "reveal_linux": "Open Containing Folder",
     "copy_path": "Copy Path",
-    "copy_relative_path": "Copy Relative Path"
+    "copy_relative_path": "Copy Relative Path",
+    "new_file": "New File",
+    "new_folder": "New Folder",
+    "new_file_placeholder": "File name",
+    "new_folder_placeholder": "Folder name"
   }
 }

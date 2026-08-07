@@ -11,6 +11,10 @@
     "reveal_macos": "Mostrar en Finder",
     "reveal_linux": "Abrir la carpeta contenedora",
     "copy_path": "Copiar ruta",
-    "copy_relative_path": "Copiar ruta relativa"
+    "copy_relative_path": "Copiar ruta relativa",
+    "new_file": "Nuevo archivo",
+    "new_folder": "Nueva carpeta",
+    "new_file_placeholder": "Nombre del archivo",
+    "new_folder_placeholder": "Nombre de la carpeta"
   }
 }

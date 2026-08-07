@@ -11,6 +11,10 @@
     "reveal_macos": "Pokaż w Finderze",
     "reveal_linux": "Otwórz folder zawierający",
     "copy_path": "Kopiuj ścieżkę",
-    "copy_relative_path": "Kopiuj ścieżkę względną"
+    "copy_relative_path": "Kopiuj ścieżkę względną",
+    "new_file": "Nowy plik",
+    "new_folder": "Nowy folder",
+    "new_file_placeholder": "Nazwa pliku",
+    "new_folder_placeholder": "Nazwa folderu"
   }
 }
