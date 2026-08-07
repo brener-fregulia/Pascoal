@@ -5,6 +5,12 @@
     "refresh": "Actualizar",
     "close_folder": "Cerrar carpeta",
     "loading": "Cargando...",
-    "no_files": "Esta carpeta está vacía."
+    "no_files": "Esta carpeta está vacía.",
+    "open": "Abrir",
+    "reveal_windows": "Mostrar en el explorador de archivos",
+    "reveal_macos": "Mostrar en Finder",
+    "reveal_linux": "Abrir la carpeta contenedora",
+    "copy_path": "Copiar ruta",
+    "copy_relative_path": "Copiar ruta relativa"
   }
 }

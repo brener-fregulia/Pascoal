@@ -5,6 +5,12 @@
     "refresh": "Refresh",
     "close_folder": "Close folder",
     "loading": "Loading...",
-    "no_files": "This folder is empty."
+    "no_files": "This folder is empty.",
+    "open": "Open",
+    "reveal_windows": "Reveal in File Explorer",
+    "reveal_macos": "Reveal in Finder",
+    "reveal_linux": "Open Containing Folder",
+    "copy_path": "Copy Path",
+    "copy_relative_path": "Copy Relative Path"
   }
 }

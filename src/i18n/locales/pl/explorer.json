@@ -5,6 +5,12 @@
     "refresh": "Odśwież",
     "close_folder": "Zamknij folder",
     "loading": "Ładowanie...",
-    "no_files": "Ten folder jest pusty."
+    "no_files": "Ten folder jest pusty.",
+    "open": "Otwórz",
+    "reveal_windows": "Pokaż w Eksploratorze plików",
+    "reveal_macos": "Pokaż w Finderze",
+    "reveal_linux": "Otwórz folder zawierający",
+    "copy_path": "Kopiuj ścieżkę",
+    "copy_relative_path": "Kopiuj ścieżkę względną"
   }
 }

@@ -5,6 +5,12 @@
     "refresh": "Atualizar",
     "close_folder": "Fechar pasta",
     "loading": "Carregando...",
-    "no_files": "Esta pasta está vazia."
+    "no_files": "Esta pasta está vazia.",
+    "open": "Abrir",
+    "reveal_windows": "Revelar no Explorador de Arquivos",
+    "reveal_macos": "Revelar no Finder",
+    "reveal_linux": "Abrir Pasta que Contém o Arquivo",
+    "copy_path": "Copiar Caminho",
+    "copy_relative_path": "Copiar Caminho Relativo"
   }
 }
