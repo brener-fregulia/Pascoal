@@ -1,5 +1,5 @@
 ---
-name: Review changes
+name: review-changes
 description: Perform a read-only review of Pascoal changes against the task, architecture, tests, supported platforms, and scope.
 argument-hint: "[diff, commit range, files, or task]"
 disable-model-invocation: true

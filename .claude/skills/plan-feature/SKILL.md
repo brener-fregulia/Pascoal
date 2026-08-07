@@ -1,5 +1,5 @@
 ---
-name: Plan feature
+name: plan-feature
 description: Produce a repository-specific, read-only plan for a Pascoal feature, fix, refactor, or investigation before implementation.
 argument-hint: "[task, issue, or objective]"
 disable-model-invocation: true

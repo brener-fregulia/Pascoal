@@ -23,7 +23,11 @@ Do not invent files, APIs, behavior, requirements, commands, conventions, or val
 
 Keep changes limited to the requested outcome and directly necessary supporting work.
 
-A task may include related implementation, tests, and documentation when they are needed to deliver the requested behavior. Keep independently reviewable stages separate when practical, and do not expand into unrelated cleanup, refactoring, formatting, translations, dependencies, versions, changelog entries, or release work.
+Scope each implementation pass to a single responsibility. When a request bundles more than one independently reviewable capability, break it into separate sub-items before implementing, and implement and report them one at a time unless the user explicitly asks for all of them in one pass. Prefer several small, single-responsibility commits over one large one — this keeps regressions small and easy to isolate and validate.
+
+Tests are a separate follow-up by default. Implement the requested behavior, let the user manually validate it, then add tests afterward as their own stage and commit — do not bundle tests into the same implementation pass or commit unless the user explicitly asks for both together, or the task is itself a regression test for an already-diagnosed bug.
+
+Do not expand into unrelated cleanup, refactoring, formatting, translations, dependencies, versions, changelog entries, or release work.
 
 Preserve existing architecture, naming, and behavior unless the task requires a change. Report useful out-of-scope improvements separately.
 

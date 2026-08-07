@@ -1,5 +1,5 @@
 ---
-name: Update documentation
+name: update-documentation
 description: Update only the Pascoal documentation required by confirmed code or process changes.
 argument-hint: "[change, diff, files, or documentation objective]"
 disable-model-invocation: true

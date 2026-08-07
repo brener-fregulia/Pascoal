@@ -13,6 +13,8 @@ Mandatory safety, scope, and Git rules are in `AGENTS.md`. Test procedures are i
 - The repository is the permanent source of context.
 - A task may include several directly necessary stages.
 - Keep independently reviewable work separate when practical.
+- Scope each implementation pass to a single responsibility; break a multi-part request into sub-items and implement them one at a time rather than as one large change.
+- Testing is a separate stage that follows the user's manual validation of the implemented behavior, not something bundled into the same pass or commit, unless the user asks for both together.
 - Do not expand a task into unrelated work.
 - Commits should represent meaningful, reversible changes.
 - The repository owner performs Git and publication operations.
@@ -84,23 +86,22 @@ Implementation may follow immediately when the task requests planning and execut
 
 ## 3. Implementation
 
-Implement the requested behavior with the smallest coherent change.
+Implement the requested behavior with the smallest coherent change, scoped to a single responsibility.
 
 - Inspect the current state before editing.
+- If the request bundles more than one independently reviewable capability (e.g., several distinct features asked for together), break it into sub-items before writing any code, and implement and report them one at a time — do not combine them into one pass or one commit unless the user explicitly asks for all of them together.
 - Preserve established architecture and naming.
 - Modify only required behavior and supporting code.
 - Consider Windows and Linux where relevant.
 - Run the narrowest useful existing validation.
-- Report changed behavior, files, and remaining checks.
+- Report changed behavior, files, and remaining checks, and name any remaining sub-items still pending.
 
-Directly necessary tests or documentation may be included. Avoid unrelated test expansion, documentation rewrites, translations, changelog entries, version changes, dependency upgrades, or workflow restructuring.
+Do not add tests in this stage by default. Testing is a dedicated follow-up that starts only after the user has manually validated the behavior (see stage 4 and 5) — this lets the user catch a wrong behavior before a test locks it in, and keeps each commit small enough to validate on its own. Add a test alongside implementation only when the user explicitly asks for both together, or the task is itself a regression test for an already-diagnosed bug. Avoid unrelated documentation rewrites, translations, changelog entries, version changes, dependency upgrades, or workflow restructuring.
 
-When implementation, tests, or documentation remain independently reviewable, suggest separate commits:
+Suggest a commit boundary per responsibility:
 
 ```text
 feat(settings): add toolchain status page
-test(settings): cover toolchain detection states
-docs(settings): document toolchain status behavior
 ```
 
 Do not create the commits.
@@ -119,10 +120,13 @@ Report what was checked and what remains for the repository owner. Do not claim 
 
 Problems return to the relevant implementation or testing work.
 
+This is the gate before testing starts (stage 5): the owner manually checks the implemented behavior first, tests come once the behavior is confirmed right.
+
 ## 5. Testing
 
-Testing may be part of implementation or a dedicated follow-up.
+Testing is a dedicated follow-up stage by default, started only after the user has manually validated the implemented behavior (stage 4) — not bundled into the same request or commit as the implementation, unless the user explicitly asked for both together when requesting the work. This is intentional: it keeps each implementation pass small and lets a wrong behavior get caught by a human before a test encodes it as correct.
 
+- Confirm the behavior has been manually validated before starting; if that is unclear, ask rather than assume.
 - Inspect the behavior and nearby tests.
 - Add focused success, failure, boundary, and regression cases.
 - Follow existing test patterns.
@@ -223,11 +227,12 @@ The repository owner creates commits and tags, pushes, monitors workflows, revie
 A small, low-risk task may use:
 
 ```text
-implementation
+implementation (single responsibility)
 → proportional validation
-→ directly relevant tests when needed
+→ user's manual validation
+→ tests, as a separate follow-up, once validated
 → documentation only when necessary
-→ suggested commit boundary
+→ suggested commit boundary per stage
 ```
 
 This does not remove repository inspection, scope control, honest validation, preservation of user changes, or Git restrictions.
@@ -260,6 +265,8 @@ chore(release): bump version to 2026.4.0
 ```
 
 Not every change needs every commit. Do not split inseparable work artificially or combine independently reviewable work merely to shorten history. Squashing is not required.
+
+The `feat`/`fix` commit and its `test` commit are not simultaneous by default: the `test` commit follows the owner's manual validation of the `feat`/`fix` commit, as its own later stage — see stage 5. When a request bundles several distinct capabilities (e.g., three unrelated features asked for together), prefer one `feat` commit per capability over one commit covering all of them.
 
 ## Task tracking
 

@@ -1,5 +1,5 @@
 ---
-name: Analyze coverage
+name: analyze-coverage
 description: Generate and interpret Pascoal frontend or Rust coverage without changing thresholds or production code by default.
 argument-hint: "[frontend, rust, files, or objective]"
 disable-model-invocation: true

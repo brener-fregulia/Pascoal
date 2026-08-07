@@ -43,3 +43,4 @@ Do not delegate the same work repeatedly without a concrete reason.
 - Verify repository commands before executing them.
 - Do not install system dependencies or change global configuration without explicit permission.
 - Use `docs/development/workflow.md` and `docs/development/testing.md` when their detailed procedures are relevant.
+- Scope each implementation pass to a single responsibility; break a multi-part request into sub-items and implement/commit them separately. Defer tests to a follow-up pass started only after the user's manual validation — see `docs/development/workflow.md`.

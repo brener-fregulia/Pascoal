@@ -1,5 +1,5 @@
 ---
-name: Update translations
+name: update-translations
 description: Synchronize scoped Pascoal i18n, translated documentation, or localized release notes from an authoritative source.
 argument-hint: "[keys, source text, locales, or changed file]"
 disable-model-invocation: true

@@ -1,5 +1,5 @@
 ---
-name: Add tests
+name: add-tests
 description: Add focused tests for existing Pascoal behavior or a completed change and report coverage or testability gaps.
 argument-hint: "[behavior, diff, files, or regression]"
 disable-model-invocation: true
@@ -10,6 +10,8 @@ disable-model-invocation: true
 Add tests for:
 
 $ARGUMENTS
+
+Pascoal's default workflow adds tests as a follow-up stage, after the user has manually validated the implemented behavior — not bundled with implementation. If it is unclear whether that validation happened yet, ask before proceeding rather than assuming.
 
 ## Procedure
 

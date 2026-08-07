@@ -1,5 +1,5 @@
 ---
-name: Prepare release
+name: prepare-release
 description: Check or update Pascoal release preparation files without creating tags, pushing, or publishing.
 argument-hint: "[check|update] [target version]"
 disable-model-invocation: true
