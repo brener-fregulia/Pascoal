@@ -1,6 +1,10 @@
 <script lang="ts">
   import { appStore } from './app'
   import { i18n } from '../i18n'
+  import {
+    recentWorkspacesStore,
+    type RecentWorkspace,
+  } from '../project/recentWorkspaces'
   import PascoalLogo from '../shared/PascoalLogo.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
 
@@ -9,27 +13,61 @@
 
   let openMenu: string | null = null
 
+  // MAX_RECENT_IN_MENU is intentionally lower than recentWorkspacesStore's
+  // own MAX_ENTRIES (10) - the File menu should stay short, the full list
+  // lives in the Welcome screen's "Recent Workspaces" section.
+  const MAX_RECENT_IN_MENU = 5
+
   type MenuItem =
-    | { type: 'action'; labelKey: string; event: string }
+    | {
+        type: 'action'
+        labelKey?: string
+        label?: string
+        event: string
+        payload?: unknown
+      }
     | { type: 'separator' }
     | { type: 'link'; labelKey: string; url: string }
 
-  const fileItems: MenuItem[] = [
-    { type: 'action', labelKey: 'titlebar.new_file', event: 'menu-new-file' },
-    { type: 'action', labelKey: 'titlebar.open_file', event: 'menu-open-file' },
-    {
-      type: 'action',
-      labelKey: 'titlebar.open_folder',
-      event: 'menu-open-folder',
-    },
-    { type: 'separator' },
-    { type: 'action', labelKey: 'titlebar.save', event: 'menu-save-file' },
-    {
-      type: 'action',
-      labelKey: 'titlebar.save_as',
-      event: 'menu-save-file-as',
-    },
-  ]
+  function buildFileItems(recentWorkspaces: RecentWorkspace[]): MenuItem[] {
+    const items: MenuItem[] = [
+      { type: 'action', labelKey: 'titlebar.new_file', event: 'menu-new-file' },
+      {
+        type: 'action',
+        labelKey: 'titlebar.open_file',
+        event: 'menu-open-file',
+      },
+      {
+        type: 'action',
+        labelKey: 'titlebar.open_folder',
+        event: 'menu-open-folder',
+      },
+      { type: 'separator' },
+      { type: 'action', labelKey: 'titlebar.save', event: 'menu-save-file' },
+      {
+        type: 'action',
+        labelKey: 'titlebar.save_as',
+        event: 'menu-save-file-as',
+      },
+    ]
+
+    const recent = recentWorkspaces.slice(0, MAX_RECENT_IN_MENU)
+    if (recent.length > 0) {
+      items.push({ type: 'separator' })
+      for (const w of recent) {
+        items.push({
+          type: 'action',
+          label: w.name,
+          event: 'menu-open-recent-workspace',
+          payload: w.path,
+        })
+      }
+    }
+
+    return items
+  }
+
+  $: fileItems = buildFileItems($recentWorkspacesStore)
 
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
   const helpItems: MenuItem[] = [
@@ -64,7 +102,7 @@
     { type: 'action', labelKey: 'titlebar.about_pascoal', event: 'menu-about' },
   ]
 
-  const menus = [
+  $: menus = [
     { id: 'file', labelKey: 'titlebar.file', items: fileItems },
     { id: 'help', labelKey: 'titlebar.help', items: helpItems },
   ]
@@ -82,7 +120,7 @@
     if (item.type === 'action') {
       if (!isTauriAvailable()) return
       const { emit } = await import('@tauri-apps/api/event')
-      await emit(item.event)
+      await emit(item.event, item.payload)
     } else if (item.type === 'link') {
       isTauriAvailable()
         ? await invoke('open_url', { url: item.url }).catch(() =>
@@ -194,6 +232,10 @@
             {#each menu.items as item}
               {#if item.type === 'separator'}
                 <hr class="menu-sep" />
+              {:else if item.type === 'action'}
+                <button class="menu-item" on:click={() => handleItem(item)}>
+                  {item.label ?? $i18n(item.labelKey ?? '')}
+                </button>
               {:else}
                 <button class="menu-item" on:click={() => handleItem(item)}>
                   {$i18n(item.labelKey)}

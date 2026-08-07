@@ -10,6 +10,12 @@
   import { gitStore } from '../integrations/git/gitStore'
   import { themeCompartment } from './editor-extensions'
   import { buildPascoalTheme } from './editor-theme'
+  import {
+    settingsStore,
+    MIN_FONT_SIZE,
+    MAX_FONT_SIZE,
+    DEFAULT_FONT_SIZE,
+  } from '../settings/settingsStore'
   import { i18n } from '../i18n'
   import IconButton from '../shared/IconButton.svelte'
   import FindWidget from './FindWidget.svelte'
@@ -35,10 +41,11 @@
 
   $effect(() => {
     const _theme = $themeStore.current
+    const fontSize = $settingsStore.fontSize
     if (!view) return
     Promise.resolve().then(() => {
       view?.dispatch({
-        effects: themeCompartment.reconfigure(buildPascoalTheme()),
+        effects: themeCompartment.reconfigure(buildPascoalTheme(fontSize)),
       })
     })
   })
@@ -82,7 +89,11 @@
 
     currentTabId = activeTab?.id ?? null
     document.addEventListener('keydown', handleKeydown)
-    return () => document.removeEventListener('keydown', handleKeydown)
+    editorEl.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      document.removeEventListener('keydown', handleKeydown)
+      editorEl.removeEventListener('wheel', handleWheel)
+    }
   })
 
   onDestroy(() => {
@@ -116,7 +127,50 @@
     if (e.key === 'F5') {
       e.preventDefault()
       await runActiveFile()
+      return
     }
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.code === 'Equal' || e.code === 'NumpadAdd' || e.key === '+' || e.key === '=')
+    ) {
+      e.preventDefault()
+      zoomBy(1)
+      return
+    }
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.code === 'Minus' || e.code === 'NumpadSubtract' || e.key === '-')
+    ) {
+      e.preventDefault()
+      zoomBy(-1)
+      return
+    }
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.code === 'Digit0' || e.code === 'Numpad0' || e.key === '0')
+    ) {
+      e.preventDefault()
+      resetZoom()
+    }
+  }
+
+  function clampFontSize(size: number): number {
+    return Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, size))
+  }
+
+  function zoomBy(delta: number) {
+    const current = get(settingsStore).fontSize
+    settingsStore.updateSetting('fontSize', clampFontSize(current + delta))
+  }
+
+  function resetZoom() {
+    settingsStore.updateSetting('fontSize', DEFAULT_FONT_SIZE)
+  }
+
+  function handleWheel(e: WheelEvent) {
+    if (!(e.ctrlKey || e.metaKey)) return
+    e.preventDefault()
+    zoomBy(e.deltaY < 0 ? 1 : -1)
   }
 
   function getContent(): string {
@@ -179,7 +233,11 @@
   </IconButton>
 </div>
 <div id="editor-body">
-  <div id="codemirror-editor" bind:this={editorEl}></div>
+  <div
+    id="codemirror-editor"
+    bind:this={editorEl}
+    style="--editor-font-size: {$settingsStore.fontSize}px"
+  ></div>
   <FindWidget bind:open={showFind} {view} focusTick={findFocusTick} />
 </div>
 
@@ -214,7 +272,7 @@
   #codemirror-editor :global(.cm-editor) {
     height: 100%;
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--editor-font-size, 13px);
     font-variant-ligatures: none;
     user-select: text;
     cursor: text;

@@ -7,6 +7,7 @@ import enSearch from './locales/en/search.json'
 import enGit from './locales/en/git.json'
 import enSettings from './locales/en/settings.json'
 import enSystem from './locales/en/system.json'
+import enWorkspace from './locales/en/workspace.json'
 
 import ptBRShell from './locales/pt-BR/shell.json'
 import ptBREditor from './locales/pt-BR/editor.json'
@@ -15,6 +16,7 @@ import ptBRSearch from './locales/pt-BR/search.json'
 import ptBRGit from './locales/pt-BR/git.json'
 import ptBRSettings from './locales/pt-BR/settings.json'
 import ptBRSystem from './locales/pt-BR/system.json'
+import ptBRWorkspace from './locales/pt-BR/workspace.json'
 
 import es419Shell from './locales/es-419/shell.json'
 import es419Editor from './locales/es-419/editor.json'
@@ -23,6 +25,7 @@ import es419Search from './locales/es-419/search.json'
 import es419Git from './locales/es-419/git.json'
 import es419Settings from './locales/es-419/settings.json'
 import es419System from './locales/es-419/system.json'
+import es419Workspace from './locales/es-419/workspace.json'
 
 import plShell from './locales/pl/shell.json'
 import plEditor from './locales/pl/editor.json'
@@ -31,6 +34,7 @@ import plSearch from './locales/pl/search.json'
 import plGit from './locales/pl/git.json'
 import plSettings from './locales/pl/settings.json'
 import plSystem from './locales/pl/system.json'
+import plWorkspace from './locales/pl/workspace.json'
 
 const en = {
   ...enShell,
@@ -40,6 +44,7 @@ const en = {
   ...enGit,
   ...enSettings,
   ...enSystem,
+  ...enWorkspace,
 }
 const ptBR = {
   ...ptBRShell,
@@ -49,6 +54,7 @@ const ptBR = {
   ...ptBRGit,
   ...ptBRSettings,
   ...ptBRSystem,
+  ...ptBRWorkspace,
 }
 const es419 = {
   ...es419Shell,
@@ -58,6 +64,7 @@ const es419 = {
   ...es419Git,
   ...es419Settings,
   ...es419System,
+  ...es419Workspace,
 }
 const pl = {
   ...plShell,
@@ -67,6 +74,7 @@ const pl = {
   ...plGit,
   ...plSettings,
   ...plSystem,
+  ...plWorkspace,
 }
 
 export type Locale = 'en' | 'pt-BR' | 'es-419' | 'pl'

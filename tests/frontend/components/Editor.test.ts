@@ -1,6 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 import { EditorState } from '@codemirror/state'
+import { get } from 'svelte/store'
+import {
+    settingsStore,
+    DEFAULT_FONT_SIZE,
+} from '../../../src/settings/settingsStore'
 
 const {
     mockTabState,
@@ -68,6 +73,7 @@ afterEach(() => {
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     vi.clearAllMocks()
+    settingsStore.updateSetting('fontSize', DEFAULT_FONT_SIZE)
 })
 
 describe('Editor', () => {
@@ -125,5 +131,150 @@ describe('Editor', () => {
         const { container } = render(Editor)
         await fireEvent.keyDown(document, { key: 'f', ctrlKey: true })
         expect(container.querySelector('.find-widget')).toBeInTheDocument()
+    })
+
+    describe('zoom', () => {
+        it('increases the font size on Ctrl+Wheel up', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            const { container } = render(Editor)
+            const target = container.querySelector('#codemirror-editor')!
+            await fireEvent.wheel(target, { ctrlKey: true, deltaY: -100 })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE + 1)
+        })
+
+        it('decreases the font size on Ctrl+Wheel down', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            const { container } = render(Editor)
+            const target = container.querySelector('#codemirror-editor')!
+            await fireEvent.wheel(target, { ctrlKey: true, deltaY: 100 })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE - 1)
+        })
+
+        it('ignores wheel scrolling without Ctrl held', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            const { container } = render(Editor)
+            const target = container.querySelector('#codemirror-editor')!
+            await fireEvent.wheel(target, { deltaY: -100 })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE)
+        })
+
+        it('increases the font size on Ctrl+=', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '=',
+                code: 'Equal',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE + 1)
+        })
+
+        it('increases the font size on the numpad add key', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '+',
+                code: 'NumpadAdd',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE + 1)
+        })
+
+        it('decreases the font size on Ctrl+-', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '-',
+                code: 'Minus',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE - 1)
+        })
+
+        it('resets to the default font size on Ctrl+0', async () => {
+            settingsStore.updateSetting('fontSize', 20)
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '0',
+                code: 'Digit0',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE)
+        })
+
+        it('resets to the default font size on the numpad 0 key', async () => {
+            settingsStore.updateSetting('fontSize', 20)
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '0',
+                code: 'Numpad0',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(DEFAULT_FONT_SIZE)
+        })
+
+        it('clamps zoom in at the maximum font size', async () => {
+            settingsStore.updateSetting('fontSize', 24)
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '=',
+                code: 'Equal',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(24)
+        })
+
+        it('clamps zoom out at the minimum font size', async () => {
+            settingsStore.updateSetting('fontSize', 10)
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '-',
+                code: 'Minus',
+                ctrlKey: true,
+            })
+            expect(get(settingsStore).fontSize).toBe(10)
+        })
+
+        it('reflects the current font size in the editor container style', async () => {
+            const tab = makeTab()
+            mockTabState.tabs = [tab]
+            mockTabState.activeTabId = tab.id
+            const { container } = render(Editor)
+            await fireEvent.keyDown(document, {
+                key: '=',
+                code: 'Equal',
+                ctrlKey: true,
+            })
+            const target = container.querySelector(
+                '#codemirror-editor',
+            ) as HTMLElement
+            expect(target.style.getPropertyValue('--editor-font-size')).toBe(
+                `${DEFAULT_FONT_SIZE + 1}px`,
+            )
+        })
     })
 })

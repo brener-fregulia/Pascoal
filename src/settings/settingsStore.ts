@@ -6,12 +6,20 @@ export interface Settings {
   autoSaveBeforeRun: boolean
   theme: Theme | null
   gitAutoStageOnCommit: 'ask' | 'always' | 'never'
+  fontSize: number
+  reopenLastWorkspace: boolean
 }
+
+export const MIN_FONT_SIZE = 10
+export const MAX_FONT_SIZE = 24
+export const DEFAULT_FONT_SIZE = 13
 
 const DEFAULTS: Settings = {
   autoSaveBeforeRun: true,
   theme: null,
   gitAutoStageOnCommit: 'ask',
+  fontSize: DEFAULT_FONT_SIZE,
+  reopenLastWorkspace: true,
 }
 
 function createSettingsStore() {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
   import Titlebar from './app/Titlebar.svelte'
   import ActivityBar from './app/ActivityBar.svelte'
   import EditorArea from './editor/EditorArea.svelte'
@@ -15,6 +16,9 @@
   import { themeStore } from './shared/theme'
   import { tabStore } from './editor/tabs'
   import { explorerStore } from './project/explorerStore'
+  import { recentStore } from './project/recent'
+  import { recentWorkspacesStore } from './project/recentWorkspaces'
+  import { settingsStore } from './settings/settingsStore'
   import { fpcInstallStore } from './toolchain/fpcInstall'
   import { updateStore } from './integrations/updater/updateStore'
   import { gitStore } from './integrations/git/gitStore'
@@ -40,6 +44,18 @@
     if (!isTauriAvailable()) return
     const { listen } = await import('@tauri-apps/api/event')
 
+    if (get(settingsStore).reopenLastWorkspace) {
+      const [lastWorkspace] = get(recentWorkspacesStore)
+      if (lastWorkspace) {
+        const opened = await explorerStore.openFolderAtPath(lastWorkspace.path)
+        if (opened) {
+          if (activePanel === null) activePanel = 'explorer'
+        } else {
+          recentWorkspacesStore.remove(lastWorkspace.path)
+        }
+      }
+    }
+
     await listen('menu-new-file', async () => {
       const tab = await tabStore.newTab(PASCAL_TEMPLATE)
       tabStore.activate(tab.id)
@@ -52,6 +68,7 @@
           const [filePath, content] = result
           const tab = await tabStore.openFile(filePath, content)
           tabStore.activate(tab.id)
+          recentStore.add(filePath, get(explorerStore).folder?.path ?? null)
         }
       } catch (e) {
         console.error('open_file failed:', e)
@@ -61,6 +78,16 @@
     await listen('menu-open-folder', async () => {
       const opened = await explorerStore.openFolder()
       if (opened) activePanel = 'explorer'
+    })
+
+    await listen<string>('menu-open-recent-workspace', async (event) => {
+      const path = event.payload
+      const opened = await explorerStore.openFolderAtPath(path)
+      if (opened) {
+        activePanel = 'explorer'
+      } else {
+        recentWorkspacesStore.remove(path)
+      }
     })
 
     await listen('menu-save-file', () => {

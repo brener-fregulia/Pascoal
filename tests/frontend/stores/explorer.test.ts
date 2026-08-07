@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { get } from 'svelte/store'
 import { explorerStore } from '../../../src/project/explorerStore'
+import { recentWorkspacesStore } from '../../../src/project/recentWorkspaces'
 
 function state() {
     return get(explorerStore)
@@ -42,6 +43,8 @@ describe('explorerStore', () => {
     beforeEach(() => {
         explorerStore.reset()
         vi.unstubAllGlobals()
+        localStorage.clear()
+        recentWorkspacesStore.clear()
     })
 
     describe('initial state', () => {
@@ -100,6 +103,66 @@ describe('explorerStore', () => {
             expect(result).toBe(false)
             expect(state().error).toBe('permission denied')
             expect(state().loading).toBe(false)
+        })
+
+        it('records the folder in recentWorkspacesStore on success', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
+            await explorerStore.openFolder()
+            expect(get(recentWorkspacesStore)[0]).toMatchObject({
+                path: MOCK_FOLDER.path,
+                name: MOCK_FOLDER.name,
+            })
+        })
+
+        it('does not record anything in recentWorkspacesStore when the dialog is cancelled', async () => {
+            mockTauri(() => Promise.resolve(null))
+            await explorerStore.openFolder()
+            expect(get(recentWorkspacesStore)).toHaveLength(0)
+        })
+
+        it('does not record anything in recentWorkspacesStore on failure', async () => {
+            mockTauri(() => Promise.reject(new Error('permission denied')))
+            await explorerStore.openFolder()
+            expect(get(recentWorkspacesStore)).toHaveLength(0)
+        })
+    })
+
+    describe('openFolderAtPath', () => {
+        it('returns false when not in Tauri context', async () => {
+            vi.stubGlobal('__TAURI__', undefined)
+            const result = await explorerStore.openFolderAtPath(MOCK_FOLDER.path)
+            expect(result).toBe(false)
+        })
+
+        it('sets folder and tree on success', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
+            const result = await explorerStore.openFolderAtPath(MOCK_FOLDER.path)
+            expect(result).toBe(true)
+            expect(state().folder).toEqual(MOCK_FOLDER)
+            expect(state().tree).toHaveLength(2)
+        })
+
+        it('sets error and returns false on failure', async () => {
+            mockTauri(() => Promise.reject(new Error('path does not exist')))
+            const result = await explorerStore.openFolderAtPath('/gone')
+            expect(result).toBe(false)
+            expect(state().error).toBe('path does not exist')
+            expect(state().loading).toBe(false)
+        })
+
+        it('records the folder in recentWorkspacesStore on success', async () => {
+            mockTauri(() => Promise.resolve({ folder: MOCK_FOLDER, tree: MOCK_TREE }))
+            await explorerStore.openFolderAtPath(MOCK_FOLDER.path)
+            expect(get(recentWorkspacesStore)[0]).toMatchObject({
+                path: MOCK_FOLDER.path,
+                name: MOCK_FOLDER.name,
+            })
+        })
+
+        it('does not record anything in recentWorkspacesStore on failure', async () => {
+            mockTauri(() => Promise.reject(new Error('path does not exist')))
+            await explorerStore.openFolderAtPath('/gone')
+            expect(get(recentWorkspacesStore)).toHaveLength(0)
         })
     })
 

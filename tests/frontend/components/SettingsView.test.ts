@@ -18,11 +18,12 @@ describe('SettingsView', () => {
         expect(nav?.textContent).toContain('Language')
     })
 
-    it('renders Git and Toolchain as standalone items in the sidebar', () => {
+    it('renders Git, Toolchain and Workspace as standalone items in the sidebar', () => {
         const { container } = render(SettingsView, { props: { onClose: vi.fn() } })
         const nav = container.querySelector('#settings-nav')
         expect(nav?.textContent).toContain('Git')
         expect(nav?.textContent).toContain('Toolchain')
+        expect(nav?.textContent).toContain('Workspace')
     })
 
     it('switches to the Language page when clicked', async () => {
@@ -60,6 +61,14 @@ describe('SettingsView', () => {
         )
 
         vi.unstubAllGlobals()
+    })
+
+    it('switches to the Workspace page when clicked', async () => {
+        const { container, getByText } = render(SettingsView, { props: { onClose: vi.fn() } })
+        await fireEvent.click(getByText('Workspace'))
+        expect(container.querySelector('#settings-content')?.textContent).toContain(
+            'Reopen last workspace on startup',
+        )
     })
 
     it('calls onClose when the close button is clicked', async () => {

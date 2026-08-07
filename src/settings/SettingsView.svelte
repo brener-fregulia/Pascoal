@@ -7,10 +7,11 @@
   import LanguageSettings from './LanguageSettings.svelte'
   import GitSettings from './GitSettings.svelte'
   import ToolchainSettings from './ToolchainSettings.svelte'
+  import WorkspaceSettings from './WorkspaceSettings.svelte'
 
   export let onClose: () => void
 
-  type Leaf = 'themes' | 'language' | 'git' | 'toolchain'
+  type Leaf = 'themes' | 'language' | 'git' | 'toolchain' | 'workspace'
 
   interface NavItem {
     id: Leaf
@@ -32,6 +33,7 @@
     },
     { items: [{ id: 'git', labelKey: 'settings.category_git' }] },
     { items: [{ id: 'toolchain', labelKey: 'settings.category_toolchain' }] },
+    { items: [{ id: 'workspace', labelKey: 'settings.category_workspace' }] },
   ]
 
   let activeLeaf: Leaf = 'themes'
@@ -78,6 +80,8 @@
         <GitSettings />
       {:else if activeLeaf === 'toolchain'}
         <ToolchainSettings />
+      {:else if activeLeaf === 'workspace'}
+        <WorkspaceSettings />
       {:else}
         <p class="placeholder">{$i18n('settings.coming_soon')}</p>
       {/if}

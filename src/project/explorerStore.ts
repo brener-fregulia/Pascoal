@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store'
 import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+import { recentWorkspacesStore } from './recentWorkspaces'
 
 export interface ExplorerNode {
     name: string
@@ -53,6 +54,37 @@ function createExplorerStore() {
                 error: null,
             }))
 
+            recentWorkspacesStore.add(result.folder.path, result.folder.name)
+
+            return true
+        } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e)
+            update(s => ({ ...s, loading: false, error: msg }))
+            return false
+        }
+    }
+
+    async function openFolderAtPath(path: string): Promise<boolean> {
+        if (!isTauriAvailable()) return false
+
+        update(s => ({ ...s, loading: true, error: null }))
+
+        try {
+            const result = await invoke<{
+                folder: ExplorerFolder
+                tree: ExplorerNode[]
+            }>('open_workspace_at_path', { path })
+
+            update(s => ({
+                ...s,
+                folder: result.folder,
+                tree: result.tree,
+                loading: false,
+                error: null,
+            }))
+
+            recentWorkspacesStore.add(result.folder.path, result.folder.name)
+
             return true
         } catch (e) {
             const msg = e instanceof Error ? e.message : String(e)
@@ -90,6 +122,7 @@ function createExplorerStore() {
     return {
         subscribe,
         openFolder,
+        openFolderAtPath,
         refresh,
         closeFolder,
         reset,

@@ -1,0 +1,9 @@
+{
+  "workspace": {
+    "section_recent_workspaces": "Recent Workspaces",
+    "no_recent_workspaces": "No recent workspaces.",
+    "open_recent": "Open recent workspace",
+    "remove_recent": "Remove from recents",
+    "switch_confirm": "You have unsaved changes. Switching workspaces will change the open project folder. Continue?"
+  }
+}

@@ -6,6 +6,8 @@ const DEFAULTS: Settings = {
     autoSaveBeforeRun: true,
     theme: null,
     gitAutoStageOnCommit: 'ask',
+    fontSize: 13,
+    reopenLastWorkspace: true,
 }
 
 describe('settingsStore', () => {

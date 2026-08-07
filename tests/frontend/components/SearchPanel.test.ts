@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, cleanup, fireEvent } from '@testing-library/svelte'
+import { render, cleanup, fireEvent, waitFor } from '@testing-library/svelte'
 
 const { mockSearchState, mockSearch, mockToggleCaseSensitive, mockExplorerState } =
     vi.hoisted(() => ({
@@ -44,8 +44,18 @@ vi.mock('../../../src/project/explorerStore', () => ({
 
 vi.mock('../../../src/editor/tabs', () => ({
     tabStore: {
-        openFile: vi.fn(),
+        openFile: vi.fn().mockResolvedValue({ id: 'tab-1' }),
         activate: vi.fn(),
+    },
+}))
+
+const { mockRecentAdd } = vi.hoisted(() => ({
+    mockRecentAdd: vi.fn(),
+}))
+
+vi.mock('../../../src/project/recent', () => ({
+    recentStore: {
+        add: mockRecentAdd,
     },
 }))
 
@@ -59,6 +69,7 @@ afterEach(() => {
     mockExplorerState.folder = null
     vi.clearAllMocks()
     vi.useRealTimers()
+        ; (window as any).__TAURI__ = undefined
 })
 
 describe('SearchPanel', () => {
@@ -104,5 +115,26 @@ describe('SearchPanel', () => {
         await fireEvent.click(getByTitle('Match case'))
         expect(mockToggleCaseSensitive).toHaveBeenCalled()
         expect(mockSearch).toHaveBeenCalled()
+    })
+
+    it('adds the opened match to recentStore, scoped to the open workspace', async () => {
+        ; (window as any).__TAURI__ = {
+            core: { invoke: vi.fn().mockResolvedValue('program Test;') },
+        }
+        mockExplorerState.folder = { name: 'MyProject', path: '/tmp' }
+        mockSearchState.results = [
+            {
+                filePath: '/tmp/main.pas',
+                fileName: 'main.pas',
+                lineNumber: 3,
+                lineText: "  writeln('hi');",
+                column: 2,
+            },
+        ]
+        const { getByText } = render(SearchPanel)
+        await fireEvent.click(getByText("writeln('hi');"))
+        await waitFor(() =>
+            expect(mockRecentAdd).toHaveBeenCalledWith('/tmp/main.pas', '/tmp'),
+        )
     })
 })

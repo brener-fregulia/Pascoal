@@ -1,8 +1,36 @@
-import { describe, it, expect, afterEach } from 'vitest'
-import { render, cleanup, fireEvent } from '@testing-library/svelte'
+import { describe, it, expect, afterEach, vi } from 'vitest'
+import { render, cleanup, fireEvent, waitFor } from '@testing-library/svelte'
+
+const { mockRecentWorkspaceEntries, mockEmit } = vi.hoisted(() => ({
+    mockRecentWorkspaceEntries: [] as Array<{
+        path: string
+        name: string
+        openedAt: number
+    }>,
+    mockEmit: vi.fn(),
+}))
+
+vi.mock('../../../src/project/recentWorkspaces', () => ({
+    recentWorkspacesStore: {
+        subscribe: (fn: (v: typeof mockRecentWorkspaceEntries) => void) => {
+            fn(mockRecentWorkspaceEntries)
+            return () => { }
+        },
+    },
+}))
+
+vi.mock('@tauri-apps/api/event', () => ({
+    emit: mockEmit,
+}))
+
 import Titlebar from '../../../src/app/Titlebar.svelte'
 
-afterEach(() => cleanup())
+afterEach(() => {
+    cleanup()
+    mockRecentWorkspaceEntries.length = 0
+    vi.clearAllMocks()
+        ; (window as any).__TAURI__ = undefined
+})
 
 describe('Titlebar', () => {
     it('renders the File and Help menu triggers', () => {
@@ -51,5 +79,59 @@ describe('Titlebar', () => {
         await fireEvent.click(getByText('File'))
         await fireEvent.click(getByText('New File'))
         expect(queryByText('New File')).not.toBeInTheDocument()
+    })
+
+    describe('recent workspaces', () => {
+        it('does not show any recent workspace entries when the list is empty', async () => {
+            const { getByText, container } = render(Titlebar)
+            await fireEvent.click(getByText('File'))
+            expect(container.querySelectorAll('.menu-sep')).toHaveLength(1)
+        })
+
+        it('lists recent workspaces after a separator when present', async () => {
+            mockRecentWorkspaceEntries.push({
+                path: '/tmp/MyProject',
+                name: 'MyProject',
+                openedAt: Date.now(),
+            })
+            const { getByText, container } = render(Titlebar)
+            await fireEvent.click(getByText('File'))
+            expect(getByText('MyProject')).toBeInTheDocument()
+            expect(container.querySelectorAll('.menu-sep')).toHaveLength(2)
+        })
+
+        it('caps the recent workspaces shown in the menu at 5', async () => {
+            for (let i = 1; i <= 7; i++) {
+                mockRecentWorkspaceEntries.push({
+                    path: `/tmp/project${i}`,
+                    name: `project${i}`,
+                    openedAt: Date.now(),
+                })
+            }
+            const { getByText, queryByText } = render(Titlebar)
+            await fireEvent.click(getByText('File'))
+            expect(getByText('project1')).toBeInTheDocument()
+            expect(getByText('project5')).toBeInTheDocument()
+            expect(queryByText('project6')).not.toBeInTheDocument()
+            expect(queryByText('project7')).not.toBeInTheDocument()
+        })
+
+        it('emits menu-open-recent-workspace with the path when clicked', async () => {
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+            mockRecentWorkspaceEntries.push({
+                path: '/tmp/MyProject',
+                name: 'MyProject',
+                openedAt: Date.now(),
+            })
+            const { getByText } = render(Titlebar)
+            await fireEvent.click(getByText('File'))
+            await fireEvent.click(getByText('MyProject'))
+            await waitFor(() =>
+                expect(mockEmit).toHaveBeenCalledWith(
+                    'menu-open-recent-workspace',
+                    '/tmp/MyProject',
+                ),
+            )
+        })
     })
 })

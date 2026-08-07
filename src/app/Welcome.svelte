@@ -1,9 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
+  import { ask } from '@tauri-apps/plugin-dialog'
   import { tabStore } from '../editor/tabs'
   import { recentStore, type RecentFile } from '../project/recent'
+  import {
+    recentWorkspacesStore,
+    type RecentWorkspace,
+  } from '../project/recentWorkspaces'
   import { explorerStore } from '../project/explorerStore'
-  import { i18n } from '../i18n'
+  import { i18n, t } from '../i18n'
   import FileNew from '../icons/FileNew.svelte'
   import File from '../icons/File.svelte'
   import Folder from '../icons/Folder.svelte'
@@ -16,6 +22,7 @@
 
   onMount(() => {
     recentStore.validate()
+    recentWorkspacesStore.validate()
   })
 
   async function handleNewFile() {
@@ -31,7 +38,7 @@
         const [filePath, content] = result
         const tab = await tabStore.openFile(filePath, content)
         tabStore.activate(tab.id)
-        recentStore.add(filePath)
+        recentStore.add(filePath, get(explorerStore).folder?.path ?? null)
       }
     } catch (e) {
       console.error('open_file failed:', e)
@@ -44,17 +51,51 @@
     await emit('menu-open-folder')
   }
 
+  // Opening a recent file whose workspacePath differs from the currently
+  // open folder is a disruptive context switch when there's unsaved work
+  // in progress (even though swapping explorerStore.folder itself doesn't
+  // touch any open tab) - confirm before doing it, same pattern tabStore.
+  // close() already uses for unsaved-changes prompts.
   async function openRecent(entry: RecentFile) {
     if (!isTauriAvailable()) return
+
+    const currentWorkspace = get(explorerStore).folder?.path ?? null
+    const targetWorkspace = entry.workspacePath ?? null
+
+    if (targetWorkspace && targetWorkspace !== currentWorkspace) {
+      const hasDirtyTabs = get(tabStore).tabs.some((tab) => tab.isDirty)
+      if (hasDirtyTabs) {
+        const confirmed = await ask(t('workspace.switch_confirm'), {
+          title: 'Pascoal',
+          kind: 'warning',
+        })
+        if (!confirmed) return
+      }
+
+      const opened = await explorerStore.openFolderAtPath(targetWorkspace)
+      if (!opened) {
+        recentStore.remove(entry.filePath)
+        return
+      }
+    }
+
     try {
       const content = await invoke<string>('read_file', {
         path: entry.filePath,
       })
       const tab = await tabStore.openFile(entry.filePath, content)
       tabStore.activate(tab.id)
-      recentStore.add(entry.filePath)
+      recentStore.add(entry.filePath, get(explorerStore).folder?.path ?? null)
     } catch {
       recentStore.remove(entry.filePath)
+    }
+  }
+
+  async function openRecentWorkspace(entry: RecentWorkspace) {
+    if (!isTauriAvailable()) return
+    const opened = await explorerStore.openFolderAtPath(entry.path)
+    if (!opened) {
+      recentWorkspacesStore.remove(entry.path)
     }
   }
 
@@ -144,6 +185,36 @@
             title={$i18n('welcome.remove_recent')}
             aria-label={$i18n('welcome.remove_recent')}
             on:click={() => recentStore.remove(entry.filePath)}
+          >
+            <X size={10} />
+          </button>
+        </div>
+      {/each}
+    {/if}
+  </div>
+
+  <div class="welcome-section">
+    <h2>{$i18n('workspace.section_recent_workspaces')}</h2>
+    {#if $recentWorkspacesStore.length === 0}
+      <p class="empty">{$i18n('workspace.no_recent_workspaces')}</p>
+    {:else}
+      {#each $recentWorkspacesStore as entry (entry.path)}
+        <div class="recent-entry">
+          <button
+            class="welcome-action recent-action"
+            title={entry.path}
+            on:click={() => openRecentWorkspace(entry)}
+            aria-label={$i18n('workspace.open_recent')}
+          >
+            <Folder size={16} />
+            <span class="recent-name">{entry.name}</span>
+            <span class="recent-date">{formatDate(entry.openedAt)}</span>
+          </button>
+          <button
+            class="recent-remove"
+            title={$i18n('workspace.remove_recent')}
+            aria-label={$i18n('workspace.remove_recent')}
+            on:click={() => recentWorkspacesStore.remove(entry.path)}
           >
             <X size={10} />
           </button>

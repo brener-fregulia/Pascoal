@@ -32,6 +32,26 @@ describe('recentStore', () => {
       // We test persistence indirectly via add + reload simulation below
       expect(true).toBe(true) // structural — covered by add tests
     })
+
+    it('loads pre-existing entries persisted before workspacePath existed', async () => {
+      localStorage.setItem(
+        'pascoal-recent-files',
+        JSON.stringify([
+          {
+            filePath: '/home/user/legacy.pas',
+            fileName: 'legacy.pas',
+            openedAt: 1,
+          },
+        ]),
+      )
+      vi.resetModules()
+      const { recentStore: freshStore } = await import(
+        '../../../src/project/recent'
+      )
+      const loaded = get(freshStore) as RecentFile[]
+      expect(loaded).toHaveLength(1)
+      expect(loaded[0].filePath).toBe('/home/user/legacy.pas')
+    })
   })
 
   describe('add', () => {
@@ -104,6 +124,16 @@ describe('recentStore', () => {
       recentStore.add('/home/user/b.pas')
       recentStore.add('/home/user/a.pas')
       expect(state()[0].openedAt).toBeGreaterThanOrEqual(firstOpenedAt)
+    })
+
+    it('stores workspacePath when provided', () => {
+      recentStore.add('/home/user/hello.pas', '/home/user')
+      expect(state()[0].workspacePath).toBe('/home/user')
+    })
+
+    it('defaults workspacePath to null when omitted', () => {
+      recentStore.add('/home/user/hello.pas')
+      expect(state()[0].workspacePath).toBeNull()
     })
   })
 

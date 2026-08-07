@@ -7,8 +7,12 @@ function v(name: string): string {
     .trim()
 }
 
-// Called once per theme change — builds a fresh theme from current CSS vars
-export function buildPascoalTheme() {
+// Called once per theme (or font size) change — builds a fresh theme from
+// current CSS vars. `fontSize` defaults to the base editor size so callers
+// that don't care about zoom (diff view, initial per-tab extension setup)
+// keep working unchanged - Editor.svelte's zoom handling passes the current
+// value explicitly and reconfigures the compartment whenever it changes.
+export function buildPascoalTheme(fontSize: number = 13) {
   const bg = v('--bg')
   const panel = v('--panel')
   const border = v('--border')
@@ -24,7 +28,7 @@ export function buildPascoalTheme() {
         background: bg,
         color: text,
         fontFamily: fontMono,
-        fontSize: '13px',
+        fontSize: `${fontSize}px`,
         height: '100%',
       },
       '.cm-scroller': {

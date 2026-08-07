@@ -5,6 +5,9 @@ export interface RecentFile {
   filePath: string
   fileName: string
   openedAt: number // Unix timestamp ms
+  // Workspace folder that was open when this file was opened, if any.
+  // Optional so entries persisted before this field existed keep loading.
+  workspacePath?: string | null
 }
 
 const STORAGE_KEY = 'pascoal-recent-files'
@@ -20,7 +23,10 @@ function load(): RecentFile[] {
       (e): e is RecentFile =>
         typeof e.filePath === 'string' &&
         typeof e.fileName === 'string' &&
-        typeof e.openedAt === 'number',
+        typeof e.openedAt === 'number' &&
+        (e.workspacePath === undefined ||
+          e.workspacePath === null ||
+          typeof e.workspacePath === 'string'),
     )
   } catch {
     return []
@@ -60,12 +66,17 @@ function createRecentStore() {
   }
 
   /** Add or move-to-top a file. Call after a successful open. */
-  function add(filePath: string) {
+  function add(filePath: string, workspacePath?: string | null) {
     update((entries) => {
       const fileName = filePath.split(/[\\/]/).pop() ?? filePath
       const filtered = entries.filter((e) => e.filePath !== filePath)
       const next = [
-        { filePath, fileName, openedAt: Date.now() },
+        {
+          filePath,
+          fileName,
+          openedAt: Date.now(),
+          workspacePath: workspacePath ?? null,
+        },
         ...filtered,
       ].slice(0, MAX_ENTRIES)
       save(next)
