@@ -12,6 +12,7 @@
 
   let expandedPaths = $state(new Set<string>())
   let selectedPath = $state<string | null>(null)
+  let selectedIsDirectory = $state(false)
   let menu = $state<
     | { kind: 'node'; node: ExplorerNode; x: number; y: number }
     | { kind: 'empty'; x: number; y: number }
@@ -43,6 +44,7 @@
 
   function toggle(path: string) {
     selectedPath = path
+    selectedIsDirectory = true
     const next = new Set(expandedPaths)
     if (next.has(path)) next.delete(path)
     else next.add(path)
@@ -51,6 +53,7 @@
 
   async function openFilePath(path: string) {
     selectedPath = path
+    selectedIsDirectory = false
     if (!isTauriAvailable()) return
     try {
       const content = await invoke<string>('read_file', { path })
@@ -67,6 +70,7 @@
 
   function handleContextMenu(node: ExplorerNode, x: number, y: number) {
     selectedPath = node.path
+    selectedIsDirectory = node.isDirectory
     menu = { kind: 'node', node, x, y }
   }
 
@@ -166,12 +170,25 @@
     if (folder) startCreate(folder.path, true)
   }
 
+  // Creates inside the selected folder when one is selected, otherwise at
+  // the workspace root - matches VS Code's toolbar behavior.
+  function toolbarTargetParent(): string | null {
+    if (selectedIsDirectory && selectedPath) return selectedPath
+    return folder?.path ?? null
+  }
+
   function toolbarNewFile() {
-    if (folder) startCreate(folder.path, false)
+    const parent = toolbarTargetParent()
+    if (!parent) return
+    if (parent === selectedPath) expandFolder(parent)
+    startCreate(parent, false)
   }
 
   function toolbarNewFolder() {
-    if (folder) startCreate(folder.path, true)
+    const parent = toolbarTargetParent()
+    if (!parent) return
+    if (parent === selectedPath) expandFolder(parent)
+    startCreate(parent, true)
   }
 
   function handleKeydown(e: KeyboardEvent) {
