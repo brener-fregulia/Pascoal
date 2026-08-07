@@ -103,4 +103,82 @@ describe('FileTreeNode', () => {
         await fireEvent.click(getByText('src'))
         expect(onToggle).toHaveBeenCalledWith('/tmp/src')
     })
+
+    it('does not have the selected class when selectedPath does not match the node', () => {
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node: fileNode(),
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                selectedPath: '/tmp/other.pas',
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('main.pas').closest('button')?.className).not.toContain('selected')
+    })
+
+    it('has the selected class when selectedPath matches the file node path', () => {
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                selectedPath: node.path,
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('main.pas').closest('button')?.className).toContain('selected')
+    })
+
+    it('has the selected class when selectedPath matches the directory node path', () => {
+        const node = dirNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                selectedPath: node.path,
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('src').closest('button')?.className).toContain('selected')
+    })
+
+    it('calls onContextMenu with the node and pointer coordinates on right-click of a file row', async () => {
+        const onContextMenu = vi.fn()
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+                onContextMenu,
+            },
+        })
+        await fireEvent.contextMenu(getByText('main.pas'), { clientX: 42, clientY: 84 })
+        expect(onContextMenu).toHaveBeenCalledWith(node, 42, 84)
+    })
+
+    it('calls onContextMenu with the node and pointer coordinates on right-click of a directory row', async () => {
+        const onContextMenu = vi.fn()
+        const node = dirNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+                onContextMenu,
+            },
+        })
+        await fireEvent.contextMenu(getByText('src'), { clientX: 5, clientY: 9 })
+        expect(onContextMenu).toHaveBeenCalledWith(node, 5, 9)
+    })
 })
