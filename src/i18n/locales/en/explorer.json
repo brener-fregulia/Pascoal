@@ -1,0 +1,10 @@
+{
+  "explorer": {
+    "no_folder": "No folder open.",
+    "open_folder": "Open Folder...",
+    "refresh": "Refresh",
+    "close_folder": "Close folder",
+    "loading": "Loading...",
+    "no_files": "This folder is empty."
+  }
+}

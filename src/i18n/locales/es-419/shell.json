@@ -1,0 +1,50 @@
+{
+  "titlebar": {
+    "close": "Cerrar",
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "file": "Archivo",
+    "new_file": "Nuevo archivo",
+    "open_file": "Abrir archivo...",
+    "open_folder": "Abrir carpeta...",
+    "save": "Guardar",
+    "save_as": "Guardar como...",
+    "help": "Ayuda",
+    "report_bug": "Reportar un error",
+    "report_pascal_compiler_issue": "Reportar un problema de Pascal / compilador",
+    "request_feature": "Solicitar una función",
+    "view_on_github": "Ver en GitHub",
+    "release_notes": "Notas de la Versión",
+    "version_history": "Historial de Versiones",
+    "about_pascoal": "Acerca de Pascoal"
+  },
+  "activity": {
+    "explorer": "Explorador",
+    "search": "Buscar",
+    "git": "Git",
+    "playground": "Playground",
+    "settings": "Configuración"
+  },
+  "statusbar": {
+    "fpc_not_found": "FPC no encontrado",
+    "fpc_install_hint": "Haz clic para instalar"
+  },
+  "welcome": {
+    "subtitle": "IDE y Playground de Pascal",
+    "section_start": "Inicio",
+    "section_walkthroughs": "Tutoriales",
+    "section_recent": "Recientes",
+    "new_file": "Nuevo archivo...",
+    "open_file": "Abrir archivo...",
+    "open_folder": "Abrir carpeta...",
+    "new_project_git": "Nuevo proyecto + Git...",
+    "open_playground": "Abrir Playground",
+    "configure_git": "Configurar Git",
+    "no_recent": "No hay proyectos recientes.",
+    "open_recent": "Abrir archivo reciente",
+    "remove_recent": "Quitar de recientes",
+    "recent_today": "Hoy",
+    "recent_yesterday": "Ayer",
+    "recent_days_ago": "Hace {n} días"
+  }
+}

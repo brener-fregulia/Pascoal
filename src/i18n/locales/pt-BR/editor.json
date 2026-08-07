@@ -1,0 +1,24 @@
+{
+  "editor": {
+    "run": "Executar"
+  },
+  "console": {
+    "title": "Console",
+    "clear": "Limpar",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "build": "Build",
+    "program": "Programa",
+    "status_idle": "Nenhum build ainda",
+    "status_compiling": "Compilando...",
+    "status_success": "Build concluído",
+    "status_error": "Build falhou",
+    "exit_success": "Processo finalizado com código 0",
+    "exit_failure": "Processo finalizado com código {code}"
+  },
+  "tabs": {
+    "welcome": "Início",
+    "unsaved_confirm": "\"{name}\" tem alterações não salvas. Fechar mesmo assim?",
+    "read_only": "Somente leitura"
+  }
+}

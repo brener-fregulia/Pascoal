@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "title": "Ustawienia",
+    "close": "Zamknij",
+    "group_general": "Ogólne",
+    "category_language": "Język",
+    "category_git": "Git",
+    "category_toolchain": "Toolchain",
+    "coming_soon": "Wkrótce.",
+    "section_themes": "Motywy",
+    "theme_dark": "Ciemny",
+    "theme_light": "Jasny",
+    "theme_charcoal": "Grafitowy",
+    "git_scope_user": "Użytkownik",
+    "git_name": "Imię i nazwisko",
+    "git_email": "E-mail",
+    "git_workspace_hint": "Otwórz folder projektu, aby ustawić tożsamość specyficzną dla projektu.",
+    "toolchain_checking": "Sprawdzanie...",
+    "toolchain_not_found": "Nie znaleziono",
+    "toolchain_install": "Zainstaluj",
+    "toolchain_download": "Pobierz"
+  }
+}

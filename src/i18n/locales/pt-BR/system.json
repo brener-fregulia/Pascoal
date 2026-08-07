@@ -1,0 +1,51 @@
+{
+  "fpc_missing": {
+    "title": "Free Pascal não encontrado",
+    "message": "Não foi encontrada nenhuma instalação do FPC nesta máquina. Deseja instalá-lo agora?",
+    "installing": "Instalando o Free Pascal…",
+    "success": "Free Pascal instalado com sucesso.",
+    "error": "A instalação falhou. Você pode tentar novamente ou instalar manualmente.",
+    "no_package_manager": "Nenhum gerenciador de pacotes suportado foi detectado. Instale manualmente.",
+    "install": "Instalar",
+    "installing_btn": "Instalando…",
+    "download": "Baixar manualmente",
+    "cancel": "Cancelar",
+    "close": "Fechar"
+  },
+  "update": {
+    "title": "Atualização disponível",
+    "available_message": "Uma nova versão ({version}) está disponível. Deseja atualizar agora?",
+    "checking": "Verificando…",
+    "check_now": "Verificar atualizações",
+    "up_to_date": "Você já está na versão mais recente.",
+    "downloading": "Baixando atualização…",
+    "ready": "Atualização instalada. Reiniciando…",
+    "error": "A atualização falhou. Você pode tentar novamente ou baixar manualmente.",
+    "now": "Atualizar agora",
+    "later": "Mais tarde",
+    "retry": "Tentar novamente",
+    "download_manually": "Baixar manualmente"
+  },
+  "whats_new": {
+    "title": "O que há de novo",
+    "close": "Entendi",
+    "view_history": "Histórico de versões",
+    "view_changelog": "Ver changelog completo"
+  },
+  "version_history": {
+    "title": "Histórico de Versões",
+    "close": "Fechar",
+    "loading": "Carregando…",
+    "empty": "Ainda não há notas de versão."
+  },
+  "about": {
+    "title": "Sobre o Pascoal",
+    "version": "Versão",
+    "fpc": "Free Pascal",
+    "fpc_not_found": "Não encontrado",
+    "detected": "Detectado",
+    "platform": "Plataforma",
+    "view_repo": "Ver no GitHub",
+    "license": "Licença MIT - Brener Fregulia, 2026"
+  }
+}

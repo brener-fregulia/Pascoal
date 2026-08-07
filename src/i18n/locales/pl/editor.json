@@ -1,0 +1,24 @@
+{
+  "editor": {
+    "run": "Uruchom"
+  },
+  "console": {
+    "title": "Konsola",
+    "clear": "Wyczyść",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano!",
+    "build": "Kompiluj",
+    "program": "Program",
+    "status_idle": "Jeszcze nic nie skompilowano",
+    "status_compiling": "Kompilowanie...",
+    "status_success": "Kompilacja zakończona pomyślnie",
+    "status_error": "Kompilacja nie powiodła się",
+    "exit_success": "Proces zakończony kodem 0",
+    "exit_failure": "Proces zakończony kodem {code}"
+  },
+  "tabs": {
+    "welcome": "Start",
+    "unsaved_confirm": "\"{name}\" ma niezapisane zmiany. Czy mimo to zamknąć?",
+    "read_only": "Tylko do odczytu"
+  }
+}

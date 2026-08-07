@@ -1,0 +1,24 @@
+{
+  "editor": {
+    "run": "Ejecutar"
+  },
+  "console": {
+    "title": "Consola",
+    "clear": "Limpiar",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "build": "Compilar",
+    "program": "Programa",
+    "status_idle": "Aún no hay compilaciones",
+    "status_compiling": "Compilando...",
+    "status_success": "Compilación completada",
+    "status_error": "La compilación falló",
+    "exit_success": "Proceso finalizado con código 0",
+    "exit_failure": "Proceso finalizado con código {code}"
+  },
+  "tabs": {
+    "welcome": "Inicio",
+    "unsaved_confirm": "\"{name}\" tiene cambios sin guardar. ¿Cerrar de todos modos?",
+    "read_only": "Solo lectura"
+  }
+}

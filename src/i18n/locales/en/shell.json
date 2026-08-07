@@ -1,0 +1,50 @@
+{
+  "titlebar": {
+    "close": "Close",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "file": "File",
+    "new_file": "New File",
+    "open_file": "Open File...",
+    "open_folder": "Open Folder...",
+    "save": "Save",
+    "save_as": "Save As...",
+    "help": "Help",
+    "report_bug": "Report a Bug",
+    "report_pascal_compiler_issue": "Report a Pascal / Compiler Issue",
+    "request_feature": "Request a Feature",
+    "view_on_github": "View on GitHub",
+    "release_notes": "Release Notes",
+    "version_history": "Version History",
+    "about_pascoal": "About Pascoal"
+  },
+  "activity": {
+    "explorer": "Explorer",
+    "search": "Search",
+    "git": "Git",
+    "playground": "Playground",
+    "settings": "Settings"
+  },
+  "statusbar": {
+    "fpc_not_found": "FPC not found",
+    "fpc_install_hint": "Click to install"
+  },
+  "welcome": {
+    "subtitle": "Pascal IDE & Playground",
+    "section_start": "Start",
+    "section_walkthroughs": "Walkthroughs",
+    "section_recent": "Recent",
+    "new_file": "New File...",
+    "open_file": "Open File...",
+    "open_folder": "Open Folder...",
+    "new_project_git": "New Project + Git...",
+    "open_playground": "Open Playground",
+    "configure_git": "Configure Git",
+    "no_recent": "No recent projects.",
+    "open_recent": "Open recent file",
+    "remove_recent": "Remove from recents",
+    "recent_today": "Today",
+    "recent_yesterday": "Yesterday",
+    "recent_days_ago": "{n} days ago"
+  }
+}

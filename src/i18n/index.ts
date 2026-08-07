@@ -1,15 +1,79 @@
 import { writable, derived, get } from 'svelte/store'
 
-import en from './locales/en.json'
-import ptBR from './locales/pt-BR.json'
-import es419 from './locales/es-419.json'
-import pl from './locales/pl.json'
+import enShell from './locales/en/shell.json'
+import enEditor from './locales/en/editor.json'
+import enExplorer from './locales/en/explorer.json'
+import enSearch from './locales/en/search.json'
+import enGit from './locales/en/git.json'
+import enSettings from './locales/en/settings.json'
+import enSystem from './locales/en/system.json'
+
+import ptBRShell from './locales/pt-BR/shell.json'
+import ptBREditor from './locales/pt-BR/editor.json'
+import ptBRExplorer from './locales/pt-BR/explorer.json'
+import ptBRSearch from './locales/pt-BR/search.json'
+import ptBRGit from './locales/pt-BR/git.json'
+import ptBRSettings from './locales/pt-BR/settings.json'
+import ptBRSystem from './locales/pt-BR/system.json'
+
+import es419Shell from './locales/es-419/shell.json'
+import es419Editor from './locales/es-419/editor.json'
+import es419Explorer from './locales/es-419/explorer.json'
+import es419Search from './locales/es-419/search.json'
+import es419Git from './locales/es-419/git.json'
+import es419Settings from './locales/es-419/settings.json'
+import es419System from './locales/es-419/system.json'
+
+import plShell from './locales/pl/shell.json'
+import plEditor from './locales/pl/editor.json'
+import plExplorer from './locales/pl/explorer.json'
+import plSearch from './locales/pl/search.json'
+import plGit from './locales/pl/git.json'
+import plSettings from './locales/pl/settings.json'
+import plSystem from './locales/pl/system.json'
+
+const en = {
+  ...enShell,
+  ...enEditor,
+  ...enExplorer,
+  ...enSearch,
+  ...enGit,
+  ...enSettings,
+  ...enSystem,
+}
+const ptBR = {
+  ...ptBRShell,
+  ...ptBREditor,
+  ...ptBRExplorer,
+  ...ptBRSearch,
+  ...ptBRGit,
+  ...ptBRSettings,
+  ...ptBRSystem,
+}
+const es419 = {
+  ...es419Shell,
+  ...es419Editor,
+  ...es419Explorer,
+  ...es419Search,
+  ...es419Git,
+  ...es419Settings,
+  ...es419System,
+}
+const pl = {
+  ...plShell,
+  ...plEditor,
+  ...plExplorer,
+  ...plSearch,
+  ...plGit,
+  ...plSettings,
+  ...plSystem,
+}
 
 export type Locale = 'en' | 'pt-BR' | 'es-419' | 'pl'
 
 type LocaleData = typeof en
 
-const locales: Record<Locale, LocaleData> = {
+export const locales: Record<Locale, LocaleData> = {
   en: en,
   'pt-BR': ptBR,
   'es-419': es419,

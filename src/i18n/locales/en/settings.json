@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "title": "Settings",
+    "close": "Close",
+    "group_general": "General",
+    "category_language": "Language",
+    "category_git": "Git",
+    "category_toolchain": "Toolchain",
+    "coming_soon": "Coming soon.",
+    "section_themes": "Themes",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
+    "theme_charcoal": "Charcoal",
+    "git_scope_user": "User",
+    "git_name": "Name",
+    "git_email": "Email",
+    "git_workspace_hint": "Open a project folder to set a project-specific identity.",
+    "toolchain_checking": "Checking...",
+    "toolchain_not_found": "Not found",
+    "toolchain_install": "Install",
+    "toolchain_download": "Download"
+  }
+}

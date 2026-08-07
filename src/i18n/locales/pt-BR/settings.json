@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "title": "Configurações",
+    "close": "Fechar",
+    "group_general": "Geral",
+    "category_language": "Idioma",
+    "category_git": "Git",
+    "category_toolchain": "Toolchain",
+    "coming_soon": "Em breve.",
+    "section_themes": "Temas",
+    "theme_dark": "Escuro",
+    "theme_light": "Claro",
+    "theme_charcoal": "Carvão",
+    "git_scope_user": "Usuário",
+    "git_name": "Nome",
+    "git_email": "Email",
+    "git_workspace_hint": "Abra uma pasta de projeto para configurar uma identidade específica do projeto.",
+    "toolchain_checking": "Verificando...",
+    "toolchain_not_found": "Não encontrado",
+    "toolchain_install": "Instalar",
+    "toolchain_download": "Baixar"
+  }
+}

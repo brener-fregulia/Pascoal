@@ -1,0 +1,10 @@
+{
+  "explorer": {
+    "no_folder": "No hay ninguna carpeta abierta.",
+    "open_folder": "Abrir carpeta...",
+    "refresh": "Actualizar",
+    "close_folder": "Cerrar carpeta",
+    "loading": "Cargando...",
+    "no_files": "Esta carpeta está vacía."
+  }
+}

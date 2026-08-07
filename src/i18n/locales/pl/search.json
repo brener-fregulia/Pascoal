@@ -1,0 +1,24 @@
+{
+  "search": {
+    "placeholder": "Szukaj w plikach...",
+    "case_sensitive": "Rozróżniaj wielkość liter",
+    "no_folder": "Otwórz folder, aby przeszukać pliki.",
+    "no_results": "Nie znaleziono wyników.",
+    "results_count": "{count} wyników"
+  },
+  "find": {
+    "find_placeholder": "Znajdź",
+    "replace_placeholder": "Zamień",
+    "match_case": "Rozróżniaj wielkość liter",
+    "whole_word": "Całe słowo",
+    "use_regex": "Użyj wyrażenia regularnego",
+    "toggle_replace": "Przełącz zamianę",
+    "no_results": "Brak wyników",
+    "of": "z",
+    "previous": "Poprzednie dopasowanie",
+    "next": "Następne dopasowanie",
+    "close": "Zamknij",
+    "replace": "Zamień",
+    "replace_all": "Zamień wszystko"
+  }
+}

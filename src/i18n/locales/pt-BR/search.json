@@ -1,0 +1,24 @@
+{
+  "search": {
+    "placeholder": "Buscar nos arquivos...",
+    "case_sensitive": "Diferenciar maiúsculas",
+    "no_folder": "Abra uma pasta para buscar nos arquivos.",
+    "no_results": "Nenhum resultado encontrado.",
+    "results_count": "{count} resultados"
+  },
+  "find": {
+    "find_placeholder": "Buscar",
+    "replace_placeholder": "Substituir",
+    "match_case": "Diferenciar maiúsculas",
+    "whole_word": "Palavra inteira",
+    "use_regex": "Usar expressão regular",
+    "toggle_replace": "Alternar substituição",
+    "no_results": "Nenhum resultado",
+    "of": "de",
+    "previous": "Ocorrência anterior",
+    "next": "Próxima ocorrência",
+    "close": "Fechar",
+    "replace": "Substituir",
+    "replace_all": "Substituir tudo"
+  }
+}

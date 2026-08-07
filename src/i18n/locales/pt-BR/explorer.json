@@ -1,0 +1,10 @@
+{
+  "explorer": {
+    "no_folder": "Nenhuma pasta aberta.",
+    "open_folder": "Abrir Pasta...",
+    "refresh": "Atualizar",
+    "close_folder": "Fechar pasta",
+    "loading": "Carregando...",
+    "no_files": "Esta pasta está vazia."
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "editor": {
+    "run": "Run"
+  },
+  "console": {
+    "title": "Console",
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "build": "Build",
+    "program": "Program",
+    "status_idle": "No build yet",
+    "status_compiling": "Compiling...",
+    "status_success": "Build succeeded",
+    "status_error": "Build failed",
+    "exit_success": "Process finished with exit code 0",
+    "exit_failure": "Process finished with exit code {code}"
+  },
+  "tabs": {
+    "welcome": "Welcome",
+    "unsaved_confirm": "\"{name}\" has unsaved changes. Close anyway?",
+    "read_only": "Read-only"
+  }
+}

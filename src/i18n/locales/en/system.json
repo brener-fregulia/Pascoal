@@ -1,0 +1,51 @@
+{
+  "fpc_missing": {
+    "title": "Free Pascal not found",
+    "message": "No FPC installation was found on this machine. Would you like to install it now?",
+    "installing": "Installing Free Pascal…",
+    "success": "Free Pascal was installed successfully.",
+    "error": "Installation failed. You can try again or install it manually.",
+    "no_package_manager": "No supported package manager was detected. Please install manually.",
+    "install": "Install",
+    "installing_btn": "Installing…",
+    "download": "Download manually",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "update": {
+    "title": "Update available",
+    "available_message": "A new version ({version}) is available. Would you like to update now?",
+    "checking": "Checking…",
+    "check_now": "Check for updates",
+    "up_to_date": "You're on the latest version.",
+    "downloading": "Downloading update…",
+    "ready": "Update installed. Restarting…",
+    "error": "Update failed. You can retry or download it manually.",
+    "now": "Update now",
+    "later": "Later",
+    "retry": "Retry",
+    "download_manually": "Download manually"
+  },
+  "whats_new": {
+    "title": "What's new",
+    "close": "Got it",
+    "view_history": "Version history",
+    "view_changelog": "View full changelog"
+  },
+  "version_history": {
+    "title": "Version History",
+    "close": "Close",
+    "loading": "Loading…",
+    "empty": "No release notes yet."
+  },
+  "about": {
+    "title": "About Pascoal",
+    "version": "Version",
+    "fpc": "Free Pascal",
+    "fpc_not_found": "Not found",
+    "detected": "Detected",
+    "platform": "Platform",
+    "view_repo": "View on GitHub",
+    "license": "MIT License - Brener Fregulia, 2026"
+  }
+}
