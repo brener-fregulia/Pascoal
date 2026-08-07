@@ -98,6 +98,16 @@ describe('Welcome', () => {
             expect(getByText('MyProject')).toBeInTheDocument()
         })
 
+        it('shows the full path of each recent workspace entry', () => {
+            mockRecentWorkspaceEntries.push({
+                path: '/tmp/MyProject',
+                name: 'MyProject',
+                openedAt: Date.now(),
+            })
+            const { getByText } = render(Welcome)
+            expect(getByText('/tmp/MyProject')).toBeInTheDocument()
+        })
+
         // Opening a recent workspace from here is routed through the same
         // menu-open-recent-workspace event the File menu uses (handled in
         // App.svelte) rather than calling explorerStore directly - that

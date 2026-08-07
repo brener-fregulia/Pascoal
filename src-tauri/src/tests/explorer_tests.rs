@@ -1,4 +1,4 @@
-use crate::project::files::list_folder_tree;
+use crate::project::files::{list_folder_tree, open_workspace_at_path};
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -104,4 +104,39 @@ fn empty_subfolder_has_empty_children_not_none() {
 
     assert!(nodes[0].is_directory);
     assert_eq!(nodes[0].children.as_ref().unwrap().len(), 0);
+}
+
+#[test]
+fn open_workspace_at_path_returns_folder_and_tree_for_valid_directory() {
+    let dir = tmp_dir("open_valid");
+    fs::write(dir.join("main.pas"), "").unwrap();
+
+    let result = open_workspace_at_path(&dir.to_string_lossy()).unwrap();
+
+    let expected_name = dir.file_name().unwrap().to_string_lossy().to_string();
+    assert_eq!(result.folder.name, expected_name);
+
+    let canonical = dunce::canonicalize(&dir).unwrap();
+    assert_eq!(result.folder.path, canonical.to_string_lossy());
+
+    assert_eq!(result.tree.len(), 1);
+    assert_eq!(result.tree[0].name, "main.pas");
+}
+
+#[test]
+fn open_workspace_at_path_fails_for_nonexistent_path() {
+    let result = open_workspace_at_path("/nonexistent/path/xyz_open_workspace");
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn open_workspace_at_path_fails_when_path_is_a_file() {
+    let dir = tmp_dir("open_file_not_dir");
+    let file_path = dir.join("main.pas");
+    fs::write(&file_path, "").unwrap();
+
+    let result = open_workspace_at_path(&file_path.to_string_lossy());
+
+    assert!(result.is_err());
 }
