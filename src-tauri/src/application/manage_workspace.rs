@@ -13,6 +13,15 @@ pub async fn open_workspace(app: AppHandle) -> Option<OpenFolderResult> {
     Some(result)
 }
 
+pub fn open_workspace_at_path(app: AppHandle, path: String) -> Result<OpenFolderResult, String> {
+    let result = files::open_workspace_at_path(&path)?;
+
+    let state = app.state::<WorkspaceState>();
+    *state.root.lock().unwrap() = Some(std::path::PathBuf::from(&result.folder.path));
+
+    Ok(result)
+}
+
 pub fn list_folder_tree(folder_path: String) -> Vec<ExplorerNode> {
     files::list_folder_tree(&folder_path)
 }

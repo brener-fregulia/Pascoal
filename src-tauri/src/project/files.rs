@@ -198,6 +198,37 @@ pub async fn open_workspace(app: &tauri::AppHandle) -> Option<OpenFolderResult> 
     })
 }
 
+pub fn open_workspace_at_path(path: &str) -> Result<OpenFolderResult, String> {
+    let picked_path = std::path::PathBuf::from(path);
+
+    if !picked_path.exists() {
+        return Err(format!("Path does not exist: {path}"));
+    }
+    if !picked_path.is_dir() {
+        return Err(format!("Path is not a directory: {path}"));
+    }
+
+    // dunce::canonicalize, not std::fs::canonicalize - see open_workspace above.
+    let folder_path = dunce::canonicalize(&picked_path)
+        .map_err(|e| format!("Failed to resolve path: {e}"))?;
+
+    let name = folder_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("Folder")
+        .to_string();
+
+    let tree = build_tree(&folder_path, &folder_path);
+
+    Ok(OpenFolderResult {
+        folder: ExplorerFolder {
+            name,
+            path: folder_path.to_string_lossy().to_string(),
+        },
+        tree,
+    })
+}
+
 pub fn list_folder_tree(folder_path: &str) -> Vec<ExplorerNode> {
     let path = std::path::PathBuf::from(folder_path);
     build_tree(&path, &path)

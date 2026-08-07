@@ -48,6 +48,14 @@ pub async fn open_workspace(app: tauri::AppHandle) -> Option<OpenFolderResult> {
 }
 
 #[tauri::command]
+pub fn open_workspace_at_path(
+    app: tauri::AppHandle,
+    path: String,
+) -> Result<OpenFolderResult, String> {
+    manage_workspace::open_workspace_at_path(app, path)
+}
+
+#[tauri::command]
 pub fn list_folder_tree(folder_path: String) -> Vec<ExplorerNode> {
     manage_workspace::list_folder_tree(folder_path)
 }

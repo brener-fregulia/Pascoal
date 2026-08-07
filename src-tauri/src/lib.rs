@@ -88,6 +88,7 @@ pub fn run() {
             commands::project_commands::file_exists,
             commands::project_commands::read_file,
             commands::project_commands::open_workspace,
+            commands::project_commands::open_workspace_at_path,
             commands::project_commands::list_folder_tree,
             commands::project_commands::open_url,
             commands::project_commands::reveal_in_file_manager,
