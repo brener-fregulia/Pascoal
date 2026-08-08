@@ -5,6 +5,7 @@ import { get } from 'svelte/store'
 import {
     settingsStore,
     DEFAULT_FONT_SIZE,
+    MAX_FONT_SIZE,
 } from '../../../src/settings/settingsStore'
 
 const {
@@ -232,7 +233,7 @@ describe('Editor', () => {
         })
 
         it('clamps zoom in at the maximum font size', async () => {
-            settingsStore.updateSetting('fontSize', 24)
+            settingsStore.updateSetting('fontSize', MAX_FONT_SIZE)
             const tab = makeTab()
             mockTabState.tabs = [tab]
             mockTabState.activeTabId = tab.id
@@ -242,7 +243,7 @@ describe('Editor', () => {
                 code: 'Equal',
                 ctrlKey: true,
             })
-            expect(get(settingsStore).fontSize).toBe(24)
+            expect(get(settingsStore).fontSize).toBe(MAX_FONT_SIZE)
         })
 
         it('clamps zoom out at the minimum font size', async () => {

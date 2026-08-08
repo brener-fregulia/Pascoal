@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { get } from 'svelte/store'
-import { settingsStore, type Settings } from '../../../src/settings/settingsStore'
+import { DEFAULT_FONT_SIZE, settingsStore, type Settings } from '../../../src/settings/settingsStore'
 
 const DEFAULTS: Settings = {
     autoSaveBeforeRun: true,
     theme: null,
     gitAutoStageOnCommit: 'ask',
-    fontSize: 13,
+    fontSize: DEFAULT_FONT_SIZE,
     reopenLastWorkspace: true,
 }
 

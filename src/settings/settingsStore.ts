@@ -11,8 +11,8 @@ export interface Settings {
 }
 
 export const MIN_FONT_SIZE = 10
-export const MAX_FONT_SIZE = 24
-export const DEFAULT_FONT_SIZE = 13
+export const MAX_FONT_SIZE = 40
+export const DEFAULT_FONT_SIZE = 14
 
 const DEFAULTS: Settings = {
   autoSaveBeforeRun: true,
