@@ -12,6 +12,8 @@ const {
     mockTabStoreActivate,
     mockTabStoreRemapPaths,
     mockTabStoreClose,
+    mockAsk,
+    mockMessage,
 } =
     vi.hoisted(() => ({
         mockExplorerState: {
@@ -36,7 +38,14 @@ const {
         mockTabStoreActivate: vi.fn(),
         mockTabStoreRemapPaths: vi.fn(),
         mockTabStoreClose: vi.fn().mockResolvedValue(true),
+        mockAsk: vi.fn(),
+        mockMessage: vi.fn(),
     }))
+
+vi.mock('@tauri-apps/plugin-dialog', () => ({
+    ask: mockAsk,
+    message: mockMessage,
+}))
 
 vi.mock('../../../src/project/explorerStore', () => ({
     explorerStore: {
@@ -85,6 +94,11 @@ afterEach(() => {
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     vi.clearAllMocks()
+    // clearAllMocks only clears call history, not queued `mockResolvedValueOnce`
+    // implementations - reset ask/message explicitly so a queued answer left
+    // over from one delete test can never leak into the next one.
+    mockAsk.mockReset()
+    mockMessage.mockReset()
         ; (window as any).__TAURI__ = undefined
 })
 
@@ -761,5 +775,251 @@ describe('FileTree rename file and folder', () => {
 
         expect(container.querySelector('.rename-input')).toBe(freshInput)
         expect(mockInvoke).not.toHaveBeenCalledWith('rename_path', expect.anything())
+    })
+})
+
+describe('FileTree delete file and folder', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('shows the trash confirmation when Delete is pressed with an item selected', async () => {
+        setupTree()
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        expect(mockAsk).toHaveBeenCalled()
+    })
+
+    it('does nothing when Delete is pressed with nothing selected', async () => {
+        setupTree()
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        render(FileTree)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        expect(mockAsk).not.toHaveBeenCalled()
+    })
+
+    it('does nothing when Delete is pressed while a create is pending', async () => {
+        setupTree()
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText, getByTitle } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.click(getByTitle('New File'))
+
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        expect(mockAsk).not.toHaveBeenCalled()
+    })
+
+    it('does nothing when Delete is pressed while a rename is pending', async () => {
+        setupTree()
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'F2' })
+
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        expect(mockAsk).not.toHaveBeenCalled()
+    })
+
+    it('does not call trash_path when the trash confirmation is cancelled', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(false)
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockAsk).toHaveBeenCalled()
+        })
+        expect(mockInvoke).not.toHaveBeenCalledWith('trash_path', expect.anything())
+    })
+
+    it('calls trash_path with the path and refreshes the tree when confirmed and successful', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('trash_path', {
+                path: '/tmp/MyProject/main.pas',
+            })
+        })
+        await vi.waitFor(() => {
+            expect(mockRefresh).toHaveBeenCalled()
+        })
+    })
+
+    it('closes an open tab pointing at the deleted file', async () => {
+        setupTree()
+        mockTabState.tabs = [{ id: 'tab-1', filePath: '/tmp/MyProject/main.pas' }]
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockTabStoreClose).toHaveBeenCalledWith('tab-1')
+        })
+    })
+
+    it('closes an open tab pointing at a file inside the deleted folder', async () => {
+        setupTree()
+        mockTabState.tabs = [
+            { id: 'tab-2', filePath: '/tmp/MyProject/src/inner.pas' },
+        ]
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('src').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockTabStoreClose).toHaveBeenCalledWith('tab-2')
+        })
+    })
+
+    it('clears the selection when the currently selected item is deleted', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        expect(row.className).toContain('selected')
+
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(row.className).not.toContain('selected')
+        })
+    })
+
+    it('deletes a file via the "Delete" context menu item', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Delete'))
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('trash_path', {
+                path: '/tmp/MyProject/main.pas',
+            })
+        })
+    })
+
+    it('deletes a folder via the "Delete" context menu item', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue(undefined)
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true)
+        const { getByText } = render(FileTree)
+        const row = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Delete'))
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('trash_path', {
+                path: '/tmp/MyProject/src',
+            })
+        })
+    })
+
+    it('does not call delete_path_permanently when trash_path fails and the fallback confirmation is cancelled', async () => {
+        setupTree()
+        const mockInvoke = vi.fn((cmd: string) => {
+            if (cmd === 'trash_path') return Promise.reject(new Error('trash unavailable'))
+            return Promise.resolve(undefined)
+        })
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true) // trash confirmation
+        mockAsk.mockResolvedValueOnce(false) // permanent-delete fallback confirmation
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockAsk).toHaveBeenCalledTimes(2)
+        })
+        expect(mockInvoke).not.toHaveBeenCalledWith(
+            'delete_path_permanently',
+            expect.anything(),
+        )
+    })
+
+    it('calls delete_path_permanently and finishes the same cleanup when trash_path fails and the fallback is confirmed', async () => {
+        setupTree()
+        mockTabState.tabs = [{ id: 'tab-1', filePath: '/tmp/MyProject/main.pas' }]
+        const mockInvoke = vi.fn((cmd: string) => {
+            if (cmd === 'trash_path') return Promise.reject(new Error('trash unavailable'))
+            return Promise.resolve(undefined)
+        })
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true) // trash confirmation
+        mockAsk.mockResolvedValueOnce(true) // permanent-delete fallback confirmation
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('delete_path_permanently', {
+                path: '/tmp/MyProject/main.pas',
+            })
+        })
+        await vi.waitFor(() => {
+            expect(mockRefresh).toHaveBeenCalled()
+            expect(mockTabStoreClose).toHaveBeenCalledWith('tab-1')
+        })
+    })
+
+    it('shows the final error message when both trash_path and delete_path_permanently fail', async () => {
+        setupTree()
+        const mockInvoke = vi.fn((cmd: string) => {
+            if (cmd === 'trash_path') return Promise.reject(new Error('trash unavailable'))
+            if (cmd === 'delete_path_permanently')
+                return Promise.reject(new Error('permission denied'))
+            return Promise.resolve(undefined)
+        })
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        mockAsk.mockResolvedValueOnce(true) // trash confirmation
+        mockAsk.mockResolvedValueOnce(true) // permanent-delete fallback confirmation
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        await vi.waitFor(() => {
+            expect(mockMessage).toHaveBeenCalled()
+        })
     })
 })

@@ -1,5 +1,6 @@
 use crate::project::files::{
-    create_directory, create_file, list_folder_tree, open_workspace_at_path, rename_path,
+    create_directory, create_file, delete_path_permanently, list_folder_tree,
+    open_workspace_at_path, rename_path, trash_path,
 };
 use std::fs;
 
@@ -277,4 +278,74 @@ fn rename_path_fails_with_conflict_message_when_the_destination_already_exists()
     // Neither the source nor the pre-existing destination were touched.
     assert!(source.is_file());
     assert_eq!(fs::read_to_string(&target).unwrap(), "original content");
+}
+
+#[test]
+fn trash_path_moves_a_file_out_of_its_original_location() {
+    let dir = tmp_dir("trash_file_success");
+    let target = dir.join("doomed.pas");
+    fs::write(&target, "program Doomed;").unwrap();
+
+    let result = trash_path(&target);
+
+    assert!(result.is_ok());
+    assert!(!target.exists());
+}
+
+#[test]
+fn trash_path_moves_a_folder_with_contents_out_of_its_original_location() {
+    let dir = tmp_dir("trash_folder_success");
+    let target = dir.join("doomed_folder");
+    fs::create_dir(&target).unwrap();
+    fs::write(target.join("inner.pas"), "program Inner;").unwrap();
+
+    let result = trash_path(&target);
+
+    assert!(result.is_ok());
+    assert!(!target.exists());
+}
+
+#[test]
+fn trash_path_fails_for_a_nonexistent_path() {
+    let dir = tmp_dir("trash_nonexistent");
+    let target = dir.join("does_not_exist.pas");
+
+    let result = trash_path(&target);
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn delete_path_permanently_removes_a_file() {
+    let dir = tmp_dir("delete_permanently_file_success");
+    let target = dir.join("doomed.pas");
+    fs::write(&target, "program Doomed;").unwrap();
+
+    let result = delete_path_permanently(&target);
+
+    assert!(result.is_ok());
+    assert!(!target.exists());
+}
+
+#[test]
+fn delete_path_permanently_removes_a_folder_and_its_contents_recursively() {
+    let dir = tmp_dir("delete_permanently_folder_success");
+    let target = dir.join("doomed_folder");
+    fs::create_dir(&target).unwrap();
+    fs::write(target.join("inner.pas"), "program Inner;").unwrap();
+
+    let result = delete_path_permanently(&target);
+
+    assert!(result.is_ok());
+    assert!(!target.exists());
+}
+
+#[test]
+fn delete_path_permanently_fails_for_a_nonexistent_path() {
+    let dir = tmp_dir("delete_permanently_nonexistent");
+    let target = dir.join("does_not_exist.pas");
+
+    let result = delete_path_permanently(&target);
+
+    assert!(result.is_err());
 }
