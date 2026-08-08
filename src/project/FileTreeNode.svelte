@@ -50,6 +50,21 @@
     e.stopPropagation()
     onContextMenu(node, e.clientX, e.clientY)
   }
+
+  // Native <button> elements already fire a click from Enter/Space by
+  // default, which would trigger onclick below on its own in a real
+  // browser - but that translation isn't simulated by jsdom (the test
+  // environment), so it wouldn't be verifiable by an automated test, and it
+  // would silently stop working if this row ever stopped being a <button>.
+  // Handling Enter explicitly here (and preventing its default action, so
+  // the native click-from-Enter doesn't also fire and double-run this) makes
+  // the behavior explicit, robust to markup changes, and testable.
+  function handleRowKeydown(e: KeyboardEvent) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    if (node.isDirectory) onToggle(node.path)
+    else onFileClick(node)
+  }
 </script>
 
 {#if node.isDirectory}
@@ -71,6 +86,7 @@
       style="padding-left: {8 + depth * 14}px"
       title={node.relativePath}
       onclick={() => onToggle(node.path)}
+      onkeydown={handleRowKeydown}
       oncontextmenu={handleContextMenu}
     >
       <span class="chevron">{isExpanded ? '▾' : '▸'}</span>
@@ -127,6 +143,7 @@
     style="padding-left: {8 + depth * 14 + 16}px"
     title={node.relativePath}
     onclick={() => onFileClick(node)}
+    onkeydown={handleRowKeydown}
     oncontextmenu={handleContextMenu}
   >
     <File size={13} />
