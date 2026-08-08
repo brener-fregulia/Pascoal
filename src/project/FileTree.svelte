@@ -25,6 +25,7 @@
     error: string | null
   } | null>(null)
   let renaming = $state<{ path: string; error: string | null } | null>(null)
+  let clipboard = $state<{ path: string; mode: 'copy' | 'cut' } | null>(null)
 
   let folder = $derived($explorerStore.folder)
   let tree = $derived($explorerStore.tree)
@@ -288,6 +289,57 @@
     deletePath(node.path)
   }
 
+  function menuCut(node: ExplorerNode) {
+    closeMenu()
+    clipboard = { path: node.path, mode: 'cut' }
+  }
+
+  function menuCopy(node: ExplorerNode) {
+    closeMenu()
+    clipboard = { path: node.path, mode: 'copy' }
+  }
+
+  // Copies or moves `clipboard.path` into `targetParent`. Cut is a one-shot
+  // action: it clears the clipboard once the move succeeds and remaps any
+  // open tabs/expanded paths/selection pointing at the old location, since
+  // the original path no longer exists. Copy leaves the clipboard untouched
+  // (so the same item can be pasted into multiple places, matching standard
+  // OS behavior) and never remaps anything, since the original file/folder
+  // and its open tabs are untouched by a copy.
+  async function pasteClipboard(targetParent: string | null) {
+    if (!clipboard || !targetParent) return
+    if (!isTauriAvailable()) return
+    const { path, mode } = clipboard
+    try {
+      const command = mode === 'copy' ? 'copy_path' : 'move_path'
+      const newPath = await invoke<string>(command, {
+        path,
+        destinationParent: targetParent,
+      })
+      if (mode === 'cut') {
+        clipboard = null
+        tabStore.remapPaths(path, newPath)
+        expandedPaths = new Set(
+          Array.from(expandedPaths, (p) => remapPathPrefix(p, path, newPath)),
+        )
+        if (selectedPath) {
+          selectedPath = remapPathPrefix(selectedPath, path, newPath)
+        }
+      }
+      expandFolder(targetParent)
+      await explorerStore.refresh()
+      selectedPath = newPath
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      await message(msg, { title: 'Pascoal', kind: 'error' })
+    }
+  }
+
+  function menuPaste(node: ExplorerNode) {
+    closeMenu()
+    pasteClipboard(node.path)
+  }
+
   function menuNewFile(node: ExplorerNode) {
     closeMenu()
     expandFolder(node.path)
@@ -308,6 +360,11 @@
   function menuNewFolderRoot() {
     closeMenu()
     if (folder) startCreate(folder.path, true)
+  }
+
+  function menuPasteRoot() {
+    closeMenu()
+    if (folder) pasteClipboard(folder.path)
   }
 
   // Creates inside the selected folder when one is selected, otherwise at
@@ -331,17 +388,41 @@
     startCreate(parent, true)
   }
 
-  function handleKeydown(e: KeyboardEvent) {
+  // Escape closes the context menu overlay regardless of where keyboard
+  // focus currently is - it covers the whole screen, so it must stay global
+  // on `window` rather than scoped to the tree.
+  function handleGlobalKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') closeMenu()
-    else if (e.key === 'F2' && selectedPath && !pendingCreate && !renaming) {
+  }
+
+  // F2/Delete/Cut/Copy/Paste act on the selected tree item and must only
+  // fire while keyboard focus is inside the file tree - the Explorer panel
+  // sits in a split pane next to the code editor, so a global `window`
+  // listener for these would also fire while the user is typing/deleting
+  // text in the editor, acting on whatever was last selected in the tree.
+  // Attaching this to `.tree-body` (rather than `window`) relies on native
+  // event bubbling: it only fires when a descendant of `.tree-body` (e.g. a
+  // focused tree row) has focus.
+  function handleTreeKeydown(e: KeyboardEvent) {
+    const mod = e.ctrlKey || e.metaKey
+    if (e.key === 'F2' && selectedPath && !pendingCreate && !renaming) {
       startRename(selectedPath)
     } else if (e.key === 'Delete' && selectedPath && !pendingCreate && !renaming) {
       deletePath(selectedPath)
+    } else if (mod && e.key.toLowerCase() === 'c' && selectedPath) {
+      e.preventDefault()
+      clipboard = { path: selectedPath, mode: 'copy' }
+    } else if (mod && e.key.toLowerCase() === 'x' && selectedPath) {
+      e.preventDefault()
+      clipboard = { path: selectedPath, mode: 'cut' }
+    } else if (mod && e.key.toLowerCase() === 'v' && clipboard) {
+      e.preventDefault()
+      pasteClipboard(toolbarTargetParent())
     }
   }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="file-tree">
   {#if !folder}
@@ -386,7 +467,11 @@
     </div>
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="tree-body" oncontextmenu={handleEmptyContextMenu}>
+    <div
+      class="tree-body"
+      oncontextmenu={handleEmptyContextMenu}
+      onkeydown={handleTreeKeydown}
+    >
       {#if loading}
         <p class="status-msg">{$i18n('explorer.loading')}</p>
       {:else if error}
@@ -414,6 +499,7 @@
             {selectedPath}
             {pendingCreate}
             {renaming}
+            {clipboard}
             onToggle={toggle}
             onFileClick={openFile}
             onContextMenu={handleContextMenu}
@@ -444,6 +530,11 @@
       <button class="menu-item" onclick={() => menuNewFolder(menuNode)}>
         {$i18n('explorer.new_folder')}
       </button>
+      {#if clipboard}
+        <button class="menu-item" onclick={() => menuPaste(menuNode)}>
+          {$i18n('explorer.paste')}
+        </button>
+      {/if}
       <hr class="menu-sep" />
     {/if}
     {#if !menuNode.isDirectory}
@@ -454,6 +545,13 @@
     {/if}
     <button class="menu-item" onclick={() => menuReveal(menuNode)}>
       {$i18n(revealLabelKey)}
+    </button>
+    <hr class="menu-sep" />
+    <button class="menu-item" onclick={() => menuCut(menuNode)}>
+      {$i18n('explorer.cut')}
+    </button>
+    <button class="menu-item" onclick={() => menuCopy(menuNode)}>
+      {$i18n('explorer.copy')}
     </button>
     <hr class="menu-sep" />
     <button class="menu-item" onclick={() => menuRename(menuNode)}>
@@ -485,6 +583,11 @@
     <button class="menu-item" onclick={menuNewFolderRoot}>
       {$i18n('explorer.new_folder')}
     </button>
+    {#if clipboard}
+      <button class="menu-item" onclick={menuPasteRoot}>
+        {$i18n('explorer.paste')}
+      </button>
+    {/if}
   </div>
 {/if}
 

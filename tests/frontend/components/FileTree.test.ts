@@ -570,7 +570,7 @@ describe('FileTree rename file and folder', () => {
         const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
 
         const input = container.querySelector('.rename-input') as HTMLInputElement
         expect(input).toBeInTheDocument()
@@ -580,7 +580,7 @@ describe('FileTree rename file and folder', () => {
     it('does nothing when F2 is pressed with nothing selected', async () => {
         setupTree()
         const { container } = render(FileTree)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
         expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
     })
 
@@ -592,7 +592,7 @@ describe('FileTree rename file and folder', () => {
         await fireEvent.click(getByTitle('New File'))
         expect(container.querySelector('.new-entry-input')).toBeInTheDocument()
 
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
 
         expect(container.querySelector('.new-entry-input')).toBeInTheDocument()
         expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
@@ -603,7 +603,7 @@ describe('FileTree rename file and folder', () => {
         const { getByText, container } = render(FileTree)
         const fileRow = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(fileRow)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
         const input = container.querySelector('.rename-input') as HTMLInputElement
         expect(input).toBeInTheDocument()
 
@@ -612,7 +612,7 @@ describe('FileTree rename file and folder', () => {
         // untouched.
         const folderRow = getByText('src').closest('button') as HTMLElement
         await fireEvent.click(folderRow)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
 
         expect(container.querySelectorAll('.rename-input')).toHaveLength(1)
         expect(container.querySelector('.rename-input')).toBe(input)
@@ -752,7 +752,7 @@ describe('FileTree rename file and folder', () => {
         // Start renaming "main.pas" via F2.
         const fileRow = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(fileRow)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
         const staleInput = container.querySelector('.rename-input') as HTMLInputElement
         expect(staleInput).toBeInTheDocument()
         expect(staleInput.value).toBe('main.pas')
@@ -789,10 +789,10 @@ describe('FileTree delete file and folder', () => {
     it('shows the trash confirmation when Delete is pressed with an item selected', async () => {
         setupTree()
             ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         expect(mockAsk).toHaveBeenCalled()
     })
@@ -800,8 +800,8 @@ describe('FileTree delete file and folder', () => {
     it('does nothing when Delete is pressed with nothing selected', async () => {
         setupTree()
             ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
-        render(FileTree)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        const { container } = render(FileTree)
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         expect(mockAsk).not.toHaveBeenCalled()
     })
@@ -809,12 +809,12 @@ describe('FileTree delete file and folder', () => {
     it('does nothing when Delete is pressed while a create is pending', async () => {
         setupTree()
             ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
-        const { getByText, getByTitle } = render(FileTree)
+        const { getByText, getByTitle, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
         await fireEvent.click(getByTitle('New File'))
 
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         expect(mockAsk).not.toHaveBeenCalled()
     })
@@ -822,12 +822,12 @@ describe('FileTree delete file and folder', () => {
     it('does nothing when Delete is pressed while a rename is pending', async () => {
         setupTree()
             ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'F2' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'F2' })
 
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         expect(mockAsk).not.toHaveBeenCalled()
     })
@@ -837,10 +837,10 @@ describe('FileTree delete file and folder', () => {
         const mockInvoke = vi.fn()
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(false)
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockAsk).toHaveBeenCalled()
@@ -853,10 +853,10 @@ describe('FileTree delete file and folder', () => {
         const mockInvoke = vi.fn().mockResolvedValue(undefined)
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true)
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockInvoke).toHaveBeenCalledWith('trash_path', {
@@ -874,10 +874,10 @@ describe('FileTree delete file and folder', () => {
         const mockInvoke = vi.fn().mockResolvedValue(undefined)
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true)
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockTabStoreClose).toHaveBeenCalledWith('tab-1')
@@ -892,10 +892,10 @@ describe('FileTree delete file and folder', () => {
         const mockInvoke = vi.fn().mockResolvedValue(undefined)
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true)
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('src').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockTabStoreClose).toHaveBeenCalledWith('tab-2')
@@ -907,12 +907,12 @@ describe('FileTree delete file and folder', () => {
         const mockInvoke = vi.fn().mockResolvedValue(undefined)
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true)
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
         expect(row.className).toContain('selected')
 
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(row.className).not.toContain('selected')
@@ -962,10 +962,10 @@ describe('FileTree delete file and folder', () => {
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true) // trash confirmation
         mockAsk.mockResolvedValueOnce(false) // permanent-delete fallback confirmation
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockAsk).toHaveBeenCalledTimes(2)
@@ -986,10 +986,10 @@ describe('FileTree delete file and folder', () => {
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true) // trash confirmation
         mockAsk.mockResolvedValueOnce(true) // permanent-delete fallback confirmation
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockInvoke).toHaveBeenCalledWith('delete_path_permanently', {
@@ -1013,10 +1013,10 @@ describe('FileTree delete file and folder', () => {
             ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
         mockAsk.mockResolvedValueOnce(true) // trash confirmation
         mockAsk.mockResolvedValueOnce(true) // permanent-delete fallback confirmation
-        const { getByText } = render(FileTree)
+        const { getByText, container } = render(FileTree)
         const row = getByText('main.pas').closest('button') as HTMLElement
         await fireEvent.click(row)
-        await fireEvent.keyDown(window, { key: 'Delete' })
+        await fireEvent.keyDown(container.querySelector('.tree-body') as HTMLElement, { key: 'Delete' })
 
         await vi.waitFor(() => {
             expect(mockMessage).toHaveBeenCalled()

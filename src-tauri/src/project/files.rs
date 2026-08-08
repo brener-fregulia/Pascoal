@@ -292,3 +292,63 @@ pub fn delete_path_permanently(target: &std::path::Path) -> Result<(), String> {
         std::fs::remove_file(target).map_err(|e| e.to_string())
     }
 }
+
+/// Picks a name that doesn't already exist inside `parent`, starting from
+/// `name` as-is and, if that's taken, trying `"{stem} (2){ext}"`,
+/// `"{stem} (3){ext}"`, etc. (extension preserved, counter before it) - the
+/// same convention Windows Explorer/Finder use for a pasted duplicate.
+pub fn unique_name_in(parent: &std::path::Path, name: &str) -> String {
+    if !parent.join(name).exists() {
+        return name.to_string();
+    }
+
+    let stem = std::path::Path::new(name)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or(name);
+    let extension = std::path::Path::new(name)
+        .extension()
+        .and_then(|e| e.to_str());
+
+    let mut counter = 2;
+    loop {
+        let candidate = match extension {
+            Some(ext) => format!("{stem} ({counter}).{ext}"),
+            None => format!("{stem} ({counter})"),
+        };
+
+        if !parent.join(&candidate).exists() {
+            return candidate;
+        }
+
+        counter += 1;
+    }
+}
+
+/// Copies `source` (file, or directory recursively) into `target`, which
+/// must not already exist yet. Rejects explicitly instead of silently
+/// overwriting, same convention as create_file/create_directory/rename_path.
+pub fn copy_path(source: &std::path::Path, target: &std::path::Path) -> Result<(), String> {
+    if target.exists() {
+        return Err("A file or folder with this name already exists".to_string());
+    }
+    copy_recursive(source, target)
+}
+
+fn copy_recursive(source: &std::path::Path, target: &std::path::Path) -> Result<(), String> {
+    if source.is_dir() {
+        std::fs::create_dir_all(target).map_err(|e| e.to_string())?;
+
+        for entry in std::fs::read_dir(source).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let entry_target = target.join(entry.file_name());
+            copy_recursive(&entry.path(), &entry_target)?;
+        }
+
+        Ok(())
+    } else {
+        std::fs::copy(source, target)
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+}

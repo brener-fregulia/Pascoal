@@ -110,3 +110,21 @@ pub fn trash_path(app: tauri::AppHandle, path: String) -> Result<(), String> {
 pub fn delete_path_permanently(app: tauri::AppHandle, path: String) -> Result<(), String> {
     manage_workspace::delete_path_permanently(app, path)
 }
+
+#[tauri::command]
+pub fn copy_path(
+    app: tauri::AppHandle,
+    path: String,
+    destination_parent: String,
+) -> Result<String, String> {
+    manage_workspace::copy_path(app, path, destination_parent)
+}
+
+#[tauri::command]
+pub fn move_path(
+    app: tauri::AppHandle,
+    path: String,
+    destination_parent: String,
+) -> Result<String, String> {
+    manage_workspace::move_path(app, path, destination_parent)
+}

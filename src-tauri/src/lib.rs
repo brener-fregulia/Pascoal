@@ -121,6 +121,8 @@ pub fn run() {
             commands::project_commands::rename_path,
             commands::project_commands::trash_path,
             commands::project_commands::delete_path_permanently,
+            commands::project_commands::copy_path,
+            commands::project_commands::move_path,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
             commands::installer_commands::detect_installer,

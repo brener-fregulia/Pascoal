@@ -13,6 +13,7 @@
     selectedPath = null,
     pendingCreate = null,
     renaming = null,
+    clipboard = null,
     onToggle,
     onFileClick,
     onContextMenu = () => {},
@@ -31,6 +32,7 @@
       error: string | null
     } | null
     renaming?: { path: string; error: string | null } | null
+    clipboard?: { path: string; mode: 'copy' | 'cut' } | null
     onToggle: (path: string) => void
     onFileClick: (node: ExplorerNode) => void
     onContextMenu?: (node: ExplorerNode, x: number, y: number) => void
@@ -44,6 +46,7 @@
   let isSelected = $derived(node.path === selectedPath)
   let isRenaming = $derived(node.path === renaming?.path)
   let renameError = $derived(isRenaming ? (renaming?.error ?? null) : null)
+  let isCut = $derived(node.path === clipboard?.path && clipboard?.mode === 'cut')
 
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault()
@@ -83,6 +86,7 @@
     <button
       class="tree-row dir-row"
       class:selected={isSelected}
+      class:cut={isCut}
       style="padding-left: {8 + depth * 14}px"
       title={node.relativePath}
       onclick={() => onToggle(node.path)}
@@ -115,6 +119,7 @@
         {selectedPath}
         {pendingCreate}
         {renaming}
+        {clipboard}
         {onToggle}
         {onFileClick}
         {onContextMenu}
@@ -140,6 +145,7 @@
   <button
     class="tree-row file-row"
     class:selected={isSelected}
+    class:cut={isCut}
     style="padding-left: {8 + depth * 14 + 16}px"
     title={node.relativePath}
     onclick={() => onFileClick(node)}
@@ -186,6 +192,10 @@
 
   .tree-row.selected:hover {
     background: rgba(128, 128, 128, 0.22);
+  }
+
+  .tree-row.cut {
+    opacity: 0.5;
   }
 
   .chevron {

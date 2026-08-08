@@ -85,3 +85,65 @@ pub fn delete_path_permanently(app: AppHandle, path: String) -> Result<(), Strin
     let target = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
     files::delete_path_permanently(&target)
 }
+
+pub fn copy_path(
+    app: AppHandle,
+    path: String,
+    destination_parent: String,
+) -> Result<String, String> {
+    let root = current_root(&app)?;
+    let source = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
+    let dest_parent =
+        workspace_guard::authorize_existing(&root, std::path::Path::new(&destination_parent))?;
+
+    // Never copy a folder into itself or one of its own subfolders - doing
+    // so would make copy_recursive recurse into the freshly-copied output,
+    // never terminating and filling up the disk. Reject before attempting.
+    if dest_parent == source || dest_parent.starts_with(&source) {
+        return Err("Cannot copy a folder into itself or one of its own subfolders".to_string());
+    }
+
+    let name = source
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| "Path has no file name".to_string())?;
+    let unique_name = files::unique_name_in(&dest_parent, name);
+    let target = workspace_guard::authorize_new(&root, &dest_parent, &unique_name)?;
+    files::copy_path(&source, &target)?;
+    Ok(target.to_string_lossy().to_string())
+}
+
+pub fn move_path(
+    app: AppHandle,
+    path: String,
+    destination_parent: String,
+) -> Result<String, String> {
+    let root = current_root(&app)?;
+    let source = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
+    let dest_parent =
+        workspace_guard::authorize_existing(&root, std::path::Path::new(&destination_parent))?;
+
+    // Same guard as copy_path - moving a folder into itself would corrupt
+    // the tree, and std::fs::rename's behavior in that case isn't reliable
+    // across platforms, so it's rejected explicitly rather than relied upon.
+    if dest_parent == source || dest_parent.starts_with(&source) {
+        return Err("Cannot move a folder into itself or one of its own subfolders".to_string());
+    }
+
+    // Pasting (moving) back into the same parent it's already in is a
+    // no-op, not a conflict with itself - without this check,
+    // unique_name_in would see the item's own current entry as a
+    // "conflict" and rename it to a spurious "(2)".
+    if source.parent() == Some(dest_parent.as_path()) {
+        return Ok(source.to_string_lossy().to_string());
+    }
+
+    let name = source
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| "Path has no file name".to_string())?;
+    let unique_name = files::unique_name_in(&dest_parent, name);
+    let target = workspace_guard::authorize_new(&root, &dest_parent, &unique_name)?;
+    files::rename_path(&source, &target)?;
+    Ok(target.to_string_lossy().to_string())
+}
