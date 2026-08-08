@@ -73,3 +73,15 @@ pub fn rename_path(app: AppHandle, path: String, new_name: String) -> Result<Str
     files::rename_path(&source, &target)?;
     Ok(target.to_string_lossy().to_string())
 }
+
+pub fn trash_path(app: AppHandle, path: String) -> Result<(), String> {
+    let root = current_root(&app)?;
+    let target = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
+    files::trash_path(&target)
+}
+
+pub fn delete_path_permanently(app: AppHandle, path: String) -> Result<(), String> {
+    let root = current_root(&app)?;
+    let target = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
+    files::delete_path_permanently(&target)
+}

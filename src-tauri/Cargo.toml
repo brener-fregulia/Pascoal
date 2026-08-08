@@ -30,6 +30,7 @@ portable-pty = "0.9.0"
 tree-sitter = "0.25"
 tree-sitter-pascal = "0.10.2"
 tree-sitter-highlight = "0.25"
+trash = "5"
 tauri-plugin-wdio-webdriver = { version = "1", optional = true }
 
 [dev-dependencies]

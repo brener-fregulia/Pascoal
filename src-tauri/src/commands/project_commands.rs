@@ -100,3 +100,13 @@ pub fn rename_path(
 ) -> Result<String, String> {
     manage_workspace::rename_path(app, path, new_name)
 }
+
+#[tauri::command]
+pub fn trash_path(app: tauri::AppHandle, path: String) -> Result<(), String> {
+    manage_workspace::trash_path(app, path)
+}
+
+#[tauri::command]
+pub fn delete_path_permanently(app: tauri::AppHandle, path: String) -> Result<(), String> {
+    manage_workspace::delete_path_permanently(app, path)
+}

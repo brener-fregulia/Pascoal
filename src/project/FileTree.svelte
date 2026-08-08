@@ -9,6 +9,7 @@
   import FileNew from '../icons/FileNew.svelte'
   import FolderNew from '../icons/FolderNew.svelte'
   import { isTauriAvailable, invoke } from '../integrations/tauri/client'
+  import { ask, message } from '@tauri-apps/plugin-dialog'
 
   let expandedPaths = $state(new Set<string>())
   let selectedPath = $state<string | null>(null)
@@ -211,6 +212,82 @@
     startRename(node.path)
   }
 
+  // True when `candidate` is exactly `path` or lives inside it (a
+  // descendant file/folder) - same prefix-matching rule as
+  // `remapPathPrefix`/`tabStore.remapPaths` above, just as a boolean check
+  // instead of a rewrite.
+  function isPathOrDescendant(candidate: string | null, path: string): boolean {
+    if (candidate === null) return false
+    return (
+      candidate === path ||
+      candidate.startsWith(path + '/') ||
+      candidate.startsWith(path + '\\')
+    )
+  }
+
+  // Shared cleanup after a delete (via trash or permanent) actually
+  // succeeds on the backend: close every open tab pointing at the deleted
+  // path or something inside it, clear the selection if it was affected,
+  // then refresh the tree. Tabs are closed one at a time (not in parallel)
+  // so a dirty tab's unsaved-changes confirmation dialog never overlaps
+  // with another one still pending.
+  async function finishDelete(path: string) {
+    const affected = $tabStore.tabs.filter((tab) =>
+      isPathOrDescendant(tab.filePath, path),
+    )
+    for (const tab of affected) {
+      await tabStore.close(tab.id)
+    }
+    if (isPathOrDescendant(selectedPath, path)) {
+      selectedPath = null
+      selectedIsDirectory = false
+    }
+    await explorerStore.refresh()
+  }
+
+  async function deletePath(path: string) {
+    const name = path.split(/[\\/]/).pop() ?? path
+    const trashMessage = $i18n('explorer.delete_confirm', { name })
+    const confirmedTrash = isTauriAvailable()
+      ? await ask(trashMessage, { title: 'Pascoal', kind: 'warning' })
+      : window.confirm(trashMessage)
+    if (!confirmedTrash) return
+    if (!isTauriAvailable()) return
+
+    try {
+      await invoke('trash_path', { path })
+      await finishDelete(path)
+      return
+    } catch (e) {
+      const error = e instanceof Error ? e.message : String(e)
+      const permanentMessage = $i18n('explorer.delete_permanently_confirm', {
+        name,
+        error,
+      })
+      const confirmedPermanent = await ask(permanentMessage, {
+        title: 'Pascoal',
+        kind: 'warning',
+      })
+      if (!confirmedPermanent) return
+
+      try {
+        await invoke('delete_path_permanently', { path })
+        await finishDelete(path)
+      } catch (e2) {
+        const error2 = e2 instanceof Error ? e2.message : String(e2)
+        await message($i18n('explorer.delete_failed', { name, error: error2 }), {
+          title: 'Pascoal',
+          kind: 'error',
+        })
+      }
+    }
+  }
+
+  function menuDelete(node: ExplorerNode) {
+    closeMenu()
+    deletePath(node.path)
+  }
+
   function menuNewFile(node: ExplorerNode) {
     closeMenu()
     expandFolder(node.path)
@@ -258,6 +335,8 @@
     if (e.key === 'Escape') closeMenu()
     else if (e.key === 'F2' && selectedPath && !pendingCreate && !renaming) {
       startRename(selectedPath)
+    } else if (e.key === 'Delete' && selectedPath && !pendingCreate && !renaming) {
+      deletePath(selectedPath)
     }
   }
 </script>
@@ -386,6 +465,10 @@
     </button>
     <button class="menu-item" onclick={() => menuCopyRelativePath(menuNode)}>
       {$i18n('explorer.copy_relative_path')}
+    </button>
+    <hr class="menu-sep" />
+    <button class="menu-item" onclick={() => menuDelete(menuNode)}>
+      {$i18n('explorer.delete')}
     </button>
   </div>
 {:else if menu?.kind === 'empty'}

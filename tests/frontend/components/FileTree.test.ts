@@ -7,9 +7,11 @@ const {
     mockRefresh,
     mockCloseFolder,
     mockAppState,
+    mockTabState,
     mockTabStoreOpenFile,
     mockTabStoreActivate,
     mockTabStoreRemapPaths,
+    mockTabStoreClose,
 } =
     vi.hoisted(() => ({
         mockExplorerState: {
@@ -25,9 +27,15 @@ const {
             info: null as { platform: string } | null,
             loading: false,
         },
+        mockTabState: {
+            tabs: [] as { id: string; filePath: string | null }[],
+            activeTabId: null as string | null,
+            activeView: 'welcome' as const,
+        },
         mockTabStoreOpenFile: vi.fn().mockResolvedValue({ id: 'tab-1' }),
         mockTabStoreActivate: vi.fn(),
         mockTabStoreRemapPaths: vi.fn(),
+        mockTabStoreClose: vi.fn().mockResolvedValue(true),
     }))
 
 vi.mock('../../../src/project/explorerStore', () => ({
@@ -44,9 +52,14 @@ vi.mock('../../../src/project/explorerStore', () => ({
 
 vi.mock('../../../src/editor/tabs', () => ({
     tabStore: {
+        subscribe: (fn: (v: typeof mockTabState) => void) => {
+            fn(mockTabState)
+            return () => { }
+        },
         openFile: mockTabStoreOpenFile,
         activate: mockTabStoreActivate,
         remapPaths: mockTabStoreRemapPaths,
+        close: mockTabStoreClose,
     },
 }))
 
@@ -69,6 +82,8 @@ afterEach(() => {
     mockExplorerState.error = null
     mockAppState.info = null
     mockAppState.loading = false
+    mockTabState.tabs = []
+    mockTabState.activeTabId = null
     vi.clearAllMocks()
         ; (window as any).__TAURI__ = undefined
 })

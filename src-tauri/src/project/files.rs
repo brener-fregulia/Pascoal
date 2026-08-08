@@ -269,3 +269,26 @@ pub fn rename_path(source: &std::path::Path, target: &std::path::Path) -> Result
     }
     std::fs::rename(source, target).map_err(|e| e.to_string())
 }
+
+/// Moves `target` (file or directory) to the OS trash/recycle bin. Returns
+/// an error for ANY failure - including the trash mechanism itself not
+/// being available in this environment (network drive, unsupported
+/// filesystem, etc.) - without trying to distinguish the reason. The
+/// frontend treats any failure here as "offer to permanently delete
+/// instead, with an explicit confirmation" rather than silently falling
+/// back on its own.
+pub fn trash_path(target: &std::path::Path) -> Result<(), String> {
+    trash::delete(target).map_err(|e| e.to_string())
+}
+
+/// Permanently deletes `target` (file or directory), bypassing the trash.
+/// Only meant to be called after the user explicitly confirmed a
+/// permanent-delete fallback (trash_path having failed) - this function
+/// itself does not ask for confirmation, that's the frontend's job.
+pub fn delete_path_permanently(target: &std::path::Path) -> Result<(), String> {
+    if target.is_dir() {
+        std::fs::remove_dir_all(target).map_err(|e| e.to_string())
+    } else {
+        std::fs::remove_file(target).map_err(|e| e.to_string())
+    }
+}
