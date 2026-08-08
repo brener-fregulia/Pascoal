@@ -82,6 +82,19 @@
     menu = { kind: 'empty', x: e.clientX, y: e.clientY }
   }
 
+  // Clears the selection when the empty area of the tree (below/between
+  // rows) is clicked directly - e.target === e.currentTarget only holds when
+  // the click landed on .tree-body itself, not on a bubbled row button -
+  // so clicking on a row's own click handler isn't affected. This is the
+  // only way to move the toolbar's "New File"/"New Folder" target back to
+  // the workspace root after a subfolder was selected, short of clicking a
+  // file (which resets it as a side effect) or reopening the folder.
+  function handleEmptyClick(e: MouseEvent) {
+    if (e.target !== e.currentTarget) return
+    selectedPath = null
+    selectedIsDirectory = false
+  }
+
   function closeMenu() {
     menu = null
   }
@@ -469,6 +482,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="tree-body"
+      onclick={handleEmptyClick}
       oncontextmenu={handleEmptyContextMenu}
       onkeydown={handleTreeKeydown}
     >
