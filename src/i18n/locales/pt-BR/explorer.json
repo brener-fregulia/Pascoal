@@ -10,6 +10,7 @@
     "reveal_windows": "Revelar no Explorador de Arquivos",
     "reveal_macos": "Revelar no Finder",
     "reveal_linux": "Abrir Pasta que Contém o Arquivo",
+    "rename": "Renomear",
     "copy_path": "Copiar Caminho",
     "copy_relative_path": "Copiar Caminho Relativo",
     "new_file": "Novo Arquivo",

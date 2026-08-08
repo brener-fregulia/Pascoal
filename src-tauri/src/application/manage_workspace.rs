@@ -62,3 +62,14 @@ pub fn create_directory(
     files::create_directory(&target)?;
     Ok(target.to_string_lossy().to_string())
 }
+
+pub fn rename_path(app: AppHandle, path: String, new_name: String) -> Result<String, String> {
+    let root = current_root(&app)?;
+    let source = workspace_guard::authorize_existing(&root, std::path::Path::new(&path))?;
+    let parent = source
+        .parent()
+        .ok_or_else(|| "Path has no parent directory".to_string())?;
+    let target = workspace_guard::authorize_new(&root, parent, &new_name)?;
+    files::rename_path(&source, &target)?;
+    Ok(target.to_string_lossy().to_string())
+}

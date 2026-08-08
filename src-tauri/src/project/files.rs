@@ -258,3 +258,14 @@ pub fn create_directory(target: &std::path::Path) -> Result<(), String> {
     }
     std::fs::create_dir(target).map_err(|e| e.to_string())
 }
+
+/// Renames an existing file or directory to `target`. Fails explicitly if
+/// something already exists at `target`, matching create_file/
+/// create_directory's conflict behavior - std::fs::rename would otherwise
+/// silently replace an existing destination on some platforms.
+pub fn rename_path(source: &std::path::Path, target: &std::path::Path) -> Result<(), String> {
+    if target.exists() {
+        return Err("A file or folder with this name already exists".to_string());
+    }
+    std::fs::rename(source, target).map_err(|e| e.to_string())
+}

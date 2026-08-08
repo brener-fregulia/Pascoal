@@ -184,6 +184,35 @@ function createTabStore() {
     }))
   }
 
+  // Called after a file or folder is renamed in the explorer. Any open tab
+  // whose filePath is exactly `oldPrefix` (the renamed file itself) or that
+  // starts with `oldPrefix` followed by a path separator (a file inside a
+  // renamed folder) gets its filePath rewritten with `newPrefix`, so saving
+  // an already-open tab keeps writing to the file's new location instead of
+  // a path that no longer exists.
+  function remapPaths(oldPrefix: string, newPrefix: string) {
+    update((s) => ({
+      ...s,
+      tabs: s.tabs.map((t) => {
+        if (t.filePath == null) return t
+
+        let newFilePath: string | null = null
+        if (t.filePath === oldPrefix) {
+          newFilePath = newPrefix
+        } else if (
+          t.filePath.startsWith(oldPrefix + '/') ||
+          t.filePath.startsWith(oldPrefix + '\\')
+        ) {
+          newFilePath = newPrefix + t.filePath.slice(oldPrefix.length)
+        }
+
+        if (newFilePath === null) return t
+        const fileName = newFilePath.split(/[\\/]/).pop() ?? newFilePath
+        return { ...t, filePath: newFilePath, fileName }
+      }),
+    }))
+  }
+
   function getActive(): Tab | null {
     const state = getState()
     return state.tabs.find((t) => t.id === state.activeTabId) ?? null
@@ -207,6 +236,7 @@ function createTabStore() {
     markClean,
     close,
     updateFilePath,
+    remapPaths,
     getActive,
     reset,
   }

@@ -23,6 +23,7 @@
     isDirectory: boolean
     error: string | null
   } | null>(null)
+  let renaming = $state<{ path: string; error: string | null } | null>(null)
 
   let folder = $derived($explorerStore.folder)
   let tree = $derived($explorerStore.tree)
@@ -148,6 +149,68 @@
     }
   }
 
+  function startRename(path: string) {
+    renaming = { path, error: null }
+  }
+
+  // Only clears state if `renaming` is still the one this cancel call came
+  // from - same guard as `cancelCreate` above, for the same reason: see the
+  // comment on RenameInput.svelte's handleBlur (and NewEntryRow.svelte's
+  // handleBlur) for why a stale unmount-triggered blur from a rename
+  // request that was already replaced must be a no-op instead of clobbering
+  // the request that replaced it.
+  function cancelRename(path: string) {
+    if (renaming?.path === path) renaming = null
+  }
+
+  // Rewrites a path that starts with `oldPrefix` (exactly, or as a folder
+  // ancestor) so it starts with `newPrefix` instead. Used to keep
+  // `expandedPaths`/`selectedPath` pointing at the right entries after a
+  // rename, since a renamed folder invalidates every descendant path too.
+  function remapPathPrefix(path: string, oldPrefix: string, newPrefix: string): string {
+    if (path === oldPrefix) return newPrefix
+    if (path.startsWith(oldPrefix + '/') || path.startsWith(oldPrefix + '\\')) {
+      return newPrefix + path.slice(oldPrefix.length)
+    }
+    return path
+  }
+
+  async function confirmRename(newName: string) {
+    if (!renaming) return
+    const { path } = renaming
+    const currentName = path.split(/[\\/]/).pop() ?? path
+    const trimmed = newName.trim()
+    if (!trimmed || trimmed === currentName) {
+      renaming = null
+      return
+    }
+    if (!isTauriAvailable()) return
+    try {
+      const newPath = await invoke<string>('rename_path', {
+        path,
+        newName: trimmed,
+      })
+      renaming = null
+      tabStore.remapPaths(path, newPath)
+      expandedPaths = new Set(
+        Array.from(expandedPaths, (p) => remapPathPrefix(p, path, newPath)),
+      )
+      if (selectedPath) {
+        selectedPath = remapPathPrefix(selectedPath, path, newPath)
+      }
+      await explorerStore.refresh()
+      selectedPath = newPath
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      renaming = { path, error: msg }
+    }
+  }
+
+  function menuRename(node: ExplorerNode) {
+    closeMenu()
+    startRename(node.path)
+  }
+
   function menuNewFile(node: ExplorerNode) {
     closeMenu()
     expandFolder(node.path)
@@ -193,6 +256,9 @@
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape') closeMenu()
+    else if (e.key === 'F2' && selectedPath && !pendingCreate && !renaming) {
+      startRename(selectedPath)
+    }
   }
 </script>
 
@@ -268,11 +334,14 @@
             {expandedPaths}
             {selectedPath}
             {pendingCreate}
+            {renaming}
             onToggle={toggle}
             onFileClick={openFile}
             onContextMenu={handleContextMenu}
             onCreateConfirm={confirmCreate}
             onCreateCancel={cancelCreate}
+            onRenameConfirm={confirmRename}
+            onRenameCancel={cancelRename}
           />
         {/each}
       {/if}
@@ -306,6 +375,10 @@
     {/if}
     <button class="menu-item" onclick={() => menuReveal(menuNode)}>
       {$i18n(revealLabelKey)}
+    </button>
+    <hr class="menu-sep" />
+    <button class="menu-item" onclick={() => menuRename(menuNode)}>
+      {$i18n('explorer.rename')}
     </button>
     <hr class="menu-sep" />
     <button class="menu-item" onclick={() => menuCopyPath(menuNode)}>

@@ -10,6 +10,7 @@
     "reveal_windows": "Mostrar en el explorador de archivos",
     "reveal_macos": "Mostrar en Finder",
     "reveal_linux": "Abrir la carpeta contenedora",
+    "rename": "Renombrar",
     "copy_path": "Copiar ruta",
     "copy_relative_path": "Copiar ruta relativa",
     "new_file": "Nuevo archivo",

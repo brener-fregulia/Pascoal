@@ -1,9 +1,5 @@
 use std::path::{Path, PathBuf};
 
-// `authorize_new` is used by the create-file/create-directory commands in
-// `application::manage_workspace`. Its sibling `authorize_existing` is still
-// unused - it's reserved for the future rename/delete explorer CRUD stage.
-
 /// Characters rejected in a new leaf name, regardless of platform. Windows
 /// reserves all of these; we reject them everywhere rather than branching
 /// per-OS, since none of them are meaningful in a Pascal project name.
@@ -14,7 +10,6 @@ const RESERVED_CHARS: &[char] = &['<', '>', ':', '"', '|', '?', '*', '\0'];
 /// or deleting a node already present in the explorer tree). Canonicalizes
 /// both `root` and `candidate`, then confirms `candidate` is `root` itself
 /// or lives underneath it. Returns the canonicalized candidate on success.
-#[allow(dead_code)]
 pub fn authorize_existing(root: &Path, candidate: &Path) -> Result<PathBuf, String> {
     // dunce::canonicalize, not std::fs::canonicalize - the std version
     // prefixes Windows paths with `\\?\`, which breaks string-based

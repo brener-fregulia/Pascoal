@@ -91,3 +91,12 @@ pub fn create_directory(
 ) -> Result<String, String> {
     manage_workspace::create_directory(app, parent_path, name)
 }
+
+#[tauri::command]
+pub fn rename_path(
+    app: tauri::AppHandle,
+    path: String,
+    new_name: String,
+) -> Result<String, String> {
+    manage_workspace::rename_path(app, path, new_name)
+}

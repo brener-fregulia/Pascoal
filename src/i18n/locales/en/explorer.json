@@ -10,6 +10,7 @@
     "reveal_windows": "Reveal in File Explorer",
     "reveal_macos": "Reveal in Finder",
     "reveal_linux": "Open Containing Folder",
+    "rename": "Rename",
     "copy_path": "Copy Path",
     "copy_relative_path": "Copy Relative Path",
     "new_file": "New File",

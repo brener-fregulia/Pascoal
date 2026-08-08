@@ -118,6 +118,7 @@ pub fn run() {
             commands::project_commands::delete_file,
             commands::project_commands::create_file,
             commands::project_commands::create_directory,
+            commands::project_commands::rename_path,
             commands::process_commands::compile_and_run,
             commands::process_commands::send_input,
             commands::installer_commands::detect_installer,
