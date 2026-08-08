@@ -181,4 +181,69 @@ describe('FileTreeNode', () => {
         await fireEvent.contextMenu(getByText('src'), { clientX: 5, clientY: 9 })
         expect(onContextMenu).toHaveBeenCalledWith(node, 5, 9)
     })
+
+    it('calls onFileClick when Enter is pressed on a focused file row', async () => {
+        const onFileClick = vi.fn()
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle: vi.fn(),
+                onFileClick,
+            },
+        })
+        await fireEvent.keyDown(getByText('main.pas'), { key: 'Enter' })
+        expect(onFileClick).toHaveBeenCalledWith(node)
+    })
+
+    it('calls onToggle when Enter is pressed on a focused directory row', async () => {
+        const onToggle = vi.fn()
+        const node = dirNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle,
+                onFileClick: vi.fn(),
+            },
+        })
+        await fireEvent.keyDown(getByText('src'), { key: 'Enter' })
+        expect(onToggle).toHaveBeenCalledWith('/tmp/src')
+    })
+
+    it('does not call onFileClick/onToggle for a key other than Enter', async () => {
+        const onToggle = vi.fn()
+        const onFileClick = vi.fn()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node: fileNode(),
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle,
+                onFileClick,
+            },
+        })
+        await fireEvent.keyDown(getByText('main.pas'), { key: 'a' })
+        expect(onFileClick).not.toHaveBeenCalled()
+        expect(onToggle).not.toHaveBeenCalled()
+    })
+
+    it('prevents the default action when Enter activates a row', async () => {
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+        getByText('main.pas').dispatchEvent(event)
+        expect(event.defaultPrevented).toBe(true)
+    })
 })
