@@ -159,6 +159,43 @@ describe('tabStore', () => {
     })
   })
 
+  describe('remapPaths', () => {
+    it('remaps a tab whose filePath is exactly the old prefix', async () => {
+      const tab = await tabStore.openFile('/tmp/MyProject/old.pas', 'content')
+      tabStore.remapPaths('/tmp/MyProject/old.pas', '/tmp/MyProject/new.pas')
+      const found = state().tabs.find((t) => t.id === tab.id)
+      expect(found?.filePath).toBe('/tmp/MyProject/new.pas')
+      expect(found?.fileName).toBe('new.pas')
+    })
+
+    it('remaps a tab inside a renamed folder, preserving the rest of the path', async () => {
+      const tab = await tabStore.openFile(
+        '/tmp/MyProject/old_folder/inner.pas',
+        'content',
+      )
+      tabStore.remapPaths('/tmp/MyProject/old_folder', '/tmp/MyProject/new_folder')
+      const found = state().tabs.find((t) => t.id === tab.id)
+      expect(found?.filePath).toBe('/tmp/MyProject/new_folder/inner.pas')
+      expect(found?.fileName).toBe('inner.pas')
+    })
+
+    it('does not touch a tab whose filePath is unrelated to the renamed prefix', async () => {
+      const tab = await tabStore.openFile('/tmp/MyProject/unrelated.pas', 'content')
+      tabStore.remapPaths('/tmp/MyProject/old.pas', '/tmp/MyProject/new.pas')
+      const found = state().tabs.find((t) => t.id === tab.id)
+      expect(found?.filePath).toBe('/tmp/MyProject/unrelated.pas')
+      expect(found?.fileName).toBe('unrelated.pas')
+    })
+
+    it('does not touch or break an untitled tab with a null filePath', async () => {
+      const tab = await tabStore.newTab('content')
+      tabStore.remapPaths('/tmp/MyProject/old.pas', '/tmp/MyProject/new.pas')
+      const found = state().tabs.find((t) => t.id === tab.id)
+      expect(found?.filePath).toBeNull()
+      expect(found?.fileName).toBe('untitled.pas')
+    })
+  })
+
   describe('getActive', () => {
     it('returns null when no tab is active', () => {
       expect(tabStore.getActive()).toBeNull()

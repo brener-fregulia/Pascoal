@@ -1,4 +1,4 @@
-use crate::project::workspace_guard::authorize_new;
+use crate::project::workspace_guard::{authorize_existing, authorize_new};
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -142,6 +142,90 @@ fn rejects_a_parent_that_escapes_the_workspace_through_a_symlink() {
     // directory outside it - authorizing a new entry with `link` as the
     // parent must still be rejected.
     let result = authorize_new(&root, &link, "new.pas");
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn authorize_existing_authorizes_the_root_itself_as_the_candidate() {
+    let root = tmp_dir("existing_root_is_candidate");
+
+    let result = authorize_existing(&root, &root).unwrap();
+
+    let expected = dunce::canonicalize(&root).unwrap();
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn authorize_existing_authorizes_a_file_inside_the_root() {
+    let root = tmp_dir("existing_file_inside_root");
+    let file = root.join("main.pas");
+    fs::write(&file, "").unwrap();
+
+    let result = authorize_existing(&root, &file).unwrap();
+
+    let expected = dunce::canonicalize(&file).unwrap();
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn authorize_existing_authorizes_a_subfolder_inside_the_root() {
+    let root = tmp_dir("existing_subfolder_inside_root");
+    let sub = root.join("src");
+    fs::create_dir(&sub).unwrap();
+
+    let result = authorize_existing(&root, &sub).unwrap();
+
+    let expected = dunce::canonicalize(&sub).unwrap();
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn authorize_existing_rejects_a_candidate_outside_the_root() {
+    let root = tmp_dir("existing_root_for_outside_check");
+    let outside = tmp_dir("existing_outside_candidate");
+
+    let result = authorize_existing(&root, &outside);
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn authorize_existing_rejects_a_candidate_that_does_not_exist() {
+    let root = tmp_dir("existing_root_for_missing_candidate");
+    let missing = root.join("does_not_exist.pas");
+
+    let result = authorize_existing(&root, &missing);
+
+    assert!(result.is_err());
+}
+
+#[test]
+fn authorize_existing_rejects_a_candidate_that_escapes_the_root_through_a_symlink() {
+    let root = tmp_dir("existing_root_for_symlink_escape");
+    let outside = tmp_dir("existing_outside_target_for_symlink_escape");
+    let link = root.join("escape_link");
+
+    #[cfg(unix)]
+    let symlink_created = std::os::unix::fs::symlink(&outside, &link).is_ok();
+    #[cfg(windows)]
+    let symlink_created = std::os::windows::fs::symlink_dir(&outside, &link).is_ok();
+    #[cfg(not(any(unix, windows)))]
+    let symlink_created = false;
+
+    if !symlink_created {
+        eprintln!(
+            "skipping authorize_existing_rejects_a_candidate_that_escapes_the_root_through_a_symlink: \
+            unable to create a directory symlink in this environment \
+            (missing privilege on Windows / Developer Mode not enabled, or unsupported platform)"
+        );
+        return;
+    }
+
+    // `link` lives inside `root` but resolves (via canonicalization) to a
+    // directory outside it - authorizing it as an existing candidate must
+    // still be rejected.
+    let result = authorize_existing(&root, &link);
 
     assert!(result.is_err());
 }

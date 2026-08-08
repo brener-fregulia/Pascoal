@@ -1,4 +1,6 @@
-use crate::project::files::{create_directory, create_file, list_folder_tree, open_workspace_at_path};
+use crate::project::files::{
+    create_directory, create_file, list_folder_tree, open_workspace_at_path, rename_path,
+};
 use std::fs;
 
 fn tmp_dir(name: &str) -> std::path::PathBuf {
@@ -222,4 +224,57 @@ fn create_directory_fails_with_conflict_message_when_a_file_with_the_same_name_e
         Err("A file or folder with this name already exists".to_string())
     );
     assert!(target.is_file());
+}
+
+#[test]
+fn rename_path_renames_a_file_successfully() {
+    let dir = tmp_dir("rename_file_success");
+    let source = dir.join("old.pas");
+    let target = dir.join("new.pas");
+    fs::write(&source, "program Old;").unwrap();
+
+    let result = rename_path(&source, &target);
+
+    assert!(result.is_ok());
+    assert!(!source.exists());
+    assert!(target.is_file());
+    assert_eq!(fs::read_to_string(&target).unwrap(), "program Old;");
+}
+
+#[test]
+fn rename_path_renames_a_folder_and_its_contents_successfully() {
+    let dir = tmp_dir("rename_folder_success");
+    let source = dir.join("old_folder");
+    let target = dir.join("new_folder");
+    fs::create_dir(&source).unwrap();
+    fs::write(source.join("inner.pas"), "program Inner;").unwrap();
+
+    let result = rename_path(&source, &target);
+
+    assert!(result.is_ok());
+    assert!(!source.exists());
+    assert!(target.is_dir());
+    assert_eq!(
+        fs::read_to_string(target.join("inner.pas")).unwrap(),
+        "program Inner;"
+    );
+}
+
+#[test]
+fn rename_path_fails_with_conflict_message_when_the_destination_already_exists() {
+    let dir = tmp_dir("rename_conflict");
+    let source = dir.join("old.pas");
+    let target = dir.join("existing.pas");
+    fs::write(&source, "program Old;").unwrap();
+    fs::write(&target, "original content").unwrap();
+
+    let result = rename_path(&source, &target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+    // Neither the source nor the pre-existing destination were touched.
+    assert!(source.is_file());
+    assert_eq!(fs::read_to_string(&target).unwrap(), "original content");
 }

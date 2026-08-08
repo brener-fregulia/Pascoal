@@ -9,6 +9,7 @@ const {
     mockAppState,
     mockTabStoreOpenFile,
     mockTabStoreActivate,
+    mockTabStoreRemapPaths,
 } =
     vi.hoisted(() => ({
         mockExplorerState: {
@@ -26,6 +27,7 @@ const {
         },
         mockTabStoreOpenFile: vi.fn().mockResolvedValue({ id: 'tab-1' }),
         mockTabStoreActivate: vi.fn(),
+        mockTabStoreRemapPaths: vi.fn(),
     }))
 
 vi.mock('../../../src/project/explorerStore', () => ({
@@ -44,6 +46,7 @@ vi.mock('../../../src/editor/tabs', () => ({
     tabStore: {
         openFile: mockTabStoreOpenFile,
         activate: mockTabStoreActivate,
+        remapPaths: mockTabStoreRemapPaths,
     },
 }))
 
@@ -522,5 +525,226 @@ describe('FileTree create file and folder', () => {
 
         expect(container.querySelector('.new-entry-input')).toBe(freshInput)
         expect(mockInvoke).not.toHaveBeenCalledWith('create_file', expect.anything())
+    })
+})
+
+describe('FileTree rename file and folder', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('starts renaming the selected item when F2 is pressed', async () => {
+        setupTree()
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.keyDown(window, { key: 'F2' })
+
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+        expect(input.value).toBe('main.pas')
+    })
+
+    it('does nothing when F2 is pressed with nothing selected', async () => {
+        setupTree()
+        const { container } = render(FileTree)
+        await fireEvent.keyDown(window, { key: 'F2' })
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+    })
+
+    it('does nothing when F2 is pressed while a create is already pending', async () => {
+        setupTree()
+        const { getByText, getByTitle, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await fireEvent.click(getByTitle('New File'))
+        expect(container.querySelector('.new-entry-input')).toBeInTheDocument()
+
+        await fireEvent.keyDown(window, { key: 'F2' })
+
+        expect(container.querySelector('.new-entry-input')).toBeInTheDocument()
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+    })
+
+    it('does nothing when F2 is pressed while a rename is already pending on another item', async () => {
+        setupTree()
+        const { getByText, container } = render(FileTree)
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(fileRow)
+        await fireEvent.keyDown(window, { key: 'F2' })
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+
+        // Select a different item, then try F2 again - the guard must block
+        // it since a rename is already pending, leaving the original request
+        // untouched.
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.click(folderRow)
+        await fireEvent.keyDown(window, { key: 'F2' })
+
+        expect(container.querySelectorAll('.rename-input')).toHaveLength(1)
+        expect(container.querySelector('.rename-input')).toBe(input)
+        expect(input.value).toBe('main.pas')
+    })
+
+    it('starts renaming a file via the context menu', async () => {
+        setupTree()
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+        expect(input.value).toBe('main.pas')
+    })
+
+    it('starts renaming a folder via the context menu', async () => {
+        setupTree()
+        const { getByText, container } = render(FileTree)
+        const row = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        expect(input).toBeInTheDocument()
+        expect(input.value).toBe('src')
+    })
+
+    it('confirms a valid new name, calls rename_path, closes the input, and refreshes the tree', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/renamed.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'renamed.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('rename_path', {
+                path: '/tmp/MyProject/main.pas',
+                newName: 'renamed.pas',
+            })
+        })
+        await vi.waitFor(() => {
+            expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+        })
+        expect(mockRefresh).toHaveBeenCalled()
+    })
+
+    it('does not call the backend when confirming with the same name', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+        expect(mockInvoke).not.toHaveBeenCalledWith('rename_path', expect.anything())
+    })
+
+    it('does not call the backend when confirming with an empty or whitespace-only name', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: '   ' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+        expect(mockInvoke).not.toHaveBeenCalledWith('rename_path', expect.anything())
+    })
+
+    it('keeps the input open and shows the error message when the new name conflicts with an existing entry', async () => {
+        setupTree()
+        const mockInvoke = vi
+            .fn()
+            .mockRejectedValue(new Error('A file or folder with this name already exists'))
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'src' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(
+                getByText('A file or folder with this name already exists'),
+            ).toBeInTheDocument()
+        })
+        expect(container.querySelector('.rename-input')).toBeInTheDocument()
+    })
+
+    it('cancels without calling the backend when Escape is pressed', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(row)
+        await fireEvent.click(getByText('Rename'))
+        const input = container.querySelector('.rename-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'renamed.pas' } })
+        await fireEvent.keyDown(input, { key: 'Escape' })
+
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+        expect(mockInvoke).not.toHaveBeenCalledWith('rename_path', expect.anything())
+    })
+
+    // Regression test proving FileTreeNode.svelte passes RenameInput its own
+    // stable `node.path`, not a live read of the shared "what's being
+    // renamed now" state - see the comment on RenameInput.svelte's
+    // handleBlur. A stale blur from a rename request that was already
+    // replaced by a newer one must be a no-op, not a clobber of the request
+    // that replaced it. (This is the same class of race NewEntryRow had for
+    // create requests before it was fixed in the previous sub-item.)
+    it('keeps a newer pending rename request alive when a stale blur from the request it replaced fires', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+
+        // Start renaming "main.pas" via F2.
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(fileRow)
+        await fireEvent.keyDown(window, { key: 'F2' })
+        const staleInput = container.querySelector('.rename-input') as HTMLInputElement
+        expect(staleInput).toBeInTheDocument()
+        expect(staleInput.value).toBe('main.pas')
+
+        // A rename request for "src", started via the context menu, replaces
+        // the pending one for "main.pas" - this is the request that must
+        // survive below.
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.click(getByText('Rename'))
+        const freshInput = container.querySelector('.rename-input') as HTMLInputElement
+        expect(freshInput).toBeInTheDocument()
+        expect(freshInput).not.toBe(staleInput)
+        expect(freshInput.value).toBe('src')
+
+        // A stale blur from the now-detached "main.pas" row (e.g. fired as a
+        // side effect of it being unmounted) must not clear the request that
+        // already replaced it.
+        await fireEvent.blur(staleInput)
+
+        expect(container.querySelector('.rename-input')).toBe(freshInput)
+        expect(mockInvoke).not.toHaveBeenCalledWith('rename_path', expect.anything())
     })
 })
