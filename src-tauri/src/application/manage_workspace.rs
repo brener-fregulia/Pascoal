@@ -99,7 +99,7 @@ pub fn copy_path(
     // Never copy a folder into itself or one of its own subfolders - doing
     // so would make copy_recursive recurse into the freshly-copied output,
     // never terminating and filling up the disk. Reject before attempting.
-    if dest_parent == source || dest_parent.starts_with(&source) {
+    if files::is_self_or_descendant(&dest_parent, &source) {
         return Err("Cannot copy a folder into itself or one of its own subfolders".to_string());
     }
 
@@ -126,7 +126,7 @@ pub fn move_path(
     // Same guard as copy_path - moving a folder into itself would corrupt
     // the tree, and std::fs::rename's behavior in that case isn't reliable
     // across platforms, so it's rejected explicitly rather than relied upon.
-    if dest_parent == source || dest_parent.starts_with(&source) {
+    if files::is_self_or_descendant(&dest_parent, &source) {
         return Err("Cannot move a folder into itself or one of its own subfolders".to_string());
     }
 

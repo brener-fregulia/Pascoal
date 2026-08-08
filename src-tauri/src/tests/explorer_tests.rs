@@ -1,6 +1,6 @@
 use crate::project::files::{
-    create_directory, create_file, delete_path_permanently, list_folder_tree,
-    open_workspace_at_path, rename_path, trash_path,
+    copy_path, create_directory, create_file, delete_path_permanently, is_self_or_descendant,
+    list_folder_tree, open_workspace_at_path, rename_path, trash_path, unique_name_in,
 };
 use std::fs;
 
@@ -348,4 +348,155 @@ fn delete_path_permanently_fails_for_a_nonexistent_path() {
     let result = delete_path_permanently(&target);
 
     assert!(result.is_err());
+}
+
+#[test]
+fn unique_name_in_returns_the_name_unchanged_when_there_is_no_conflict() {
+    let dir = tmp_dir("unique_name_no_conflict");
+
+    let result = unique_name_in(&dir, "main.pas");
+
+    assert_eq!(result, "main.pas");
+}
+
+#[test]
+fn unique_name_in_appends_a_counter_before_the_extension_on_conflict() {
+    let dir = tmp_dir("unique_name_conflict_with_extension");
+    fs::write(dir.join("main.pas"), "").unwrap();
+
+    let result = unique_name_in(&dir, "main.pas");
+
+    assert_eq!(result, "main (2).pas");
+}
+
+#[test]
+fn unique_name_in_appends_a_counter_with_no_extension_when_the_name_has_none() {
+    let dir = tmp_dir("unique_name_conflict_no_extension");
+    fs::create_dir(dir.join("folder")).unwrap();
+
+    let result = unique_name_in(&dir, "folder");
+
+    assert_eq!(result, "folder (2)");
+}
+
+#[test]
+fn unique_name_in_increments_until_it_finds_a_free_name() {
+    let dir = tmp_dir("unique_name_increments");
+    fs::write(dir.join("main.pas"), "").unwrap();
+    fs::write(dir.join("main (2).pas"), "").unwrap();
+
+    let result = unique_name_in(&dir, "main.pas");
+
+    assert_eq!(result, "main (3).pas");
+}
+
+#[test]
+fn copy_path_copies_a_file_and_keeps_the_original() {
+    let dir = tmp_dir("copy_file_success");
+    let source = dir.join("original.pas");
+    let target = dir.join("copy.pas");
+    fs::write(&source, "program Original;").unwrap();
+
+    let result = copy_path(&source, &target);
+
+    assert!(result.is_ok());
+    assert!(source.is_file());
+    assert_eq!(fs::read_to_string(&source).unwrap(), "program Original;");
+    assert_eq!(fs::read_to_string(&target).unwrap(), "program Original;");
+}
+
+#[test]
+fn copy_path_copies_a_folder_recursively_including_nested_content() {
+    let dir = tmp_dir("copy_folder_recursive");
+    let source = dir.join("original_folder");
+    let target = dir.join("copied_folder");
+    let nested = source.join("nested");
+    fs::create_dir_all(&nested).unwrap();
+    fs::write(source.join("top.pas"), "program Top;").unwrap();
+    fs::write(nested.join("inner.pas"), "program Inner;").unwrap();
+
+    let result = copy_path(&source, &target);
+
+    assert!(result.is_ok());
+    // Original untouched.
+    assert_eq!(
+        fs::read_to_string(source.join("top.pas")).unwrap(),
+        "program Top;"
+    );
+    assert_eq!(
+        fs::read_to_string(nested.join("inner.pas")).unwrap(),
+        "program Inner;"
+    );
+    // Copy has the same structure and content.
+    assert_eq!(
+        fs::read_to_string(target.join("top.pas")).unwrap(),
+        "program Top;"
+    );
+    assert_eq!(
+        fs::read_to_string(target.join("nested").join("inner.pas")).unwrap(),
+        "program Inner;"
+    );
+}
+
+#[test]
+fn copy_path_fails_with_conflict_message_when_the_destination_already_exists() {
+    let dir = tmp_dir("copy_conflict");
+    let source = dir.join("original.pas");
+    let target = dir.join("existing.pas");
+    fs::write(&source, "program Original;").unwrap();
+    fs::write(&target, "original content").unwrap();
+
+    let result = copy_path(&source, &target);
+
+    assert_eq!(
+        result,
+        Err("A file or folder with this name already exists".to_string())
+    );
+    // Neither the source nor the pre-existing destination were touched.
+    assert_eq!(fs::read_to_string(&source).unwrap(), "program Original;");
+    assert_eq!(fs::read_to_string(&target).unwrap(), "original content");
+}
+
+#[test]
+fn is_self_or_descendant_is_true_when_dest_parent_is_the_source_itself() {
+    let dir = tmp_dir("self_or_descendant_same");
+    let source = dir.join("folder");
+
+    assert!(is_self_or_descendant(&source, &source));
+}
+
+#[test]
+fn is_self_or_descendant_is_true_for_a_direct_child_of_the_source() {
+    let dir = tmp_dir("self_or_descendant_child");
+    let source = dir.join("folder");
+    let dest_parent = source.join("subfolder");
+
+    assert!(is_self_or_descendant(&dest_parent, &source));
+}
+
+#[test]
+fn is_self_or_descendant_is_true_for_a_deeper_descendant_of_the_source() {
+    let dir = tmp_dir("self_or_descendant_grandchild");
+    let source = dir.join("folder");
+    let dest_parent = source.join("subfolder").join("nested");
+
+    assert!(is_self_or_descendant(&dest_parent, &source));
+}
+
+#[test]
+fn is_self_or_descendant_is_false_for_a_sibling_folder() {
+    let dir = tmp_dir("self_or_descendant_sibling");
+    let source = dir.join("folder");
+    let dest_parent = dir.join("other_folder");
+
+    assert!(!is_self_or_descendant(&dest_parent, &source));
+}
+
+#[test]
+fn is_self_or_descendant_is_false_for_an_unrelated_folder() {
+    let dir = tmp_dir("self_or_descendant_unrelated");
+    let source = dir.join("folder");
+    let dest_parent = std::path::PathBuf::from("/completely/unrelated/path");
+
+    assert!(!is_self_or_descendant(&dest_parent, &source));
 }

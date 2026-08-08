@@ -325,6 +325,14 @@ pub fn unique_name_in(parent: &std::path::Path, name: &str) -> String {
     }
 }
 
+/// True when `dest_parent` is `source` itself or lives inside it - the
+/// guard against copying/moving a folder into itself or one of its own
+/// descendants (would cause infinite recursion for copy, corruption for
+/// move).
+pub fn is_self_or_descendant(dest_parent: &std::path::Path, source: &std::path::Path) -> bool {
+    dest_parent == source || dest_parent.starts_with(source)
+}
+
 /// Copies `source` (file, or directory recursively) into `target`, which
 /// must not already exist yet. Rejects explicitly instead of silently
 /// overwriting, same convention as create_file/create_directory/rename_path.
