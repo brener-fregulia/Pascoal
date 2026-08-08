@@ -231,6 +231,51 @@ describe('FileTreeNode', () => {
         expect(onToggle).not.toHaveBeenCalled()
     })
 
+    it('has the cut class when the clipboard holds this node in "cut" mode', () => {
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                clipboard: { path: node.path, mode: 'cut' },
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('main.pas').closest('button')?.className).toContain('cut')
+    })
+
+    it('does not have the cut class when the clipboard holds this node in "copy" mode', () => {
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                clipboard: { path: node.path, mode: 'copy' },
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('main.pas').closest('button')?.className).not.toContain('cut')
+    })
+
+    it('does not have the cut class when the clipboard holds a different path in "cut" mode', () => {
+        const node = fileNode()
+        const { getByText } = render(FileTreeNode, {
+            props: {
+                node,
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                clipboard: { path: '/tmp/other.pas', mode: 'cut' },
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByText('main.pas').closest('button')?.className).not.toContain('cut')
+    })
+
     it('prevents the default action when Enter activates a row', async () => {
         const node = fileNode()
         const { getByText } = render(FileTreeNode, {

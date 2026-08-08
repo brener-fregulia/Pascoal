@@ -1023,3 +1023,339 @@ describe('FileTree delete file and folder', () => {
         })
     })
 })
+
+describe('FileTree keyboard shortcut scope regression', () => {
+    // Regression test for a real bug: the shortcuts below used to be handled
+    // by a single `<svelte:window onkeydown>` listener, so pressing Delete or
+    // F2 while focus was anywhere else on the page (e.g. the code editor)
+    // still acted on whatever was last selected in the explorer tree. They
+    // are now attached to `.tree-body` instead and only fire when a
+    // descendant of it has focus - firing them on `window` directly here
+    // must be a no-op.
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('does not start a delete when Delete is pressed outside the tree body', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+
+        await fireEvent.keyDown(window, { key: 'Delete' })
+
+        expect(mockAsk).not.toHaveBeenCalled()
+        expect(mockInvoke).not.toHaveBeenCalledWith('trash_path', expect.anything())
+    })
+
+    it('does not start a rename when F2 is pressed outside the tree body', async () => {
+        setupTree()
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+
+        await fireEvent.keyDown(window, { key: 'F2' })
+
+        expect(container.querySelector('.rename-input')).not.toBeInTheDocument()
+    })
+})
+
+describe('FileTree resets the toolbar target when the empty area is clicked', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('creates at the workspace root, not the previously selected subfolder, after clicking the empty tree area', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/new.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, getByTitle, container } = render(FileTree)
+
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.click(folderRow) // selects "src" as a directory target
+        expect(folderRow.className).toContain('selected')
+
+        // A click landing directly on `.tree-body` itself (not a bubbled
+        // click from a row) clears the selection.
+        await fireEvent.click(container.querySelector('.tree-body') as HTMLElement)
+        expect(folderRow.className).not.toContain('selected')
+
+        await fireEvent.click(getByTitle('New File'))
+        const input = container.querySelector('.new-entry-input') as HTMLInputElement
+        await fireEvent.input(input, { target: { value: 'new.pas' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('create_file', {
+                parentPath: '/tmp/MyProject',
+                name: 'new.pas',
+            })
+        })
+    })
+})
+
+describe('FileTree clipboard (cut/copy/paste)', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('copies the selected file to the workspace root via Ctrl+C / Ctrl+V', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main-copy.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'c', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('copy_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject',
+            })
+        })
+    })
+
+    it('moves the selected file to the workspace root via Ctrl+X / Ctrl+V', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'x', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('move_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject',
+            })
+        })
+    })
+
+    it('does not paste a second time after a cut is pasted, since cut is a one-shot clipboard', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        // Select via the context menu (not a plain click) so the row isn't
+        // opened, which would call `invoke('read_file', ...)` and pollute
+        // the call count asserted below.
+        await fireEvent.contextMenu(row)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'x', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledTimes(1)
+        })
+
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        expect(mockInvoke).toHaveBeenCalledTimes(1)
+    })
+
+    it('allows pasting the same copy multiple times, since copy leaves the clipboard untouched', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main-copy.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        // Select via the context menu (not a plain click) for the same
+        // reason as the test above.
+        await fireEvent.contextMenu(row)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'c', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledTimes(1)
+        })
+
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledTimes(2)
+        })
+    })
+
+    it('does nothing when Ctrl+C/Ctrl+X are pressed with nothing selected', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { container } = render(FileTree)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'c', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'x', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        expect(mockInvoke).not.toHaveBeenCalled()
+    })
+
+    it('does nothing when Ctrl+V is pressed with an empty clipboard', async () => {
+        setupTree()
+        const mockInvoke = vi.fn()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        // Select via the context menu (not a plain click) so the row isn't
+        // opened, which would call `invoke('read_file', ...)` and make the
+        // assertion below meaningless.
+        await fireEvent.contextMenu(row)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        expect(mockInvoke).not.toHaveBeenCalled()
+    })
+
+    it('remaps open tabs and the selection to the new path after a cut is pasted', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/dest/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'x', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        await vi.waitFor(() => {
+            expect(mockTabStoreRemapPaths).toHaveBeenCalledWith(
+                '/tmp/MyProject/main.pas',
+                '/tmp/MyProject/dest/main.pas',
+            )
+        })
+    })
+
+    it('does not remap open tabs after a copy is pasted', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/dest/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.keyDown(treeBody, { key: 'c', ctrlKey: true })
+        await fireEvent.keyDown(treeBody, { key: 'v', ctrlKey: true })
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalled()
+        })
+        expect(mockTabStoreRemapPaths).not.toHaveBeenCalled()
+    })
+
+    it('moves a file into a folder via "Cut" then "Paste" on the context menu', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/src/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(fileRow)
+        await fireEvent.click(getByText('Cut'))
+
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.click(getByText('Paste'))
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('move_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject/src',
+            })
+        })
+    })
+
+    it('copies a file into a folder via "Copy" then "Paste" on the context menu', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/src/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(fileRow)
+        await fireEvent.click(getByText('Copy'))
+
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.click(getByText('Paste'))
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('copy_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject/src',
+            })
+        })
+    })
+
+    it('does not show "Paste" in a file\'s context menu even when the clipboard has an entry', async () => {
+        setupTree()
+        const { getByText, queryByText } = render(FileTree)
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        await fireEvent.click(getByText('Copy'))
+
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(fileRow)
+
+        expect(queryByText('Paste')).not.toBeInTheDocument()
+    })
+
+    it('shows "Paste" in the empty-area context menu and pastes at the workspace root when the clipboard has an entry', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main-copy.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText, container } = render(FileTree)
+        const fileRow = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.contextMenu(fileRow)
+        await fireEvent.click(getByText('Copy'))
+
+        await fireEvent.contextMenu(container.querySelector('.tree-body') as HTMLElement)
+        expect(getByText('Paste')).toBeInTheDocument()
+        await fireEvent.click(getByText('Paste'))
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('copy_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject',
+            })
+        })
+    })
+
+    it('does not show "Paste" anywhere when the clipboard is empty', async () => {
+        setupTree()
+        const { getByText, queryByText, container } = render(FileTree)
+
+        const folderRow = getByText('src').closest('button') as HTMLElement
+        await fireEvent.contextMenu(folderRow)
+        expect(queryByText('Paste')).not.toBeInTheDocument()
+        await fireEvent.keyDown(window, { key: 'Escape' })
+
+        await fireEvent.contextMenu(container.querySelector('.tree-body') as HTMLElement)
+        expect(queryByText('Paste')).not.toBeInTheDocument()
+    })
+})
