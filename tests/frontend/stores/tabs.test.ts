@@ -6,6 +6,7 @@ interface TabState {
   tabs: Tab[]
   activeTabId: string | null
   activeView: 'welcome' | 'editor' | 'diff'
+  welcomeClosed: boolean
 }
 
 function state(): TabState {
@@ -97,6 +98,27 @@ describe('tabStore', () => {
       tabStore.showWelcome()
       expect(state().activeView).toBe('welcome')
     })
+
+    it('clears welcomeClosed when reopening', () => {
+      tabStore.closeWelcome()
+      tabStore.showWelcome()
+      expect(state().welcomeClosed).toBe(false)
+    })
+  })
+
+  describe('closeWelcome', () => {
+    it('sets welcomeClosed to true', () => {
+      tabStore.closeWelcome()
+      expect(state().welcomeClosed).toBe(true)
+    })
+
+    it('does not change activeTabId or activeView', async () => {
+      const tab = await tabStore.newTab('content')
+      tabStore.activate(tab.id)
+      tabStore.closeWelcome()
+      expect(state().activeTabId).toBe(tab.id)
+      expect(state().activeView).toBe('editor')
+    })
   })
 
   describe('markDirty / markClean', () => {
@@ -146,6 +168,16 @@ describe('tabStore', () => {
       vi.spyOn(window, 'confirm').mockReturnValue(false)
       await tabStore.close(tab.id)
       expect(state().tabs).toHaveLength(1)
+    })
+
+    it('keeps welcomeClosed true when the last tab is closed and the view falls back to welcome', async () => {
+      const tab = await tabStore.newTab('content')
+      tabStore.activate(tab.id)
+      tabStore.closeWelcome()
+      vi.spyOn(window, 'confirm').mockReturnValue(true)
+      await tabStore.close(tab.id)
+      expect(state().activeView).toBe('welcome')
+      expect(state().welcomeClosed).toBe(true)
     })
   })
 
@@ -241,6 +273,14 @@ describe('tabStore', () => {
       tabStore.fallbackFromDiff()
       expect(state().activeTabId).toBeNull()
       expect(state().activeView).toBe('welcome')
+    })
+  })
+
+  describe('reset', () => {
+    it('clears welcomeClosed', () => {
+      tabStore.closeWelcome()
+      tabStore.reset()
+      expect(state().welcomeClosed).toBe(false)
     })
   })
 })

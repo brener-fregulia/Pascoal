@@ -7,6 +7,7 @@ const { mockTabState, mockConsoleState } = vi.hoisted(() => ({
         tabs: [] as Array<{ id: string; state: unknown }>,
         activeTabId: null as string | null,
         activeView: 'welcome' as 'welcome' | 'editor',
+        welcomeClosed: false,
     },
     mockConsoleState: {
         visible: false,
@@ -68,6 +69,7 @@ afterEach(() => {
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     mockTabState.activeView = 'welcome'
+    mockTabState.welcomeClosed = false
     mockConsoleState.visible = false
     mockConsoleState.position = 'bottom'
     mockExplorerState.folder = null
@@ -81,6 +83,14 @@ describe('EditorArea', () => {
             props: { activePanel: null },
         })
         expect(container.querySelector('#welcome')).toBeInTheDocument()
+    })
+
+    it('hides Welcome even with no open tabs when welcomeClosed is true', () => {
+        mockTabState.welcomeClosed = true
+        const { container } = render(EditorArea, {
+            props: { activePanel: null },
+        })
+        expect(container.querySelector('#welcome')).not.toBeInTheDocument()
     })
 
     it('shows the editor wrapper as visible when a tab is open and active', () => {

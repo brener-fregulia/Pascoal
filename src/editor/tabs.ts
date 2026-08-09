@@ -180,7 +180,7 @@ function createTabStore() {
         }
       }
 
-      return { tabs: newTabs, activeTabId, activeView }
+      return { ...s, tabs: newTabs, activeTabId, activeView }
     })
 
     return true

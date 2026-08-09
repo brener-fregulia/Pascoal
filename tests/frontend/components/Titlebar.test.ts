@@ -181,3 +181,23 @@ describe('Titlebar Edit menu', () => {
         expect(queryByText('Redo')).not.toBeInTheDocument()
     })
 })
+
+describe('Titlebar Help menu', () => {
+    it('shows Welcome as the first item, followed by a separator', async () => {
+        const { getByText, container } = render(Titlebar)
+        await fireEvent.click(getByText('Help'))
+        const items = container.querySelectorAll('.menu-dropdown > *')
+        expect(items[0]).toHaveTextContent('Welcome')
+        expect(items[1]).toHaveClass('menu-sep')
+    })
+
+    it('emits menu-show-welcome when Welcome is clicked', async () => {
+        ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText } = render(Titlebar)
+        await fireEvent.click(getByText('Help'))
+        await fireEvent.click(getByText('Welcome'))
+        await waitFor(() =>
+            expect(mockEmit).toHaveBeenCalledWith('menu-show-welcome', undefined),
+        )
+    })
+})

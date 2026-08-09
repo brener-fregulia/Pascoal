@@ -1,8 +1,9 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 
-const { mockShowWelcome, mockActivate, mockActivateDiff, mockClose, mockTabState } = vi.hoisted(() => ({
+const { mockShowWelcome, mockCloseWelcome, mockActivate, mockActivateDiff, mockClose, mockTabState } = vi.hoisted(() => ({
     mockShowWelcome: vi.fn(),
+    mockCloseWelcome: vi.fn(),
     mockActivate: vi.fn(),
     mockActivateDiff: vi.fn(),
     mockClose: vi.fn(),
@@ -10,6 +11,7 @@ const { mockShowWelcome, mockActivate, mockActivateDiff, mockClose, mockTabState
         tabs: [] as Array<{ id: string; fileName: string; isDirty: boolean }>,
         activeTabId: null as string | null,
         activeView: 'welcome' as 'welcome' | 'editor' | 'diff',
+        welcomeClosed: false,
     },
 }))
 
@@ -20,6 +22,7 @@ vi.mock('../../../src/editor/tabs', () => ({
             return () => { }
         },
         showWelcome: mockShowWelcome,
+        closeWelcome: mockCloseWelcome,
         activate: mockActivate,
         activateDiff: mockActivateDiff,
         close: mockClose,
@@ -34,6 +37,7 @@ afterEach(() => {
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     mockTabState.activeView = 'welcome'
+    mockTabState.welcomeClosed = false
     diffTabStore.reset()
     vi.clearAllMocks()
 })
@@ -72,6 +76,18 @@ describe('TabBar', () => {
         const { getByText } = render(TabBar)
         await fireEvent.click(getByText('Welcome'))
         expect(mockShowWelcome).toHaveBeenCalled()
+    })
+
+    it('does not render the Welcome tab when welcomeClosed is true', () => {
+        mockTabState.welcomeClosed = true
+        const { queryByText } = render(TabBar)
+        expect(queryByText('Welcome')).not.toBeInTheDocument()
+    })
+
+    it('calls tabStore.closeWelcome when the Welcome tab close button is clicked', async () => {
+        const { getByLabelText } = render(TabBar)
+        await fireEvent.click(getByLabelText('Close Welcome'))
+        expect(mockCloseWelcome).toHaveBeenCalled()
     })
 
     it('calls tabStore.close when a tab close button is clicked', async () => {
