@@ -95,6 +95,12 @@
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
   const helpItems: MenuItem[] = [
     {
+      type: 'action',
+      labelKey: 'tabs.welcome',
+      event: 'menu-show-welcome',
+    },
+    { type: 'separator' },
+    {
       type: 'link',
       labelKey: 'titlebar.report_bug',
       url: `${REPO}/issues/new?template=bug_report.yml`,
@@ -112,11 +118,6 @@
     { type: 'separator' },
     { type: 'link', labelKey: 'titlebar.view_on_github', url: REPO },
     { type: 'separator' },
-    {
-      type: 'action',
-      labelKey: 'tabs.welcome',
-      event: 'menu-show-welcome',
-    },
     {
       type: 'action',
       labelKey: 'titlebar.release_notes',
