@@ -17,6 +17,7 @@
     "paste": "Paste",
     "find": "Find",
     "replace": "Replace",
+    "find_in_files": "Find in Files",
     "help": "Help",
     "report_bug": "Report a Bug",
     "report_pascal_compiler_issue": "Report a Pascal / Compiler Issue",

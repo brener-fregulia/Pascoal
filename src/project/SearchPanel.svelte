@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { searchStore, pendingJumpLine } from './searchStore'
+  import { searchStore, pendingJumpLine, searchFocusTick } from './searchStore'
   import { explorerStore } from './explorerStore'
   import { tabStore } from '../editor/tabs'
   import { i18n } from '../i18n'
@@ -8,11 +8,13 @@
 
   let queryInput = ''
   let debounceTimer: ReturnType<typeof setTimeout>
+  let inputEl: HTMLInputElement
 
   $: folder = $explorerStore.folder
   $: results = $searchStore.results
   $: loading = $searchStore.loading
   $: caseSensitive = $searchStore.caseSensitive
+  $: if ($searchFocusTick) queueMicrotask(() => inputEl?.focus())
 
   $: grouped = results.reduce(
     (acc, r) => {
@@ -61,6 +63,7 @@
       class="search-input"
       placeholder={$i18n('search.placeholder')}
       bind:value={queryInput}
+      bind:this={inputEl}
       on:input={handleInput}
     />
     <button

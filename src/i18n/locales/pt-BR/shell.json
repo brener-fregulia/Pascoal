@@ -17,6 +17,7 @@
     "paste": "Colar",
     "find": "Localizar",
     "replace": "Substituir",
+    "find_in_files": "Localizar nos Arquivos",
     "help": "Ajuda",
     "report_bug": "Reportar um Bug",
     "report_pascal_compiler_issue": "Reportar um Problema do Pascal / Compilador",

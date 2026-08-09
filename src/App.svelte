@@ -16,6 +16,7 @@
   import { themeStore } from './shared/theme'
   import { tabStore } from './editor/tabs'
   import { explorerStore } from './project/explorerStore'
+  import { searchFocusTick } from './project/searchStore'
   import { recentWorkspacesStore } from './project/recentWorkspaces'
   import { settingsStore } from './settings/settingsStore'
   import { fpcInstallStore } from './toolchain/fpcInstall'
@@ -76,6 +77,11 @@
     await listen('menu-open-folder', async () => {
       const opened = await explorerStore.openFolder()
       if (opened) activePanel = 'explorer'
+    })
+
+    await listen('menu-find-in-files', () => {
+      activePanel = 'search'
+      searchFocusTick.update((n) => n + 1)
     })
 
     await listen<string>('menu-open-recent-workspace', async (event) => {

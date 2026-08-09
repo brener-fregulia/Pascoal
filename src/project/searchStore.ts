@@ -76,3 +76,8 @@ export const searchStore = createSearchStore()
 // Set by SearchPanel when a result is clicked — Editor.svelte watches this
 // to scroll to and select the matching line after the tab opens.
 export const pendingJumpLine = writable<number | null>(null)
+
+// Incremented by App.svelte's `menu-find-in-files` listener to tell an
+// already-mounted (or just-mounted) SearchPanel to focus its query input,
+// mirroring the focusTick pattern FindWidget uses for the editor's Find/Replace.
+export const searchFocusTick = writable(0)

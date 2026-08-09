@@ -31,6 +31,12 @@ vi.mock('../../../src/project/searchStore', () => ({
         toggleCaseSensitive: mockToggleCaseSensitive,
     },
     pendingJumpLine: { set: vi.fn() },
+    searchFocusTick: {
+        subscribe: (fn: (v: number) => void) => {
+            fn(0)
+            return () => { }
+        },
+    },
 }))
 
 vi.mock('../../../src/project/explorerStore', () => ({
