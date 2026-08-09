@@ -138,7 +138,7 @@ describe('Titlebar', () => {
 })
 
 describe('Titlebar Edit menu', () => {
-    it('opens the Edit menu and shows Undo, Redo, Cut, Copy, Paste, Find, and Replace', async () => {
+    it('opens the Edit menu and shows Undo, Redo, Cut, Copy, Paste, Find, Replace, and Find in Files', async () => {
         const { getByText, container } = render(Titlebar)
         await fireEvent.click(getByText('Edit'))
         expect(getByText('Undo')).toBeInTheDocument()
@@ -148,6 +148,7 @@ describe('Titlebar Edit menu', () => {
         expect(getByText('Paste')).toBeInTheDocument()
         expect(getByText('Find')).toBeInTheDocument()
         expect(getByText('Replace')).toBeInTheDocument()
+        expect(getByText('Find in Files')).toBeInTheDocument()
         expect(container.querySelectorAll('.menu-sep')).toHaveLength(2)
     })
 
@@ -159,6 +160,7 @@ describe('Titlebar Edit menu', () => {
         ['Paste', 'menu-paste'],
         ['Find', 'menu-find'],
         ['Replace', 'menu-replace'],
+        ['Find in Files', 'menu-find-in-files'],
     ])('emits %s as %s when clicked', async (label, event) => {
         ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
         const { getByText } = render(Titlebar)

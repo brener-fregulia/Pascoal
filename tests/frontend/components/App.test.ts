@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
-import { render, cleanup, waitFor } from '@testing-library/svelte'
+import { render, cleanup, fireEvent, waitFor } from '@testing-library/svelte'
 import { get } from 'svelte/store'
 import App from '../../../src/App.svelte'
 import { recentWorkspacesStore } from '../../../src/project/recentWorkspaces'
@@ -48,6 +48,12 @@ describe('App', () => {
                 'No FPC installation was found on this machine. Would you like to install it now?',
             ),
         ).toBeInTheDocument()
+    })
+
+    it('opens the search panel on Ctrl+Shift+F', async () => {
+        const { container } = render(App)
+        await fireEvent.keyDown(window, { key: 'F', ctrlKey: true, shiftKey: true })
+        expect(container.querySelector('.search-panel')).toBeInTheDocument()
     })
 })
 
@@ -261,6 +267,33 @@ describe('App - menu-open-recent-workspace listener', () => {
             expect(
                 get(recentWorkspacesStore).find((e) => e.path === '/tmp/Gone'),
             ).toBeUndefined()
+        })
+    })
+})
+
+describe('App - menu-find-in-files listener', () => {
+    beforeEach(() => {
+        mockInvoke.mockReset()
+        mockInvoke.mockImplementation(defaultInvokeImpl())
+        clearListenHandlers()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+    })
+
+    afterEach(() => {
+        cleanup()
+            ; (window as any).__TAURI__ = undefined
+    })
+
+    it('opens the search panel when the menu-find-in-files event fires', async () => {
+        const { container } = render(App)
+        await waitFor(() =>
+            expect(mockListenHandlers['menu-find-in-files']).toBeDefined(),
+        )
+
+        await mockListenHandlers['menu-find-in-files']({ payload: undefined })
+
+        await waitFor(() => {
+            expect(container.querySelector('.search-panel')).toBeInTheDocument()
         })
     })
 })
