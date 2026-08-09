@@ -1,5 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
+import { get } from 'svelte/store'
+import { activeFocusStore } from '../../../src/shared/activeFocus'
 
 const {
     mockExplorerState,
@@ -14,6 +16,8 @@ const {
     mockTabStoreClose,
     mockAsk,
     mockMessage,
+    mockListen,
+    listenHandlers,
 } =
     vi.hoisted(() => ({
         mockExplorerState: {
@@ -40,11 +44,24 @@ const {
         mockTabStoreClose: vi.fn().mockResolvedValue(true),
         mockAsk: vi.fn(),
         mockMessage: vi.fn(),
+        mockListen: vi.fn(
+            (event: string, handler: (...args: unknown[]) => unknown) => {
+                listenHandlers[event] = handler
+                return Promise.resolve(() => {
+                    delete listenHandlers[event]
+                })
+            },
+        ),
+        listenHandlers: {} as Record<string, (...args: unknown[]) => unknown>,
     }))
 
 vi.mock('@tauri-apps/plugin-dialog', () => ({
     ask: mockAsk,
     message: mockMessage,
+}))
+
+vi.mock('@tauri-apps/api/event', () => ({
+    listen: mockListen,
 }))
 
 vi.mock('../../../src/project/explorerStore', () => ({
@@ -83,7 +100,7 @@ vi.mock('../../../src/app/app', () => ({
 
 import FileTree from '../../../src/project/FileTree.svelte'
 
-afterEach(() => {
+afterEach(async () => {
     cleanup()
     mockExplorerState.folder = null
     mockExplorerState.tree = []
@@ -93,13 +110,21 @@ afterEach(() => {
     mockAppState.loading = false
     mockTabState.tabs = []
     mockTabState.activeTabId = null
+        ; (window as any).__TAURI__ = undefined
+    activeFocusStore.set(null)
+    // FileTree's onMount kicks off its menu-cut/menu-copy/menu-paste
+    // listener setup without awaiting it (fire-and-forget), resolving
+    // through chained `await listen(...)` calls. A real `setTimeout` tick
+    // drains any such chain still in flight before the next test starts -
+    // see the matching comment in Editor.test.ts's afterEach.
+    await new Promise((resolve) => setTimeout(resolve, 0))
     vi.clearAllMocks()
     // clearAllMocks only clears call history, not queued `mockResolvedValueOnce`
     // implementations - reset ask/message explicitly so a queued answer left
     // over from one delete test can never leak into the next one.
     mockAsk.mockReset()
     mockMessage.mockReset()
-        ; (window as any).__TAURI__ = undefined
+    for (const key of Object.keys(listenHandlers)) delete listenHandlers[key]
 })
 
 describe('FileTree', () => {
@@ -1357,5 +1382,136 @@ describe('FileTree clipboard (cut/copy/paste)', () => {
 
         await fireEvent.contextMenu(container.querySelector('.tree-body') as HTMLElement)
         expect(queryByText('Paste')).not.toBeInTheDocument()
+    })
+})
+
+describe('FileTree Edit menu (menu-cut/menu-copy/menu-paste)', () => {
+    afterEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            value: undefined,
+            configurable: true,
+        })
+    })
+
+    it('registers menu-cut/menu-copy/menu-paste listeners when Tauri is available', async () => {
+        setupTree()
+            ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        render(FileTree)
+
+        await vi.waitFor(() => {
+            expect(listenHandlers['menu-cut']).toBeDefined()
+            expect(listenHandlers['menu-copy']).toBeDefined()
+            expect(listenHandlers['menu-paste']).toBeDefined()
+        })
+    })
+
+    it('sets the active focus to "explorer" when the tree body receives focus', async () => {
+        setupTree()
+        const { container } = render(FileTree)
+        const treeBody = container.querySelector('.tree-body') as HTMLElement
+
+        await fireEvent.focusIn(treeBody)
+
+        expect(get(activeFocusStore)).toBe('explorer')
+    })
+
+    it('moves the selected file to the workspace root via menu-cut then menu-paste when the explorer owns focus', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await vi.waitFor(() => {
+            expect(listenHandlers['menu-cut']).toBeDefined()
+            expect(listenHandlers['menu-paste']).toBeDefined()
+        })
+        activeFocusStore.set('explorer')
+
+        await listenHandlers['menu-cut']()
+        await listenHandlers['menu-paste']()
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('move_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject',
+            })
+        })
+    })
+
+    it('copies the selected file to the workspace root via menu-copy then menu-paste when the explorer owns focus', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main-copy.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        await fireEvent.click(row)
+        await vi.waitFor(() => {
+            expect(listenHandlers['menu-copy']).toBeDefined()
+            expect(listenHandlers['menu-paste']).toBeDefined()
+        })
+        activeFocusStore.set('explorer')
+
+        await listenHandlers['menu-copy']()
+        await listenHandlers['menu-paste']()
+
+        await vi.waitFor(() => {
+            expect(mockInvoke).toHaveBeenCalledWith('copy_path', {
+                path: '/tmp/MyProject/main.pas',
+                destinationParent: '/tmp/MyProject',
+            })
+        })
+    })
+
+    it('ignores menu-cut/menu-copy/menu-paste when the explorer does not own focus', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        // Select via the context menu (not a plain click) so the row isn't
+        // opened, which would call `invoke('read_file', ...)` and pollute
+        // the "never called" assertion below - same pattern as the existing
+        // Ctrl+X/Ctrl+V "nothing selected" tests above.
+        await fireEvent.contextMenu(row)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        await vi.waitFor(() => {
+            expect(listenHandlers['menu-cut']).toBeDefined()
+            expect(listenHandlers['menu-copy']).toBeDefined()
+            expect(listenHandlers['menu-paste']).toBeDefined()
+        })
+        // activeFocusStore stays at its default (null) - neither panel has
+        // received focus yet, so the explorer must not act on these events.
+        expect(get(activeFocusStore)).toBe(null)
+
+        await listenHandlers['menu-cut']()
+        await listenHandlers['menu-copy']()
+        await listenHandlers['menu-paste']()
+
+        expect(mockInvoke).not.toHaveBeenCalled()
+    })
+
+    it('ignores menu-cut/menu-copy/menu-paste when the editor owns focus', async () => {
+        setupTree()
+        const mockInvoke = vi.fn().mockResolvedValue('/tmp/MyProject/main.pas')
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        const { getByText } = render(FileTree)
+        const row = getByText('main.pas').closest('button') as HTMLElement
+        // Select via the context menu (not a plain click) for the same
+        // reason as the test above.
+        await fireEvent.contextMenu(row)
+        await fireEvent.keyDown(window, { key: 'Escape' })
+        await vi.waitFor(() => {
+            expect(listenHandlers['menu-cut']).toBeDefined()
+            expect(listenHandlers['menu-copy']).toBeDefined()
+            expect(listenHandlers['menu-paste']).toBeDefined()
+        })
+        activeFocusStore.set('editor')
+
+        await listenHandlers['menu-cut']()
+        await listenHandlers['menu-copy']()
+        await listenHandlers['menu-paste']()
+
+        expect(mockInvoke).not.toHaveBeenCalled()
     })
 })

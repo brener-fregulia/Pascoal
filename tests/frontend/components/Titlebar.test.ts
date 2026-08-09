@@ -33,9 +33,10 @@ afterEach(() => {
 })
 
 describe('Titlebar', () => {
-    it('renders the File and Help menu triggers', () => {
+    it('renders the File, Edit, and Help menu triggers', () => {
         const { getByText } = render(Titlebar)
         expect(getByText('File')).toBeInTheDocument()
+        expect(getByText('Edit')).toBeInTheDocument()
         expect(getByText('Help')).toBeInTheDocument()
     })
 
@@ -133,5 +134,41 @@ describe('Titlebar', () => {
                 ),
             )
         })
+    })
+})
+
+describe('Titlebar Edit menu', () => {
+    it('opens the Edit menu and shows Undo, Redo, Cut, Copy, and Paste', async () => {
+        const { getByText } = render(Titlebar)
+        await fireEvent.click(getByText('Edit'))
+        expect(getByText('Undo')).toBeInTheDocument()
+        expect(getByText('Redo')).toBeInTheDocument()
+        expect(getByText('Cut')).toBeInTheDocument()
+        expect(getByText('Copy')).toBeInTheDocument()
+        expect(getByText('Paste')).toBeInTheDocument()
+    })
+
+    it.each([
+        ['Undo', 'menu-undo'],
+        ['Redo', 'menu-redo'],
+        ['Cut', 'menu-cut'],
+        ['Copy', 'menu-copy'],
+        ['Paste', 'menu-paste'],
+    ])('emits %s as %s when clicked', async (label, event) => {
+        ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText } = render(Titlebar)
+        await fireEvent.click(getByText('Edit'))
+        await fireEvent.click(getByText(label))
+        await waitFor(() =>
+            expect(mockEmit).toHaveBeenCalledWith(event, undefined),
+        )
+    })
+
+    it('closes the menu when an Edit item is clicked', async () => {
+        ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
+        const { getByText, queryByText } = render(Titlebar)
+        await fireEvent.click(getByText('Edit'))
+        await fireEvent.click(getByText('Undo'))
+        expect(queryByText('Redo')).not.toBeInTheDocument()
     })
 })
