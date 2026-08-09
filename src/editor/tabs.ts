@@ -20,6 +20,7 @@ interface TabState {
   tabs: Tab[]
   activeTabId: string | null
   activeView: 'welcome' | 'editor' | 'diff'
+  welcomeClosed: boolean
 }
 
 function createTabStore() {
@@ -27,6 +28,7 @@ function createTabStore() {
     tabs: [],
     activeTabId: null,
     activeView: 'welcome',
+    welcomeClosed: false,
   })
 
   function getState() {
@@ -106,7 +108,15 @@ function createTabStore() {
   }
 
   function showWelcome() {
-    update((s) => ({ ...s, activeView: 'welcome' }))
+    update((s) => ({ ...s, activeView: 'welcome', welcomeClosed: false }))
+  }
+
+  // Called from the Welcome tab's own close (X) button in the tab bar -
+  // lets the user dismiss the welcome screen even with no other tabs open,
+  // instead of it always being forced back into view. Reopened via
+  // showWelcome() (Help > Welcome).
+  function closeWelcome() {
+    update((s) => ({ ...s, welcomeClosed: true }))
   }
 
   // Used by diffTabStore - a diff tab isn't part of `tabs`, so it just
@@ -220,7 +230,7 @@ function createTabStore() {
 
   function reset() {
     tabCounter = 0
-    set({ tabs: [], activeTabId: null, activeView: 'welcome' })
+    set({ tabs: [], activeTabId: null, activeView: 'welcome', welcomeClosed: false })
   }
 
   return {
@@ -232,6 +242,7 @@ function createTabStore() {
     activateDiff,
     fallbackFromDiff,
     showWelcome,
+    closeWelcome,
     markDirty,
     markClean,
     close,

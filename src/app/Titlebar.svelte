@@ -114,6 +114,11 @@
     { type: 'separator' },
     {
       type: 'action',
+      labelKey: 'tabs.welcome',
+      event: 'menu-show-welcome',
+    },
+    {
+      type: 'action',
       labelKey: 'titlebar.release_notes',
       event: 'menu-release-notes',
     },

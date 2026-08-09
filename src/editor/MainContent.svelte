@@ -11,7 +11,8 @@
   $: hasOpenTabs = $tabStore.tabs.length > 0
   $: hasOpenDiffTabs = $diffTabStore.length > 0
   $: showWelcome =
-    $tabStore.activeView === 'welcome' || (!hasOpenTabs && !hasOpenDiffTabs)
+    !$tabStore.welcomeClosed &&
+    ($tabStore.activeView === 'welcome' || (!hasOpenTabs && !hasOpenDiffTabs))
   $: showConsole = $consoleStore.visible
   $: position = $consoleStore.position
   $: activeDiffTab =

@@ -11,17 +11,22 @@
   $: diffTabs = $diffTabStore
   $: activeTabId = $tabStore.activeTabId
   $: activeView = $tabStore.activeView
+  $: welcomeClosed = $tabStore.welcomeClosed
 </script>
 
 <div id="tab-bar">
-  <Tab
-    label={$i18n('tabs.welcome')}
-    active={activeView === 'welcome'}
-    on:click={() => tabStore.showWelcome()}
-    on:keydown={(e) => e.key === 'Enter' && tabStore.showWelcome()}
-  >
-    <Home slot="icon" size={14} />
-  </Tab>
+  {#if !welcomeClosed}
+    <Tab
+      label={$i18n('tabs.welcome')}
+      active={activeView === 'welcome'}
+      closable
+      onClose={() => tabStore.closeWelcome()}
+      on:click={() => tabStore.showWelcome()}
+      on:keydown={(e) => e.key === 'Enter' && tabStore.showWelcome()}
+    >
+      <Home slot="icon" size={14} />
+    </Tab>
+  {/if}
 
   {#each tabs as tab (tab.id)}
     <Tab

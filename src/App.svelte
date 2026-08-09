@@ -124,6 +124,10 @@
       )
     })
 
+    await listen('menu-show-welcome', () => {
+      tabStore.showWelcome()
+    })
+
     await listen('menu-about', () => {
       showAbout = true
     })
