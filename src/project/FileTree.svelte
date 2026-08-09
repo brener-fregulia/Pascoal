@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte'
+  import { get } from 'svelte/store'
   import { explorerStore, type ExplorerNode } from './explorerStore'
   import { tabStore } from '../editor/tabs'
   import { i18n } from '../i18n'
   import { appStore } from '../app/app'
+  import { activeFocusStore } from '../shared/activeFocus'
   import FileTreeNode from './FileTreeNode.svelte'
   import NewEntryRow from './NewEntryRow.svelte'
   import Folder from '../icons/Folder.svelte'
@@ -408,6 +411,21 @@
     if (e.key === 'Escape') closeMenu()
   }
 
+  // Shared by handleTreeKeydown (Ctrl+C/X/V) and the `menu-cut`/`menu-copy`/
+  // `menu-paste` Edit-menu listeners below - both act on whatever is
+  // currently selected in the tree.
+  function cutSelected() {
+    if (selectedPath) clipboard = { path: selectedPath, mode: 'cut' }
+  }
+
+  function copySelected() {
+    if (selectedPath) clipboard = { path: selectedPath, mode: 'copy' }
+  }
+
+  function pasteToSelection() {
+    if (clipboard) pasteClipboard(toolbarTargetParent())
+  }
+
   // F2/Delete/Cut/Copy/Paste act on the selected tree item and must only
   // fire while keyboard focus is inside the file tree - the Explorer panel
   // sits in a split pane next to the code editor, so a global `window`
@@ -424,15 +442,60 @@
       deletePath(selectedPath)
     } else if (mod && e.key.toLowerCase() === 'c' && selectedPath) {
       e.preventDefault()
-      clipboard = { path: selectedPath, mode: 'copy' }
+      copySelected()
     } else if (mod && e.key.toLowerCase() === 'x' && selectedPath) {
       e.preventDefault()
-      clipboard = { path: selectedPath, mode: 'cut' }
+      cutSelected()
     } else if (mod && e.key.toLowerCase() === 'v' && clipboard) {
       e.preventDefault()
-      pasteClipboard(toolbarTargetParent())
+      pasteToSelection()
     }
   }
+
+  function handleTreeFocusIn() {
+    activeFocusStore.set('explorer')
+  }
+
+  let unlistenMenuCut: (() => void) | null = null
+  let unlistenMenuCopy: (() => void) | null = null
+  let unlistenMenuPaste: (() => void) | null = null
+
+  // The Edit menu's Cut/Copy/Paste route to the tree only when it currently
+  // owns keyboard focus - see the matching guard (inverted) in
+  // Editor.svelte's setupMenuListeners.
+  onMount(() => {
+    async function setup() {
+      if (!isTauriAvailable()) return
+      try {
+        const { listen } = await import('@tauri-apps/api/event')
+
+        unlistenMenuCut = await listen('menu-cut', () => {
+          if (get(activeFocusStore) !== 'explorer') return
+          cutSelected()
+        })
+
+        unlistenMenuCopy = await listen('menu-copy', () => {
+          if (get(activeFocusStore) !== 'explorer') return
+          copySelected()
+        })
+
+        unlistenMenuPaste = await listen('menu-paste', () => {
+          if (get(activeFocusStore) !== 'explorer') return
+          pasteToSelection()
+        })
+      } catch (e) {
+        console.error('File tree menu event listeners failed to register:', e)
+      }
+    }
+
+    setup()
+  })
+
+  onDestroy(() => {
+    unlistenMenuCut?.()
+    unlistenMenuCopy?.()
+    unlistenMenuPaste?.()
+  })
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
@@ -485,6 +548,7 @@
       onclick={handleEmptyClick}
       oncontextmenu={handleEmptyContextMenu}
       onkeydown={handleTreeKeydown}
+      onfocusin={handleTreeFocusIn}
     >
       {#if loading}
         <p class="status-msg">{$i18n('explorer.loading')}</p>

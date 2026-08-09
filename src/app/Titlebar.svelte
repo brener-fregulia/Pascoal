@@ -69,6 +69,15 @@
 
   $: fileItems = buildFileItems($recentWorkspacesStore)
 
+  const editItems: MenuItem[] = [
+    { type: 'action', labelKey: 'titlebar.undo', event: 'menu-undo' },
+    { type: 'action', labelKey: 'titlebar.redo', event: 'menu-redo' },
+    { type: 'separator' },
+    { type: 'action', labelKey: 'titlebar.cut', event: 'menu-cut' },
+    { type: 'action', labelKey: 'titlebar.copy', event: 'menu-copy' },
+    { type: 'action', labelKey: 'titlebar.paste', event: 'menu-paste' },
+  ]
+
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
   const helpItems: MenuItem[] = [
     {
@@ -104,6 +113,7 @@
 
   $: menus = [
     { id: 'file', labelKey: 'titlebar.file', items: fileItems },
+    { id: 'edit', labelKey: 'titlebar.edit', items: editItems },
     { id: 'help', labelKey: 'titlebar.help', items: helpItems },
   ]
 

@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { EditorView } from '@codemirror/view'
+  import { undo, redo } from '@codemirror/commands'
   import { tabStore } from './tabs'
   import { themeStore } from '../shared/theme'
   import { explorerStore } from '../project/explorerStore'
@@ -10,6 +11,8 @@
   import { gitStore } from '../integrations/git/gitStore'
   import { themeCompartment } from './editor-extensions'
   import { buildPascoalTheme } from './editor-theme'
+  import { copySelection, cutSelection, pasteFromClipboard } from './editorClipboard'
+  import { activeFocusStore } from '../shared/activeFocus'
   import {
     settingsStore,
     MIN_FONT_SIZE,
@@ -28,6 +31,12 @@
 
   let showFind = $state(false)
   let findFocusTick = $state(0)
+
+  let unlistenUndo: (() => void) | null = null
+  let unlistenRedo: (() => void) | null = null
+  let unlistenCut: (() => void) | null = null
+  let unlistenCopy: (() => void) | null = null
+  let unlistenPaste: (() => void) | null = null
 
   $effect(() => {
     const activeTab =
@@ -90,15 +99,74 @@
     currentTabId = activeTab?.id ?? null
     document.addEventListener('keydown', handleKeydown)
     editorEl.addEventListener('wheel', handleWheel, { passive: false })
+    editorEl.addEventListener('focusin', handleFocusIn)
+
+    setupMenuListeners()
+
     return () => {
       document.removeEventListener('keydown', handleKeydown)
       editorEl.removeEventListener('wheel', handleWheel)
+      editorEl.removeEventListener('focusin', handleFocusIn)
     }
   })
 
   onDestroy(() => {
+    unlistenUndo?.()
+    unlistenRedo?.()
+    unlistenCut?.()
+    unlistenCopy?.()
+    unlistenPaste?.()
     view?.destroy()
   })
+
+  function handleFocusIn() {
+    activeFocusStore.set('editor')
+  }
+
+  // Cut/Copy/Paste from the Edit menu act on the editor unless the file
+  // explorer's tree currently owns keyboard focus - the explorer has its own
+  // path-based clipboard (see FileTree.svelte) and its own `menu-cut`/
+  // `menu-copy`/`menu-paste` listeners guarded the opposite way. A `null`
+  // focus (nothing focused yet) is treated as "editor" since it's the main
+  // content area.
+  async function setupMenuListeners() {
+    if (!isTauriAvailable()) return
+    try {
+      const { listen } = await import('@tauri-apps/api/event')
+
+      unlistenUndo = await listen('menu-undo', () => {
+        if (!view) return
+        undo(view)
+        view.focus()
+      })
+
+      unlistenRedo = await listen('menu-redo', () => {
+        if (!view) return
+        redo(view)
+        view.focus()
+      })
+
+      unlistenCut = await listen('menu-cut', async () => {
+        if (!view || get(activeFocusStore) === 'explorer') return
+        await cutSelection(view)
+        view.focus()
+      })
+
+      unlistenCopy = await listen('menu-copy', async () => {
+        if (!view || get(activeFocusStore) === 'explorer') return
+        await copySelection(view)
+        view.focus()
+      })
+
+      unlistenPaste = await listen('menu-paste', async () => {
+        if (!view || get(activeFocusStore) === 'explorer') return
+        await pasteFromClipboard(view)
+        view.focus()
+      })
+    } catch (e) {
+      console.error('Editor menu event listeners failed to register:', e)
+    }
+  }
 
   async function handleKeydown(e: KeyboardEvent) {
     if (
