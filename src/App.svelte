@@ -30,6 +30,18 @@
   let showAbout = $state(false)
   let showVersionHistory = $state(false)
 
+  function openFindInFiles() {
+    activePanel = 'search'
+    searchFocusTick.update((n) => n + 1)
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'f') {
+      e.preventDefault()
+      openFindInFiles()
+    }
+  }
+
   onMount(async () => {
     themeStore.init()
     gitStore.watchFolder()
@@ -79,10 +91,7 @@
       if (opened) activePanel = 'explorer'
     })
 
-    await listen('menu-find-in-files', () => {
-      activePanel = 'search'
-      searchFocusTick.update((n) => n + 1)
-    })
+    await listen('menu-find-in-files', openFindInFiles)
 
     await listen<string>('menu-open-recent-workspace', async (event) => {
       const path = event.payload
@@ -138,6 +147,8 @@
     }
   })
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div id="layout">
   <Titlebar />
