@@ -2,8 +2,7 @@
   "name": "pascoal",
   "productName": "Pascoal",
   "version": "2026.3.0",
-  "description": "Pascal Playground - Pascoal",
-  "main": "src/main/main.js",
+  "description": "A modern Pascal playground and IDE",
   "scripts": {
     "dev:ide": "cd src && npx vite",
     "build:ide": "cd src && npx vite build",
