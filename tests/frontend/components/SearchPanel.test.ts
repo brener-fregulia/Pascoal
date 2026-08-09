@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 
-const { mockSearchState, mockSearch, mockToggleCaseSensitive, mockExplorerState } =
+const { mockSearchState, mockSearch, mockToggleCaseSensitive, mockExplorerState, mockSearchFocusTickState } =
     vi.hoisted(() => ({
         mockSearchState: {
             results: [] as Array<{
@@ -19,6 +19,10 @@ const { mockSearchState, mockSearch, mockToggleCaseSensitive, mockExplorerState 
         mockExplorerState: {
             folder: null as { name: string; path: string } | null,
         },
+        // A container object (not a bare number) so tests can mutate the
+        // value the mock subscribe() call sees before render(), since
+        // `const` destructuring wouldn't allow reassigning a primitive.
+        mockSearchFocusTickState: { value: 0 },
     }))
 
 vi.mock('../../../src/project/searchStore', () => ({
@@ -33,7 +37,7 @@ vi.mock('../../../src/project/searchStore', () => ({
     pendingJumpLine: { set: vi.fn() },
     searchFocusTick: {
         subscribe: (fn: (v: number) => void) => {
-            fn(0)
+            fn(mockSearchFocusTickState.value)
             return () => { }
         },
     },
@@ -63,6 +67,7 @@ afterEach(() => {
     mockSearchState.loading = false
     mockSearchState.caseSensitive = false
     mockExplorerState.folder = null
+    mockSearchFocusTickState.value = 0
     vi.clearAllMocks()
     vi.useRealTimers()
         ; (window as any).__TAURI__ = undefined
@@ -111,5 +116,26 @@ describe('SearchPanel', () => {
         await fireEvent.click(getByTitle('Match case'))
         expect(mockToggleCaseSensitive).toHaveBeenCalled()
         expect(mockSearch).toHaveBeenCalled()
+    })
+
+    describe('searchFocusTick', () => {
+        it('focuses the query input when searchFocusTick is already non-zero on mount', async () => {
+            mockSearchFocusTickState.value = 1
+            const { getByPlaceholderText } = render(SearchPanel)
+            const input = getByPlaceholderText('Search in files...')
+
+            await Promise.resolve()
+
+            expect(input).toHaveFocus()
+        })
+
+        it('does not focus the query input when searchFocusTick is 0', async () => {
+            const { getByPlaceholderText } = render(SearchPanel)
+            const input = getByPlaceholderText('Search in files...')
+
+            await Promise.resolve()
+
+            expect(input).not.toHaveFocus()
+        })
     })
 })
