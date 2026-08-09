@@ -2,7 +2,9 @@
   "titlebar": {
     "close": "Cerrar",
     "minimize": "Minimizar",
-    "maximize": "Maximizar",
+    "maximize": "Maximizar"
+  },
+  "menu": {
     "file": "Archivo",
     "new_file": "Nuevo archivo",
     "open_file": "Abrir archivo...",

@@ -26,22 +26,22 @@
 
   function buildFileItems(recentWorkspaces: RecentWorkspace[]): MenuItem[] {
     const items: MenuItem[] = [
-      { type: 'action', labelKey: 'titlebar.new_file', event: 'menu-new-file' },
+      { type: 'action', labelKey: 'menu.new_file', event: 'menu-new-file' },
       {
         type: 'action',
-        labelKey: 'titlebar.open_file',
+        labelKey: 'menu.open_file',
         event: 'menu-open-file',
       },
       {
         type: 'action',
-        labelKey: 'titlebar.open_folder',
+        labelKey: 'menu.open_folder',
         event: 'menu-open-folder',
       },
       { type: 'separator' },
-      { type: 'action', labelKey: 'titlebar.save', event: 'menu-save-file' },
+      { type: 'action', labelKey: 'menu.save', event: 'menu-save-file' },
       {
         type: 'action',
-        labelKey: 'titlebar.save_as',
+        labelKey: 'menu.save_as',
         event: 'menu-save-file-as',
       },
     ]
@@ -65,24 +65,24 @@
   $: fileItems = buildFileItems($recentWorkspacesStore)
 
   const editItems: MenuItem[] = [
-    { type: 'action', labelKey: 'titlebar.undo', event: 'menu-undo' },
-    { type: 'action', labelKey: 'titlebar.redo', event: 'menu-redo' },
+    { type: 'action', labelKey: 'menu.undo', event: 'menu-undo' },
+    { type: 'action', labelKey: 'menu.redo', event: 'menu-redo' },
     { type: 'separator' },
-    { type: 'action', labelKey: 'titlebar.cut', event: 'menu-cut' },
-    { type: 'action', labelKey: 'titlebar.copy', event: 'menu-copy' },
-    { type: 'action', labelKey: 'titlebar.paste', event: 'menu-paste' },
+    { type: 'action', labelKey: 'menu.cut', event: 'menu-cut' },
+    { type: 'action', labelKey: 'menu.copy', event: 'menu-copy' },
+    { type: 'action', labelKey: 'menu.paste', event: 'menu-paste' },
     { type: 'separator' },
-    { type: 'action', labelKey: 'titlebar.find', event: 'menu-find' },
-    { type: 'action', labelKey: 'titlebar.replace', event: 'menu-replace' },
+    { type: 'action', labelKey: 'menu.find', event: 'menu-find' },
+    { type: 'action', labelKey: 'menu.replace', event: 'menu-replace' },
     {
       type: 'action',
-      labelKey: 'titlebar.find_in_files',
+      labelKey: 'menu.find_in_files',
       event: 'menu-find-in-files',
     },
     { type: 'separator' },
     {
       type: 'action',
-      labelKey: 'titlebar.toggle_line_comment',
+      labelKey: 'menu.toggle_line_comment',
       event: 'menu-toggle-comment',
     },
   ]
@@ -97,39 +97,39 @@
     { type: 'separator' },
     {
       type: 'link',
-      labelKey: 'titlebar.report_bug',
+      labelKey: 'menu.report_bug',
       url: `${REPO}/issues/new?template=bug_report.yml`,
     },
     {
       type: 'link',
-      labelKey: 'titlebar.report_pascal_compiler_issue',
+      labelKey: 'menu.report_pascal_compiler_issue',
       url: `${REPO}/issues/new?template=compiler_runtime_issue.yml`,
     },
     {
       type: 'link',
-      labelKey: 'titlebar.request_feature',
+      labelKey: 'menu.request_feature',
       url: `${REPO}/issues/new?template=feature_request.yml`,
     },
     { type: 'separator' },
-    { type: 'link', labelKey: 'titlebar.view_on_github', url: REPO },
+    { type: 'link', labelKey: 'menu.view_on_github', url: REPO },
     { type: 'separator' },
     {
       type: 'action',
-      labelKey: 'titlebar.release_notes',
+      labelKey: 'menu.release_notes',
       event: 'menu-release-notes',
     },
     {
       type: 'action',
-      labelKey: 'titlebar.version_history',
+      labelKey: 'menu.version_history',
       event: 'menu-version-history',
     },
-    { type: 'action', labelKey: 'titlebar.about_pascoal', event: 'menu-about' },
+    { type: 'action', labelKey: 'menu.about_pascoal', event: 'menu-about' },
   ]
 
   $: menus = [
-    { id: 'file', labelKey: 'titlebar.file', items: fileItems },
-    { id: 'edit', labelKey: 'titlebar.edit', items: editItems },
-    { id: 'help', labelKey: 'titlebar.help', items: helpItems },
+    { id: 'file', labelKey: 'menu.file', items: fileItems },
+    { id: 'edit', labelKey: 'menu.edit', items: editItems },
+    { id: 'help', labelKey: 'menu.help', items: helpItems },
   ]
 
   function toggleMenu(id: string) {
