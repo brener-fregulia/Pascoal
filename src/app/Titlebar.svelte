@@ -76,6 +76,9 @@
     { type: 'action', labelKey: 'titlebar.cut', event: 'menu-cut' },
     { type: 'action', labelKey: 'titlebar.copy', event: 'menu-copy' },
     { type: 'action', labelKey: 'titlebar.paste', event: 'menu-paste' },
+    { type: 'separator' },
+    { type: 'action', labelKey: 'titlebar.find', event: 'menu-find' },
+    { type: 'action', labelKey: 'titlebar.replace', event: 'menu-replace' },
   ]
 
   const REPO = 'https://github.com/brener-fregulia/Pascoal'

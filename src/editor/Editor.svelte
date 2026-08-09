@@ -30,6 +30,7 @@
   let currentTabId: string | null = null
 
   let showFind = $state(false)
+  let showReplace = $state(false)
   let findFocusTick = $state(0)
 
   let unlistenUndo: (() => void) | null = null
@@ -37,6 +38,8 @@
   let unlistenCut: (() => void) | null = null
   let unlistenCopy: (() => void) | null = null
   let unlistenPaste: (() => void) | null = null
+  let unlistenFind: (() => void) | null = null
+  let unlistenReplace: (() => void) | null = null
 
   $effect(() => {
     const activeTab =
@@ -116,6 +119,8 @@
     unlistenCut?.()
     unlistenCopy?.()
     unlistenPaste?.()
+    unlistenFind?.()
+    unlistenReplace?.()
     view?.destroy()
   })
 
@@ -163,6 +168,17 @@
         await pasteFromClipboard(view)
         view.focus()
       })
+
+      unlistenFind = await listen('menu-find', () => {
+        showFind = true
+        findFocusTick++
+      })
+
+      unlistenReplace = await listen('menu-replace', () => {
+        showFind = true
+        showReplace = true
+        findFocusTick++
+      })
     } catch (e) {
       console.error('Editor menu event listeners failed to register:', e)
     }
@@ -176,6 +192,13 @@
     ) {
       e.preventDefault()
       showFind = true
+      findFocusTick++
+      return
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+      e.preventDefault()
+      showFind = true
+      showReplace = true
       findFocusTick++
       return
     }
@@ -306,7 +329,12 @@
     bind:this={editorEl}
     style="--editor-font-size: {$settingsStore.fontSize}px"
   ></div>
-  <FindWidget bind:open={showFind} {view} focusTick={findFocusTick} />
+  <FindWidget
+    bind:open={showFind}
+    bind:showReplace
+    {view}
+    focusTick={findFocusTick}
+  />
 </div>
 
 <style>

@@ -15,6 +15,8 @@
     "cut": "Cut",
     "copy": "Copy",
     "paste": "Paste",
+    "find": "Find",
+    "replace": "Replace",
     "help": "Help",
     "report_bug": "Report a Bug",
     "report_pascal_compiler_issue": "Report a Pascal / Compiler Issue",

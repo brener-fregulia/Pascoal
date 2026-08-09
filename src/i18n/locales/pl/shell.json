@@ -15,6 +15,8 @@
     "cut": "Wytnij",
     "copy": "Kopiuj",
     "paste": "Wklej",
+    "find": "Znajdź",
+    "replace": "Zamień",
     "help": "Pomoc",
     "report_bug": "Zgłoś błąd",
     "report_pascal_compiler_issue": "Zgłoś problem z Pascalem / kompilatorem",

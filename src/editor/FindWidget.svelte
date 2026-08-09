@@ -21,14 +21,19 @@
     view,
     open = $bindable(false),
     focusTick = 0,
-  }: { view: EditorView | null; open: boolean; focusTick?: number } = $props()
+    showReplace = $bindable(false),
+  }: {
+    view: EditorView | null
+    open: boolean
+    focusTick?: number
+    showReplace?: boolean
+  } = $props()
 
   let queryText = $state('')
   let replaceText = $state('')
   let caseSensitive = $state(false)
   let wholeWord = $state(false)
   let useRegex = $state(false)
-  let showReplace = $state(false)
 
   let matchIndex = $state(0)
   let matchCount = $state(0)
