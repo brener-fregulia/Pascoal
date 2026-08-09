@@ -339,12 +339,12 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
         vi.unstubAllGlobals()
     })
 
-    // Editor's setupMenuListeners awaits `listen()` sequentially for all 5
+    // Editor's setupMenuListeners awaits `listen()` sequentially for all 7
     // events inside one async function. Waiting for only some of them to be
     // registered (e.g. just menu-undo) before a test ends lets the remaining
     // in-flight `await listen(...)` calls resolve *after* cleanup(), leaking
     // extra mockListen calls into whichever test runs next. Every test below
-    // that renders with Tauri available waits for all 5 first to avoid that.
+    // that renders with Tauri available waits for all 7 first to avoid that.
     async function waitForAllMenuListeners() {
         await vi.waitFor(() => {
             expect(listenHandlers['menu-undo']).toBeDefined()
@@ -352,6 +352,8 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
             expect(listenHandlers['menu-cut']).toBeDefined()
             expect(listenHandlers['menu-copy']).toBeDefined()
             expect(listenHandlers['menu-paste']).toBeDefined()
+            expect(listenHandlers['menu-find']).toBeDefined()
+            expect(listenHandlers['menu-replace']).toBeDefined()
         })
     }
 
@@ -467,5 +469,59 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
         await fireEvent.focusIn(target)
 
         expect(get(activeFocusStore)).toBe('editor')
+    })
+
+    it('opens the find widget without expanding replace on menu-find', async () => {
+        vi.stubGlobal('__TAURI__', { core: { invoke: vi.fn() } })
+        const tab = makeTab()
+        mockTabState.tabs = [tab]
+        mockTabState.activeTabId = tab.id
+        const { container, queryByPlaceholderText } = render(Editor)
+        await waitForAllMenuListeners()
+
+        await listenHandlers['menu-find']()
+
+        expect(container.querySelector('.find-widget')).toBeInTheDocument()
+        expect(queryByPlaceholderText('Replace')).not.toBeInTheDocument()
+    })
+
+    it('opens the find widget with replace already expanded on menu-replace', async () => {
+        vi.stubGlobal('__TAURI__', { core: { invoke: vi.fn() } })
+        const tab = makeTab()
+        mockTabState.tabs = [tab]
+        mockTabState.activeTabId = tab.id
+        const { container, getByPlaceholderText } = render(Editor)
+        await waitForAllMenuListeners()
+
+        await listenHandlers['menu-replace']()
+
+        expect(container.querySelector('.find-widget')).toBeInTheDocument()
+        expect(getByPlaceholderText('Replace')).toBeInTheDocument()
+    })
+
+    it('opens the find widget with replace already expanded on Ctrl+H', async () => {
+        const tab = makeTab()
+        mockTabState.tabs = [tab]
+        mockTabState.activeTabId = tab.id
+        const { container, getByPlaceholderText } = render(Editor)
+
+        await fireEvent.keyDown(document, { key: 'h', ctrlKey: true })
+
+        expect(container.querySelector('.find-widget')).toBeInTheDocument()
+        expect(getByPlaceholderText('Replace')).toBeInTheDocument()
+    })
+
+    it('keeps replace expanded when Ctrl+F is pressed after replace was already shown', async () => {
+        const tab = makeTab()
+        mockTabState.tabs = [tab]
+        mockTabState.activeTabId = tab.id
+        const { getByPlaceholderText } = render(Editor)
+
+        await fireEvent.keyDown(document, { key: 'h', ctrlKey: true })
+        expect(getByPlaceholderText('Replace')).toBeInTheDocument()
+
+        await fireEvent.keyDown(document, { key: 'f', ctrlKey: true })
+
+        expect(getByPlaceholderText('Replace')).toBeInTheDocument()
     })
 })

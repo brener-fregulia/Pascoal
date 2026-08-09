@@ -87,4 +87,12 @@ describe('FindWidget', () => {
         await fireEvent.click(caseBtn)
         expect(caseBtn).toHaveClass('active')
     })
+
+    it('renders the replace row already expanded when showReplace is passed in as true', () => {
+        const view = makeView('hello world')
+        const { getByPlaceholderText } = render(FindWidget, {
+            props: { view, open: true, showReplace: true },
+        })
+        expect(getByPlaceholderText('Replace')).toBeInTheDocument()
+    })
 })
