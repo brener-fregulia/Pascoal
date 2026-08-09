@@ -11,6 +11,8 @@ import { matchHighlightField } from './search-highlight'
 export const themeCompartment = new Compartment()
 
 export function pascalExtensions(onDocChange: () => void, highlightExtensions: Extension[] = []) {
+  const pascalLanguage = StreamLanguage.define(pascal)
+
   return [
     lineNumbers(),
     highlightActiveLine(),
@@ -24,7 +26,14 @@ export function pascalExtensions(onDocChange: () => void, highlightExtensions: E
     // below, since it needs to work reliably without the default panel.
     search(),
     matchHighlightField,
-    StreamLanguage.define(pascal),
+    pascalLanguage,
+    // The legacy mode only declares the `(* *)` block comment token, which
+    // made Ctrl+/ (toggleComment, from defaultKeymap) fall back to block
+    // comments. Object Pascal also supports `//` line comments, and
+    // toggleComment prefers the line token when one is set.
+    pascalLanguage.data.of({
+      commentTokens: { line: '//', block: { open: '(*', close: '*)' } },
+    }),
     EditorState.tabSize.of(2),
     keymap.of([
       ...defaultKeymap,

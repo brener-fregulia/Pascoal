@@ -18,6 +18,7 @@
     "find": "Buscar",
     "replace": "Reemplazar",
     "find_in_files": "Buscar en Archivos",
+    "toggle_line_comment": "Alternar Comentario de Línea",
     "help": "Ayuda",
     "report_bug": "Reportar un error",
     "report_pascal_compiler_issue": "Reportar un problema de Pascal / compilador",

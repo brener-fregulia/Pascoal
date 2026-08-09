@@ -149,7 +149,7 @@ describe('Titlebar Edit menu', () => {
         expect(getByText('Find')).toBeInTheDocument()
         expect(getByText('Replace')).toBeInTheDocument()
         expect(getByText('Find in Files')).toBeInTheDocument()
-        expect(container.querySelectorAll('.menu-sep')).toHaveLength(2)
+        expect(container.querySelectorAll('.menu-sep')).toHaveLength(3)
     })
 
     it.each([

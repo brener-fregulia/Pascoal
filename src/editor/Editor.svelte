@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { EditorView } from '@codemirror/view'
-  import { undo, redo } from '@codemirror/commands'
+  import { undo, redo, toggleLineComment } from '@codemirror/commands'
   import { tabStore } from './tabs'
   import { themeStore } from '../shared/theme'
   import { explorerStore } from '../project/explorerStore'
@@ -40,6 +40,7 @@
   let unlistenPaste: (() => void) | null = null
   let unlistenFind: (() => void) | null = null
   let unlistenReplace: (() => void) | null = null
+  let unlistenToggleComment: (() => void) | null = null
 
   $effect(() => {
     const activeTab =
@@ -121,6 +122,7 @@
     unlistenPaste?.()
     unlistenFind?.()
     unlistenReplace?.()
+    unlistenToggleComment?.()
     view?.destroy()
   })
 
@@ -178,6 +180,12 @@
         showFind = true
         showReplace = true
         findFocusTick++
+      })
+
+      unlistenToggleComment = await listen('menu-toggle-comment', () => {
+        if (!view) return
+        toggleLineComment(view)
+        view.focus()
       })
     } catch (e) {
       console.error('Editor menu event listeners failed to register:', e)

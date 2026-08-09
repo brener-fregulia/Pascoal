@@ -84,6 +84,12 @@
       labelKey: 'titlebar.find_in_files',
       event: 'menu-find-in-files',
     },
+    { type: 'separator' },
+    {
+      type: 'action',
+      labelKey: 'titlebar.toggle_line_comment',
+      event: 'menu-toggle-comment',
+    },
   ]
 
   const REPO = 'https://github.com/brener-fregulia/Pascoal'
