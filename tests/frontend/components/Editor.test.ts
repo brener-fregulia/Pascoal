@@ -21,6 +21,7 @@ const {
     listenHandlers,
     mockUndo,
     mockRedo,
+    mockToggleLineComment,
     mockCopySelection,
     mockCutSelection,
     mockPasteFromClipboard,
@@ -50,6 +51,7 @@ const {
     listenHandlers: {} as Record<string, (...args: unknown[]) => unknown>,
     mockUndo: vi.fn(),
     mockRedo: vi.fn(),
+    mockToggleLineComment: vi.fn(),
     mockCopySelection: vi.fn(),
     mockCutSelection: vi.fn(),
     mockPasteFromClipboard: vi.fn(),
@@ -82,6 +84,7 @@ vi.mock('@codemirror/commands', async (importOriginal) => {
         ...actual,
         undo: mockUndo,
         redo: mockRedo,
+        toggleLineComment: mockToggleLineComment,
     }
 })
 
@@ -339,12 +342,12 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
         vi.unstubAllGlobals()
     })
 
-    // Editor's setupMenuListeners awaits `listen()` sequentially for all 7
+    // Editor's setupMenuListeners awaits `listen()` sequentially for all 8
     // events inside one async function. Waiting for only some of them to be
     // registered (e.g. just menu-undo) before a test ends lets the remaining
     // in-flight `await listen(...)` calls resolve *after* cleanup(), leaking
     // extra mockListen calls into whichever test runs next. Every test below
-    // that renders with Tauri available waits for all 7 first to avoid that.
+    // that renders with Tauri available waits for all 8 first to avoid that.
     async function waitForAllMenuListeners() {
         await vi.waitFor(() => {
             expect(listenHandlers['menu-undo']).toBeDefined()
@@ -354,6 +357,7 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
             expect(listenHandlers['menu-paste']).toBeDefined()
             expect(listenHandlers['menu-find']).toBeDefined()
             expect(listenHandlers['menu-replace']).toBeDefined()
+            expect(listenHandlers['menu-toggle-comment']).toBeDefined()
         })
     }
 
@@ -408,6 +412,20 @@ describe('Editor Edit menu (undo/redo/cut/copy/paste)', () => {
 
         expect(mockRedo).toHaveBeenCalledTimes(1)
         expect(mockRedo.mock.calls[0][0]).toBeInstanceOf(EditorView)
+    })
+
+    it('calls toggleLineComment with the EditorView instance on menu-toggle-comment', async () => {
+        vi.stubGlobal('__TAURI__', { core: { invoke: vi.fn() } })
+        const tab = makeTab()
+        mockTabState.tabs = [tab]
+        mockTabState.activeTabId = tab.id
+        render(Editor)
+        await waitForAllMenuListeners()
+
+        await listenHandlers['menu-toggle-comment']()
+
+        expect(mockToggleLineComment).toHaveBeenCalledTimes(1)
+        expect(mockToggleLineComment.mock.calls[0][0]).toBeInstanceOf(EditorView)
     })
 
     it('calls cutSelection/copySelection/pasteFromClipboard when focus is on the editor', async () => {
