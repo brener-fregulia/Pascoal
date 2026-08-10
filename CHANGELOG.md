@@ -8,6 +8,52 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 ## [Unreleased]
 
 ### Added
+- Edit menu in the titlebar's native menu bar: Undo, Redo, Cut, Copy,
+  Paste, Find, Replace, Find in Files, and the new Toggle Line Comment
+  command - each action respects whether focus is on the editor or
+  the file explorer. Replace now also opens directly with `Ctrl+H`,
+  and Find in Files with `Ctrl+Shift+F`.
+- Create, rename, and delete files and folders directly from the
+  Explorer - toolbar buttons, right-click menu, or `F2`/`Delete`
+  shortcuts. Deleted items go to the OS trash/recycle bin, with a
+  permanent-delete fallback when that's unavailable.
+- Cut, copy, and paste files and folders in the Explorer, with
+  shortcuts scoped so they don't interfere with the code editor.
+- Select Explorer items and right-click for a context menu (open,
+  reveal in file manager, copy path), or press Enter on a focused row
+  to open a file / expand a folder.
+- Reopen the last workspace automatically on startup - configurable
+  in Settings - plus a Recent Workspaces list, with full paths, on
+  the Welcome screen and in the File menu.
+- Editor zoom - `Ctrl+Scroll` or `Ctrl+`/`Ctrl-` to resize the code
+  font, remembered between sessions.
+- The Welcome tab can now be closed like any other tab, and reopened
+  anytime from Help → Welcome, now the first item in that menu.
+- The Explorer/Search side panel can be resized by dragging its edge,
+  and remembers its width between sessions. Drag it far enough left
+  and it collapses, like VS Code.
+- The app window should remember its size and position between launches,
+  starting maximized on the very first run.
+
+### Fixed
+- The code editor lost its scrollbar on longer files.
+- Typing into a running program's console showed each character
+  twice, on Linux only.
+- `Ctrl+/` (Toggle Line Comment) now inserts `//` line comments
+  instead of `(* *)` block comments.
+
+### Security
+- File and folder operations are now authorized against the open
+  workspace root, preventing them from reaching outside the current
+  folder. Added a restrictive Content-Security-Policy, and opening
+  URLs or revealing files in the OS file manager now goes through a
+  vetted plugin instead of raw process spawns.
+
+---
+
+**Implemented but not yet enabled** - hidden behind development mode
+until Git support ships:
+
 - Git panel (Source Control), reachable from the sidebar: view,
   stage/unstage/discard changes, commit, and initialize a repository.
   Diffs open as their own read-only tab in the editor, side by side,
@@ -19,16 +65,6 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 - When committing with nothing staged, Pascoal offers to stage
   everything for you - configurable in Settings to always ask, always
   stage, or never.
-- The Explorer/Search/Git side panel can be resized by dragging its
-  edge, and remembers its width between sessions. Drag it far enough
-  left and it collapses, like VS Code.
-- The app window remembers its size and position between launches,
-  starting maximized on the very first run.
-
-### Fixed
-- The code editor lost its scrollbar on longer files.
-- Typing into a running program's console showed each character
-  twice, on Linux only.
 - `git status` parsing now uses a more reliable format, fixing file
   names with accented characters and renamed files being handled
   incorrectly.
