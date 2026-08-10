@@ -1,7 +1,7 @@
 ---
 name: add-tests
-description: Add focused tests for existing Pascoal behavior or a completed change and report coverage or testability gaps.
-argument-hint: "[behavior, diff, files, or regression]"
+description: Add focused Pascoal tests for existing behavior, regressions, missing coverage, or testability gaps.
+argument-hint: "[behavior, diff, files, regression, or coverage gap]"
 disable-model-invocation: true
 ---
 
@@ -11,22 +11,28 @@ Add tests for:
 
 $ARGUMENTS
 
-Pascoal's default workflow adds tests as a follow-up stage, after the user has manually validated the implemented behavior — not bundled with implementation. If it is unclear whether that validation happened yet, ask before proceeding rather than assuming.
-
 ## Procedure
 
 1. Read `AGENTS.md` and `docs/development/testing.md`.
 2. Inspect the implementation, relevant diff, and nearby test conventions.
-3. Identify the smallest meaningful set of success, failure, boundary, platform, and regression scenarios.
+3. Identify the smallest meaningful success, failure, boundary, platform, and
+   regression scenarios.
 4. Use the `testing` subagent when useful.
 5. Add focused tests at the correct layer.
-6. Modify production code only when a minimal behavior-preserving change is strictly required for testability.
+6. Modify production code only when a minimal behavior-preserving change is
+   strictly required for testability.
 7. Run the narrowest relevant command and expand validation only when justified.
 8. Run coverage only when requested or materially useful.
-9. Report remaining manual validation and environment limitations.
+9. Report environment limits and remaining manual validation.
 
 Do not activate or expand E2E testing unless explicitly requested.
 
+This skill may be used independently for test backfills or gaps. During normal SDD
+implementation, relevant tests are part of the Work Package's `In Progress` stage
+and do not need to wait for owner manual validation.
+
 ## Output
 
-Report scenarios covered, files changed, commands and actual results, coverage when collected, limitations, and one `test(...)` Conventional Commit suggestion.
+Report scenarios covered, files changed, commands and actual results, coverage
+when collected, limitations, and a concise Conventional Commit suggestion when
+the test work is independently reviewable.

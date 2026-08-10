@@ -42,5 +42,5 @@ Do not delegate the same work repeatedly without a concrete reason.
 - Keep edits focused and preserve surrounding conventions.
 - Verify repository commands before executing them.
 - Do not install system dependencies or change global configuration without explicit permission.
-- Use `docs/development/workflow.md` and `docs/development/testing.md` when their detailed procedures are relevant.
-- Scope each implementation pass to a single responsibility; break a multi-part request into sub-items and implement/commit them separately. Defer tests to a follow-up pass started only after the user's manual validation — see `docs/development/workflow.md`.
+- Use `docs/development/sdd.md`, `docs/development/workflow.md`, and `docs/development/testing.md` when their procedures are relevant.
+- Implement one approved Work Package or reduced-SDD responsibility at a time. Include relevant automated tests before owner manual validation; use GitHub and repository artifacts rather than session history to reconstruct context.

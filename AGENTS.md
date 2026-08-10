@@ -8,7 +8,9 @@ Tool-specific instructions belong in files such as `CLAUDE.md` and `.claude/`. D
 
 ## Source of truth
 
-The repository is the permanent source of project context.
+The repository is the permanent source of technical project context.
+GitHub Issues, Projects, and Milestones are the operational source of truth for
+approved work, workflow state, and release scope.
 
 Before proposing or making changes:
 
@@ -23,15 +25,19 @@ Do not invent files, APIs, behavior, requirements, commands, conventions, or val
 
 Keep changes limited to the requested outcome and directly necessary supporting work.
 
-Scope each implementation pass to a single responsibility. When a request bundles more than one independently reviewable capability, break it into separate sub-items before implementing, and implement and report them one at a time unless the user explicitly asks for all of them in one pass. Prefer several small, single-responsibility commits over one large one — this keeps regressions small and easy to isolate and validate.
+Implement one approved Work Package or reduced-SDD responsibility at a time.
+Do not silently decompose or expand approved scope during implementation.
 
-Tests are a separate follow-up by default. Implement the requested behavior, let the user manually validate it, then add tests afterward as their own stage and commit — do not bundle tests into the same implementation pass or commit unless the user explicitly asks for both together, or the task is itself a regression test for an already-diagnosed bug.
+Relevant automated tests are part of implementation completeness. Add or update
+focused tests with the behavior they protect, then run the narrowest relevant
+validation before owner manual validation. Tests may use the same commit as the
+implementation or a separate commit when that improves review or reversal.
 
 Do not expand into unrelated cleanup, refactoring, formatting, translations, dependencies, versions, changelog entries, or release work.
 
 Preserve existing architecture, naming, and behavior unless the task requires a change. Report useful out-of-scope improvements separately.
 
-Detailed workflow guidance is in `docs/development/workflow.md`.
+SDD rules are in `docs/development/sdd.md`. Detailed execution guidance is in `docs/development/workflow.md`.
 
 ## Repository protection
 
@@ -117,7 +123,9 @@ Use the existing documentation by responsibility:
 - `docs/decisions/`: significant decisions;
 - `docs/features/`: detailed feature behavior;
 - `docs/roadmap/`: strategic direction;
-- GitHub Issues and Projects: actionable work and progress.
+- GitHub Issues: approved specifications and Work Packages;
+- GitHub Projects: workflow state and progress;
+- GitHub Milestones: release scope.
 
 Avoid maintaining the same information in multiple places.
 

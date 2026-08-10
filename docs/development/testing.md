@@ -17,7 +17,8 @@ General safety and validation rules are in `AGENTS.md`. Workflow guidance is in 
 - Consider Windows and Linux when platform behavior changes.
 - Use isolated, deterministic test data.
 - Treat coverage as a diagnostic signal, not proof of correctness.
-- Use manual validation where automation is insufficient.
+- Relevant automated tests are part of implementation completeness.
+- Use owner manual validation after automated validation where automation is insufficient.
 
 ## Current commands
 
@@ -211,9 +212,19 @@ Do not lower a threshold merely to pass a workflow. Changed-code coverage is not
 
 ## Manual validation
 
-Manual validation is important for layout, responsiveness, keyboard and CodeMirror behavior, native windows and dialogs, filesystem and process integration, Git and toolchains, complete desktop flows, and platform differences.
+Manual validation follows the relevant automated implementation checks and is the
+repository owner's acceptance gate for Work Packages.
 
-Report separately automated tests, manual checks performed by the agent, and checks remaining for the repository owner.
+It is important for layout, responsiveness, keyboard and CodeMirror behavior,
+native windows and dialogs, filesystem and process integration, Git and toolchains,
+complete desktop flows, and platform differences.
+
+Before handoff to owner validation, report the automated checks that actually ran
+and the manual scenarios still required. Do not claim owner validation was
+completed.
+
+A problem found during manual validation returns the Work Package to implementation,
+including test updates when the corrected behavior changes the expected contract.
 
 ## Handling failures
 
@@ -233,8 +244,9 @@ Report:
 - commands executed and actual results;
 - coverage results when collected;
 - missing prerequisites or environment limits;
-- manual validation completed and remaining;
-- a suggested Conventional Commit message when tests remain independently reviewable.
+- automated validation completed;
+- owner manual validation remaining or confirmed by the owner;
+- a suggested Conventional Commit message when test work is independently reviewable.
 
 ```text
 test(toolchain): cover compiler detection states

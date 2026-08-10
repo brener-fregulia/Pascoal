@@ -66,7 +66,7 @@ The release is currently published directly rather than created as a draft.
 Pascoal uses:
 
 ```text
-YEAR.FEAT.PATCH
+YEAR.RELEASE.PATCH
 ```
 
 Example:
@@ -78,20 +78,25 @@ Example:
 The segments represent:
 
 * `YEAR`: release year;
-* `FEAT`: feature release sequence within the year;
-* `PATCH`: fixes or smaller follow-up releases.
+* `RELEASE`: release sequence within the year;
+* `PATCH`: corrective follow-up for that release.
 
 Examples:
 
 ```text
-2026.4.0  New feature release
+2026.4.0  Fourth release sequence of 2026
 2026.4.1  Patch for 2026.4.0
-2027.1.0  First feature release of 2027
+2027.1.0  First release sequence of 2027
 ```
 
 This is not standard Semantic Versioning, even though the version has three numeric segments.
 
-The current version script validates only the numeric `X.Y.Z` shape. The repository owner remains responsible for selecting a version consistent with `YEAR.FEAT.PATCH`.
+The `RELEASE` segment does not represent one Feature. A release may contain multiple
+Features, Fixes, and Refactors.
+
+The current version script validates only the numeric `X.Y.Z` shape. The repository
+owner remains responsible for selecting a version consistent with
+`YEAR.RELEASE.PATCH`.
 
 ## Sources of release information
 
@@ -99,6 +104,8 @@ Each release-related source has a distinct purpose.
 
 | Source                                  | Responsibility                                            |
 | --------------------------------------- | --------------------------------------------------------- |
+| GitHub Milestone                       | Approved release scope and progress                        |
+| GitHub Issues / Project                  | Completed Features, Fixes, Refactors, and Work Packages    |
 | `CHANGELOG.md`                          | Complete versioned release record and GitHub Release body |
 | `src/i18n/release-notes/locales/*.json` | Concise localized notes displayed inside Pascoal          |
 | Version-bearing files                   | Application and package version                           |
@@ -171,7 +178,7 @@ Before editing files, identify:
 * current released version;
 * current repository version;
 * intended target version;
-* whether the release is a feature or patch release;
+* whether the target starts a new release sequence or is a patch;
 * previous release tag;
 * changes intended for the release.
 
@@ -179,14 +186,18 @@ Do not infer the target version solely from the current year or unfinished roadm
 
 Confirm that the target version:
 
-* follows `YEAR.FEAT.PATCH`;
+* follows `YEAR.RELEASE.PATCH`;
 * is newer than the current release;
 * is not already used by a tag or changelog section;
 * matches the intended release scope.
 
 ## 2. Confirm release scope
 
-Review the changes since the previous release.
+Start from the target GitHub Milestone and its completed, validated work.
+
+Then verify that scope against the repository changes since the previous release
+so release communication cannot include work that is absent from the release
+revision.
 
 The release scope should include only completed and validated work.
 
@@ -434,7 +445,7 @@ Combining directly related documentation changes is acceptable when they remain 
 
 Before creating the tag, confirm:
 
-* [ ] Target version follows `YEAR.FEAT.PATCH`.
+* [ ] Target version follows `YEAR.RELEASE.PATCH`.
 * [ ] Target version is present in every version-bearing file.
 * [ ] `CHANGELOG.md` contains a non-empty target section.
 * [ ] Changelog comparison links are correct.

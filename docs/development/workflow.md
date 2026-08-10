@@ -2,297 +2,270 @@
 
 ## Purpose
 
-This document defines the development workflow for Pascoal.
+This document defines how approved Pascoal work is executed.
 
-Pascoal is primarily maintained by one developer. The workflow should preserve control, traceability, and reviewable changes without requiring pull requests, branches, squash merges, or team ceremonies.
+The specification and decomposition model is defined in
+`docs/development/sdd.md`. Testing details are in
+`docs/development/testing.md`. Mandatory safety and Git rules are in `AGENTS.md`.
 
-Mandatory safety, scope, and Git rules are in `AGENTS.md`. Test procedures are in `docs/development/testing.md`.
+Pascoal is primarily maintained by one developer. The workflow should preserve
+control, traceability, resumability across agent sessions, and reviewable changes
+without adding unnecessary team ceremony.
 
 ## Principles
 
-- The repository is the permanent source of context.
-- A task may include several directly necessary stages.
-- Keep independently reviewable work separate when practical.
-- Scope each implementation pass to a single responsibility; break a multi-part request into sub-items and implement them one at a time rather than as one large change.
-- Testing is a separate stage that follows the user's manual validation of the implemented behavior, not something bundled into the same pass or commit, unless the user asks for both together.
-- Do not expand a task into unrelated work.
-- Commits should represent meaningful, reversible changes.
-- The repository owner performs Git and publication operations.
-- Direct development on `main` is acceptable.
-- Automation should reduce repetition without removing control.
+- The repository is the source of technical truth.
+- GitHub is the operational source of truth for approved work and progress.
+- Implement one approved Work Package or reduced-SDD responsibility at a time.
+- Relevant automated tests are part of implementation completeness.
+- Owner manual validation is the gate before `Done`.
+- Keep `main` stable; planned Feature, Fix, and independent Refactor work uses a
+  dedicated branch.
+- Work Packages normally share the branch of their parent item.
+- Commits stay concise; detailed execution history belongs in the Work Package.
+- The repository owner retains control of Git and publication.
 
-## Workflow overview
-
-A change may include:
-
-| Stage | Purpose |
-| --- | --- |
-| Task definition | Establish the problem, result, and constraints |
-| Planning | Understand current behavior and design the change |
-| Implementation | Deliver the requested behavior |
-| Manual validation | Confirm complete or native behavior |
-| Testing | Protect behavior and regressions |
-| Review | Find concrete defects and scope problems |
-| Documentation and translation | Describe stable behavior |
-| Release preparation | Prepare communication, versions, and checks |
-| Git and publication | Record and publish the work |
-
-Not every task requires every stage or a separate request for each one. A bug fix may include its regression test and an indispensable documentation correction. Keep the task focused and suggest separate commit boundaries when they improve review or reversal.
-
-## 1. Task definition
-
-A task may begin as an issue, Project item, prompt, bug report, planning note, architectural question, or observed regression.
-
-Include only the context needed to establish scope:
-
-- problem or objective;
-- expected and relevant current behavior;
-- constraints and non-goals;
-- affected area or platform;
-- validation expectations.
-
-Small immediate changes do not require formal issues.
-
-## 2. Planning
-
-Planning is read-only when the request asks for a plan without implementation.
-
-A useful plan should:
-
-1. inspect relevant code, tests, configuration, and documentation;
-2. describe current behavior;
-3. define scope and non-goals;
-4. identify affected files, layers, and data flow;
-5. describe implementation steps;
-6. identify risks, edge cases, and platform differences;
-7. define validation and manual checks.
-
-Recommended output:
+## Operational flow
 
 ```text
-Objective
-Current behavior
-Scope and non-goals
-Relevant files and layers
-Implementation steps
-Risks and edge cases
+Approved specification
+        ↓
+Work Package: Ready
+        ↓
+Branch from main
+        ↓
+In Progress
+  implementation
+  + automated tests
+  + automated validation
+        ↓
 Validation
-Open questions
+  owner manual checks
+        ↓
+Done
 ```
 
-Omit sections that add no value. Use verified repository details, not generic steps.
+A failed automated check or owner validation returns the Work Package to
+`In Progress`.
 
-Implementation may follow immediately when the task requests planning and execution. A planning-only request must not modify files.
+## 1. Start or resume work
 
-## 3. Implementation
+Before editing:
 
-Implement the requested behavior with the smallest coherent change, scoped to a single responsibility.
+1. identify the approved Feature, Fix, or Refactor;
+2. identify the current Work Package;
+3. inspect its scope, acceptance criteria, and status;
+4. inspect relevant architecture and ADRs;
+5. inspect the current implementation and nearby tests;
+6. verify that unresolved questions do not block implementation.
 
-- Inspect the current state before editing.
-- If the request bundles more than one independently reviewable capability (e.g., several distinct features asked for together), break it into sub-items before writing any code, and implement and report them one at a time — do not combine them into one pass or one commit unless the user explicitly asks for all of them together.
-- Preserve established architecture and naming.
-- Modify only required behavior and supporting code.
-- Consider Windows and Linux where relevant.
-- Run the narrowest useful existing validation.
-- Report changed behavior, files, and remaining checks, and name any remaining sub-items still pending.
+A Work Package should enter `Ready` only when another agent session could begin
+from persistent repository and GitHub context without depending on conversation
+history.
 
-Do not add tests in this stage by default. Testing is a dedicated follow-up that starts only after the user has manually validated the behavior (see stage 4 and 5) — this lets the user catch a wrong behavior before a test locks it in, and keeps each commit small enough to validate on its own. Add a test alongside implementation only when the user explicitly asks for both together, or the task is itself a regression test for an already-diagnosed bug. Avoid unrelated documentation rewrites, translations, changelog entries, version changes, dependency upgrades, or workflow restructuring.
+Reduced-SDD work may skip formal GitHub decomposition when allowed by
+`docs/development/sdd.md`.
 
-Suggest a commit boundary per responsibility:
+## 2. Branch model
+
+`main` is the stable integration branch.
+
+Planned work uses a branch created from `main`:
 
 ```text
-feat(settings): add toolchain status page
+feature/<name>
+fix/<name>
+refactor/<name>
 ```
 
-Do not create the commits.
+Examples:
 
-## 4. Manual validation
+```text
+feature/git-panel
+fix/runner-rebuild
+refactor/file-tree
+```
 
-Use manual validation where automated tests do not fully represent behavior, especially for:
+A Feature's Work Packages normally use the same `feature/<name>` branch.
+Likewise, Work Packages belonging to a Fix or independent Refactor share their
+parent branch.
+
+Do not create a branch per Work Package by default.
+
+Small reduced-SDD documentation or maintenance work may be performed directly on
+`main` when the repository owner explicitly chooses that simpler path.
+
+Branch creation, switching, merging, pushing, pulling, and publication remain
+repository-owner operations unless explicitly authorized for the current task by
+`AGENTS.md`.
+
+Pull requests are optional for owner-managed work. Use them when review,
+experimentation, external contribution, or GitHub review tooling provides value.
+
+## 3. In Progress
+
+`In Progress` is the implementation stage.
+
+For the current Work Package:
+
+- inspect the current state before editing;
+- preserve established architecture and naming;
+- implement only approved scope;
+- consider Windows and Linux where relevant;
+- add or update focused automated tests for changed behavior;
+- run the narrowest relevant validation;
+- broaden validation only when the affected scope justifies it;
+- review the resulting diff for regressions and unrelated changes.
+
+Do not add unrelated cleanup, refactors, formatting, translations, dependencies,
+versions, changelog entries, or release work.
+
+Testing must not encode guessed behavior. If requirements or acceptance criteria
+are ambiguous, resolve the ambiguity instead of choosing behavior through a test.
+
+A Work Package is ready to leave `In Progress` when:
+
+- its approved scope is implemented;
+- required focused automated tests exist;
+- required automated validation is not known to be failing;
+- remaining manual checks are identified.
+
+## 4. Validation
+
+`Validation` is the repository owner's manual acceptance stage.
+
+Use manual validation especially for:
 
 - complete application flows;
 - layout, responsiveness, keyboard use, and CodeMirror interactions;
-- native dialogs, filesystems, processes, Git, and toolchains;
+- native dialogs, filesystem, processes, Git, and toolchains;
 - Windows and Linux differences;
-- preservation of unrelated behavior and user changes.
+- behavior that active automated layers cannot represent reliably.
 
-Report what was checked and what remains for the repository owner. Do not claim that the owner completed a check.
+Before handoff, the agent reports:
 
-Problems return to the relevant implementation or testing work.
+- what was implemented;
+- automated checks and actual results;
+- known limitations;
+- exact manual checks still required.
 
-This is the gate before testing starts (stage 5): the owner manually checks the implemented behavior first, tests come once the behavior is confirmed right.
+Do not claim owner validation was completed.
 
-## 5. Testing
+If manual validation finds a problem, return the Work Package to `In Progress`,
+correct the behavior and relevant tests, then validate again.
 
-Testing is a dedicated follow-up stage by default, started only after the user has manually validated the implemented behavior (stage 4) — not bundled into the same request or commit as the implementation, unless the user explicitly asked for both together when requesting the work. This is intentional: it keeps each implementation pass small and lets a wrong behavior get caught by a human before a test encodes it as correct.
+## 5. Done and Work Package outcome
 
-- Confirm the behavior has been manually validated before starting; if that is unclear, ask rather than assume.
-- Inspect the behavior and nearby tests.
-- Add focused success, failure, boundary, and regression cases.
-- Follow existing test patterns.
-- Avoid production changes unless a small behavior-preserving adjustment is required for testability.
-- Run relevant commands and report actual results.
-- Identify remaining manual checks or difficult-to-test behavior.
+`Done` means the repository owner accepted the Work Package.
 
-Substantial production changes discovered during testing are implementation work and should remain independently reviewable when practical.
-
-Commands, prerequisites, isolation, coverage, and E2E status are documented in `docs/development/testing.md`.
-
-Typical commit:
+After validation, keep the Work Package outcome concise and useful:
 
 ```text
-test(toolchain): cover compiler detection states
+Outcome
+- implemented result;
+- relevant deviation from the original plan.
+
+Automated validation
+- relevant commands and results.
+
+Manual validation
+- validated scenarios and platforms.
+
+Related changes
+- architecture or ADR updates when applicable.
 ```
 
-## 6. Technical review
+Do not reproduce the code diff or conversation transcript.
 
-Review is read-only unless corrections are also requested.
+A parent Feature, Fix, or Refactor is complete only when its required Work
+Packages and acceptance criteria are complete.
 
-Compare the work with its task, accepted scope, current architecture, tests, validation, supported platforms, and preservation of unrelated behavior.
+## 6. Architecture and documentation
 
-Prioritize:
+Implementation must respect current `docs/architecture/` and accepted
+`docs/decisions/`.
 
-1. destructive behavior, data loss, or security problems;
-2. correctness and regressions;
-3. cross-platform failures;
-4. architectural boundary violations;
-5. missing error handling or validation;
-6. missing tests or accessibility behavior;
-7. unnecessary complexity with real maintenance cost;
-8. out-of-scope changes.
+If work reveals a durable architectural decision with meaningful alternatives,
+follow the ADR process before silently establishing the choice through code.
 
-Each finding should state its location, issue, consequence, and recommended correction. Separate verified defects from optional suggestions. Avoid preference-only rewrites.
+Update permanent documentation only when the validated change affects information
+that remains useful beyond the Work Package.
 
-## 7. Documentation and translation
+Documentation ownership is defined in
+`docs/development/documentation-policy.md`.
 
-Update documentation only when behavior is stable enough to describe accurately.
+## 7. Technical review
 
-| Source | Responsibility |
-| --- | --- |
-| `README.md` | Public overview, setup, downloads, and links |
-| Translated READMEs | Localized public overview |
-| `docs/development/` | Development processes |
-| `docs/architecture/` | Current architecture |
-| `docs/decisions/` | Significant decisions |
-| `docs/features/` | Detailed feature behavior |
-| `KNOWN_ISSUES.md` | Confirmed limitations |
+Review compares the work with:
 
-Not every code change requires documentation.
+- approved scope and acceptance criteria;
+- current architecture and ADRs;
+- automated tests and validation;
+- supported platforms;
+- preservation of unrelated behavior.
 
-Translations must preserve keys, placeholders, interpolation, markup, structure, and established terminology. Report ambiguous source text instead of guessing.
+Prioritize correctness, destructive behavior, regressions, cross-platform
+failures, architectural violations, missing error handling, missing tests, and
+out-of-scope changes.
 
-Documentation and translation may share a task when directly related. Suggest separate commits when they have distinct review concerns.
+Review is read-only unless corrections are explicitly requested.
+
+## 8. Commit strategy
+
+Use concise Conventional Commits.
+
+Examples:
 
 ```text
-docs(readme): update settings overview
-i18n(settings): add toolchain status translations
+feat(git): add repository status service
+fix(runner): terminate previous run before rebuilding
+refactor(explorer): split file tree node responsibilities
+test(editor): cover document navigation states
 ```
 
-## 8. Changelog and release notes
+A commit may contain implementation and its directly related tests when they form
+one coherent change.
 
-Update release communication only for completed work intended for a release.
+Use a separate `test(...)` commit when test work is independently useful, such as
+coverage backfill or a focused regression suite.
 
-- `CHANGELOG.md` records versioned changes in the existing format.
-- In-application release notes provide concise, localized summaries.
-- The GitHub Release body may be generated from the changelog.
+Do not split work only to satisfy a process rule. Do not combine independent
+responsibilities only to shorten history.
 
-Describe completed behavior, avoid unnecessary implementation detail, and use a version only when the target is known.
+The Work Package, not the commit message, stores detailed implementation and
+validation context.
+
+Agents suggest commit messages but do not execute commits unless explicitly
+authorized.
+
+## 9. Release relationship
+
+Features, Fixes, and Refactors intended for a release belong to the corresponding
+GitHub Milestone.
+
+A release may contain multiple Features, Fixes, and Refactors.
+
+Release preparation follows:
 
 ```text
-docs(changelog): add version 2026.4.0 changes
-docs(release): add version 2026.4.0 release notes
+docs/development/release-process.md
 ```
 
-## 9. Release preparation
-
-Start with a read-only check of:
-
-- current and target versions;
-- version-bearing files and scripts;
-- changelog, release notes, and translations;
-- required tests and environment prerequisites;
-- release workflow expectations;
-- working-tree state and unrelated changes.
-
-Update release files only when requested, using verified repository scripts and conventions.
-
-```text
-chore(release): bump version to 2026.4.0
-```
-
-The repository owner creates commits and tags, pushes, monitors workflows, reviews artifacts, publishes the release, and validates updater behavior.
+Release communication should use completed GitHub work and repository
+documentation as structured context, with commit history and diffs used to verify
+what actually reached the release revision.
 
 ## Reduced workflow
 
-A small, low-risk task may use:
+A small, low-risk change may use:
 
 ```text
-implementation (single responsibility)
-→ proportional validation
-→ user's manual validation
-→ tests, as a separate follow-up, once validated
-→ documentation only when necessary
-→ suggested commit boundary per stage
+scope confirmation
+→ implementation + relevant automated tests
+→ proportional automated validation
+→ owner manual validation when needed
+→ concise commit
 ```
 
-This does not remove repository inspection, scope control, honest validation, preservation of user changes, or Git restrictions.
-
-## Branches and pull requests
-
-Branches are optional. Direct work on `main` is acceptable when scope is understood and the working state remains manageable.
-
-Use a branch when work is a large restructuring, affects several architectural areas, may remain unstable, compares alternatives, or is difficult to reverse partially.
-
-Pull requests are also optional. They may help with external contributions, large branches, experiments, GitHub review tools, or PR workflow validation.
-
-Automation must not depend exclusively on PR comments because normal development may use direct pushes.
-
-Agents do not create, switch, merge, or publish branches or pull requests without the authorization required by `AGENTS.md`.
-
-## Commit strategy
-
-Commits should reflect actual development stages, not an arbitrary number of files or prompts.
-
-A feature may produce:
-
-```text
-feat(settings): add toolchain status page
-test(settings): cover toolchain detection states
-docs(readme): update settings overview
-i18n(settings): add toolchain status translations
-docs(changelog): add version 2026.4.0 changes
-chore(release): bump version to 2026.4.0
-```
-
-Not every change needs every commit. Do not split inseparable work artificially or combine independently reviewable work merely to shorten history. Squashing is not required.
-
-The `feat`/`fix` commit and its `test` commit are not simultaneous by default: the `test` commit follows the owner's manual validation of the `feat`/`fix` commit, as its own later stage — see stage 5. When a request bundles several distinct capabilities (e.g., three unrelated features asked for together), prefer one `feat` commit per capability over one commit covering all of them.
-
-## Task tracking
-
-- GitHub Issues: actionable bugs, features, research, maintenance, and documentation.
-- GitHub Projects: status, priority, area, target, and progress.
-- `docs/roadmap/`: strategic direction, not a duplicate backlog.
-- `docs/architecture/`: current architecture.
-- `docs/decisions/`: significant decisions.
-- Prompts: temporary task instructions.
-- Commits: completed history.
-
-Use an issue when work needs planning, may be interrupted, spans stages, requires research, belongs to a future target, or benefits from acceptance criteria. Small immediate changes may remain outside Issues.
-
-## Agent handoff
-
-Provide only what the next agent needs:
-
-- task and accepted scope;
-- relevant plan, diff, commits, or changed files;
-- validation results;
-- limitations and unresolved findings.
-
-Do not transfer a long conversation when the repository and a concise handoff are sufficient. The receiving agent must verify current repository state.
-
-## Exceptions
-
-Adapt the workflow when required, such as for an urgent security fix, regression test delivered with a bug fix, documentation-only release, or testability change.
-
-State the reason, preserve focused reviewable changes where practical, and do not include unrelated work.
+Reduced SDD does not remove repository inspection, scope control, architecture
+constraints, honest validation, preservation of user changes, or Git restrictions.
