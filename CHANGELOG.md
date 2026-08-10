@@ -72,6 +72,11 @@ it into that release's version section and delete this heading.
   twice, on Linux only.
 - `Ctrl+/` (Toggle Line Comment) now inserts `//` line comments
   instead of `(* *)` block comments.
+- Running a program again while the previous run was still active (e.g.
+  waiting on input) could fail to rebuild with "Can't create object
+  file" / "error code: 5" on Windows, because the still-running previous
+  process kept the executable locked. The previous run is now actually
+  terminated before rebuilding.
 
 ### Security
 - File and folder operations are now authorized against the open

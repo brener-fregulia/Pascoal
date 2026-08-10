@@ -3,5 +3,6 @@
     "2026.1.1": "Realce de sintaxe melhorado: tipos, funções e variáveis agora são reconhecidos corretamente, com um parser de Pascal de verdade.",
     "2026.2.0": "Agora você vê um resumo do que mudou logo após cada atualização — e pode conferir de novo quando quiser em Ajuda > Notas da Versão.",
     "2026.2.1": "Agora você pode navegar pelo histórico completo de versões em Ajuda > Histórico de Versões, e as notificações de atualização mostram as mesmas notas amigáveis do 'O que há de novo'.",
-    "2026.3.0": "Chegou o painel de Configurações - escolha seu tema e idioma, configure sua identidade do git sem usar o terminal, e confira a instalação do Free Pascal e do git, tudo em um só lugar."
+    "2026.3.0": "Chegou o painel de Configurações - escolha seu tema e idioma, configure sua identidade do git sem usar o terminal, e confira a instalação do Free Pascal e do git, tudo em um só lugar.",
+    "2026.4.0": "Agora você pode criar, renomear, excluir e recortar/copiar/colar arquivos e pastas direto no Explorer, e um novo menu Editar traz Localizar nos Arquivos, Alternar Comentário de Linha e mais à barra de menus."
 }

@@ -3,5 +3,6 @@
     "2026.1.1": "Ulepszone podświetlanie składni: typy, funkcje i zmienne są teraz poprawnie rozpoznawane dzięki prawdziwemu parserowi Pascala.",
     "2026.2.0": "Po każdej aktualizacji zobaczysz teraz krótkie podsumowanie nowości - możesz je też ponownie otworzyć w dowolnym momencie w Pomoc > Informacje o Wersji.",
     "2026.2.1": "Możesz teraz przeglądać pełną historię wersji w Pomoc > Historia Wersji, a powiadomienia o aktualizacji pokazują te same przyjazne notatki co 'Co nowego'.",
-    "2026.3.0": "Pojawił się panel Ustawień - wybierz motyw i język, skonfiguruj tożsamość git bez terminala i sprawdź instalację Free Pascal oraz git, wszystko w jednym miejscu."
+    "2026.3.0": "Pojawił się panel Ustawień - wybierz motyw i język, skonfiguruj tożsamość git bez terminala i sprawdź instalację Free Pascal oraz git, wszystko w jednym miejscu.",
+    "2026.4.0": "Możesz teraz tworzyć, zmieniać nazwę, usuwać oraz wycinać/kopiować/wklejać pliki i foldery bezpośrednio w Eksploratorze, a nowe menu Edycja dodaje Znajdź w Plikach, Przełącz Komentarz Wiersza i więcej do paska menu."
 }

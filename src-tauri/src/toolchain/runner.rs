@@ -36,6 +36,11 @@ pub async fn run_with_pipes(
         let mut guard = binding.writer.lock().unwrap();
         *guard = Some(Box::new(stdin));
     }
+    {
+        let binding = app.state::<ProcessState>();
+        let mut guard = binding.pid.lock().unwrap();
+        *guard = Some(child.id());
+    }
 
     let stdout = child.stdout.take().unwrap();
     let stderr = child.stderr.take().unwrap();
@@ -106,6 +111,8 @@ pub async fn run_with_pipes(
         let binding = app_clone3.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
+        let mut pid_guard = binding.pid.lock().unwrap();
+        *pid_guard = None;
     });
 
     CompileResult {
@@ -187,6 +194,11 @@ pub async fn run_with_pty(
         let mut guard = binding.writer.lock().unwrap();
         *guard = Some(writer);
     }
+    {
+        let binding = app.state::<ProcessState>();
+        let mut guard = binding.pid.lock().unwrap();
+        *guard = child.process_id();
+    }
 
     let reader = pair.master.try_clone_reader().unwrap();
     let app_clone = app.clone();
@@ -227,6 +239,8 @@ pub async fn run_with_pty(
         let binding = app_clone.state::<ProcessState>();
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
+        let mut pid_guard = binding.pid.lock().unwrap();
+        *pid_guard = None;
     });
 
     CompileResult {

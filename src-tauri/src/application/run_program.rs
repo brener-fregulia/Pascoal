@@ -41,7 +41,16 @@ pub async fn run_program(app: tauri::AppHandle, code: String) -> CompileResult {
         let mut guard = binding.writer.lock().unwrap();
         *guard = None;
     }
-    // Give the OS time to flush and close the old stdin pipe
+    let previous_pid = {
+        let binding = app.state::<ProcessState>();
+        let mut guard = binding.pid.lock().unwrap();
+        guard.take()
+    };
+    if let Some(pid) = previous_pid {
+        crate::infrastructure::platform::kill_process(pid);
+    }
+    // Give the OS time to actually terminate the old process and release
+    // its lock on the executable, so the compiler can overwrite it.
     std::thread::sleep(std::time::Duration::from_millis(100));
 
     let result = compile(&src_file, &tmp_dir);

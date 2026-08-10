@@ -3,5 +3,6 @@
     "2026.1.1": "Improved syntax highlighting: types, functions, and variables are now recognized correctly, powered by a real Pascal parser.",
     "2026.2.0": "You'll now see a short summary of what's new right after each update - and can revisit it anytime from Help > Release Notes.",
     "2026.2.1": "You can now browse the full version history from Help > Version History, and update notifications show the same friendly notes as What's new.",
-    "2026.3.0": "A new Settings panel has arrived - pick your theme and language, set up your git identity without a terminal, and check your Free Pascal and git installation, all in one place."
+    "2026.3.0": "A new Settings panel has arrived - pick your theme and language, set up your git identity without a terminal, and check your Free Pascal and git installation, all in one place.",
+    "2026.4.0": "You can now create, rename, delete, and cut/copy/paste files and folders right in the Explorer, and a new Edit menu adds Find in Files, Toggle Line Comment, and more to the menu bar."
 }
