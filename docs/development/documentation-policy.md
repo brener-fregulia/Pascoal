@@ -2,194 +2,210 @@
 
 ## Purpose
 
-This document defines where Pascoal information belongs and when documentation should be updated.
+This document defines where Pascoal information belongs and when documentation
+should be updated.
 
-The goal is to keep one primary source for each kind of information, avoid duplicated maintenance across languages, and document only confirmed behavior.
+The goal is to keep one primary source for each kind of information, avoid
+duplicated maintenance, and document only confirmed behavior.
 
-General agent rules are defined in `AGENTS.md`. The development sequence is defined in `docs/development/workflow.md`.
+General agent rules are defined in `AGENTS.md`.
+Development sequence is defined in `docs/development/workflow.md`.
+Specification and work decomposition are defined in `docs/development/sdd.md`.
 
 ## Principles
 
 - Document current, verified behavior.
 - Use the narrowest appropriate source of truth.
-- Link to detailed information instead of copying it.
-- Update documentation when behavior, commands, requirements, or maintenance procedures change.
-- Do not update unrelated documents merely because a release is being prepared.
+- Link to detail instead of copying it.
 - Keep public documentation concise and technical documentation maintainable.
 - Preserve established terminology across source, documentation, and translations.
+- Do not leave required project context only in conversation history.
 
 ## Sources of truth
 
 | Source | Primary responsibility |
 |---|---|
+| Repository implementation | Current executable behavior |
 | `README.md` | Public project overview and entry point |
-| `docs/readme/` | Localized versions of public README content |
+| `docs/readme/` | Localized public README content |
 | `CHANGELOG.md` | Versioned record of completed changes |
-| In-application release notes | Concise localized summary for a specific release |
-| `docs/development/` | Development, testing, documentation, and release procedures |
-| `docs/architecture/` | Current technical structure and boundaries |
-| `docs/decisions/` | Significant decisions, alternatives, and consequences |
-| `docs/features/` | Detailed behavior of features needing dedicated maintenance guidance |
-| `docs/roadmap/` | Strategic direction and major themes |
-| GitHub Issues | Actionable units of work |
-| GitHub Projects | Status, priority, area, target, and progress |
+| In-application release notes | Concise localized release summary |
+| `docs/development/` | Development, SDD, testing, documentation, and release procedures |
+| `docs/architecture/` | Current technical architecture and boundaries |
+| `docs/decisions/` | Significant architectural decisions and reasoning |
+| `docs/features/` | Detailed behavior needing dedicated maintenance guidance |
+| `docs/roadmap/` | Strategic direction not yet materialized as actionable work |
+| GitHub Issues | Approved specifications and actionable work |
+| GitHub Projects | Operational workflow state and progress |
+| GitHub Milestones | Release scope and progress |
 
-Do not use the README as the detailed roadmap or backlog.
+The repository is the permanent source of technical project truth. GitHub is the
+operational source of truth for planned and active work.
+
+Do not use the README as a detailed roadmap, backlog, architecture reference, or
+implementation history.
 
 ## README
 
-The README should present Pascoal to users and contributors. It may include:
+The README should present Pascoal to users and contributors. Keep it focused on:
 
-- project purpose;
-- current major features;
+- project purpose and major features;
 - screenshots or short demonstrations;
-- downloads and installation;
-- requirements;
-- development setup summary;
-- primary test commands;
-- supported platforms;
-- technologies;
+- downloads, installation, and requirements;
+- development setup summary and primary test commands;
+- supported platforms and technologies;
 - links to detailed documentation;
 - project status and license.
 
-Move detailed architecture, maintenance procedures, release checklists, and long-term planning to their dedicated sources.
+Move detailed architecture, maintenance procedures, release checklists, and
+long-term planning to their dedicated sources.
 
-A code change requires a README update only when it changes public capabilities, installation, requirements, supported platforms, primary commands, or important project positioning.
+Update the README when public capabilities, installation, requirements,
+supported platforms, primary commands, or project positioning change.
 
 ## Translated READMEs
 
-Translated READMEs should remain semantic translations of the public README, not independent documents.
+Translated READMEs are semantic translations of the public README, not independent
+documents.
 
 When authoritative README content changes:
 
 1. update and validate the English source;
-2. identify the affected sections;
-3. update only those sections in supported translations;
-4. preserve links, commands, product names, and code blocks;
-5. verify that translated documents do not advertise unsupported behavior.
+2. update only affected sections in supported translations;
+3. preserve links, commands, product names, and code blocks;
+4. verify translations do not advertise unsupported behavior.
 
 Minor technical documentation changes do not require translated README updates.
 
 ## Technical documentation
 
-Use `docs/architecture/` for how the system works now, including major layers, boundaries, data flows, and platform integration.
+Use `docs/architecture/` for current layers, responsibilities, boundaries, data
+flows, and platform integration.
 
-Use `docs/features/` when a feature has behavior or maintenance requirements too detailed for the README or general architecture overview.
+Use `docs/features/` when feature behavior or maintenance guidance is too detailed
+for the README or architecture overview.
 
 Technical documents should:
 
 - reference actual paths and abstractions;
-- avoid copying large code blocks that will become stale;
+- avoid copying large code blocks;
 - distinguish platform-independent and platform-specific behavior;
 - state known limitations;
-- link to decisions when architecture depends on them.
+- link to relevant ADRs;
+- describe validated current behavior, not planned implementation;
+- avoid duplicating Work Package execution history.
 
-Do not create one document per source directory by default.
+Create dedicated technical documentation only when it remains useful after the
+individual implementation task is complete.
 
 ## Architectural decisions
 
-Create an ADR under `docs/decisions/` when a decision:
+Create an ADR under `docs/decisions/` when a decision has meaningful alternatives,
+changes a durable boundary, affects future implementation choices, introduces an
+important constraint, or is likely to be questioned again.
 
-- has meaningful alternatives;
-- changes or establishes a durable boundary;
-- affects future implementation choices;
-- has non-obvious tradeoffs;
-- is likely to be questioned later.
+Do not create ADRs for routine implementation details or reversible refactors.
 
-Examples include parser strategy, AST ownership, LSP adoption, IPC boundaries, persistence design, or Playground architecture.
+ADR format, status, naming, supersession, and agent requirements are defined in
+`docs/decisions/README.md`.
 
-Do not create ADRs for routine implementation details, reversible refactors, or preferences already established by nearby code.
+Accepted ADRs are historical records. Supersede them instead of rewriting their
+original reasoning.
 
-An ADR should record:
+## Changelog and release notes
 
-- status;
-- context;
-- decision;
-- alternatives considered;
-- consequences.
+`CHANGELOG.md` records completed release-relevant changes. Entries should describe
+meaningful user or maintainer impact, avoid raw commit wording and unfinished work,
+and use only categories containing entries.
 
-ADRs describe the decision at the time it was made. Supersede them rather than rewriting history when the decision changes.
+Not every internal refactor needs a changelog entry. Include one when it has
+relevant behavior, compatibility, maintenance, performance, reliability,
+packaging, or architectural impact.
 
-## Changelog
+In-application release notes are shorter, localized, user-facing summaries. They
+must describe only behavior present in the release and use the same version key in
+every supported locale.
 
-`CHANGELOG.md` records completed changes intended for releases.
+The GitHub Release body is derived from the matching changelog section.
 
-Entries should:
+## SDD artifacts
 
-- follow the existing format;
-- describe meaningful user or maintainer impact;
-- avoid raw commit wording;
-- avoid unfinished work and roadmap promises;
-- use only categories containing entries;
-- keep implementation detail only when maintainers need it.
+The SDD model is defined in `docs/development/sdd.md`.
 
-Not every internal refactor needs a changelog entry. Include it when it affects behavior, compatibility, maintenance, performance, reliability, packaging, or architecture in a relevant way.
+Use GitHub Issues for approved operational specifications and Work Package
+outcomes. Do not duplicate those specifications into repository documentation.
 
-## Release notes
+Use repository documentation for information that remains relevant beyond an
+individual work item, especially current architecture, architectural decisions,
+development procedures, and feature maintenance behavior.
 
-In-application release notes are concise and localized. They should summarize the most relevant user-facing changes for one version.
-
-They must:
-
-- use the same version key in every supported locale;
-- remain shorter than the changelog;
-- preserve meaning across languages;
-- omit internal implementation detail;
-- describe only behavior present in the release.
-
-The GitHub Release body is derived from the matching changelog section and should not require a separately maintained copy.
+Conversation history is supplemental context, not durable project documentation.
 
 ## Roadmap and task tracking
 
-Use `docs/roadmap/` for strategic direction, major themes, and areas not yet ready for actionable issues.
+Use `docs/roadmap/` for strategic direction and areas not yet ready for actionable
+specification.
 
-Use GitHub Issues and Projects for work that has scope, status, priority, ownership, acceptance criteria, or a target.
+Once work has approved scope, use GitHub:
 
-Do not duplicate the complete issue backlog in a roadmap document.
+- Milestones for Releases;
+- Epic issues only when multiple related Features need shared context;
+- Feature issues for approved functional specifications;
+- Fix and Refactor issues for independently tracked work;
+- Work Package sub-issues for focused execution units;
+- Projects for workflow state and progress.
 
-A small immediate change does not require an issue when it can be completed and reviewed without losing useful planning context.
+Do not duplicate the complete GitHub hierarchy in roadmap documents.
+Small, low-risk changes may use Reduced SDD.
 
 ## Documentation changes by task type
 
 | Change | Typical documentation |
 |---|---|
-| Internal implementation with no observable effect | Usually none |
-| User-visible feature | README or feature docs when discoverability requires it; changelog for release |
-| Bug fix | Changelog when release-relevant; feature docs only if documented behavior changed |
-| Architecture change | Architecture document and possibly ADR |
-| New or changed command | Relevant development or README command reference |
+| Internal implementation with no durable effect | Work Package outcome when useful |
+| User-visible feature | GitHub Feature spec; README/feature docs when needed; changelog |
+| Bug fix | Fix/Work Package tracking when needed; changelog when release-relevant |
+| Reversible refactor | Work Package outcome when useful |
+| Architecture change | Architecture docs and ADR when a durable decision is involved |
+| New architectural decision | ADR and affected architecture docs |
+| New or changed command | Relevant development or README reference |
 | Installation or requirement change | README and translated READMEs |
-| i18n key change | Application locale files; documentation only when public wording changes |
+| i18n key change | Locale files; docs only when public wording changes |
+| SDD process change | `docs/development/sdd.md` |
+| Development workflow change | `docs/development/workflow.md` |
 | Release preparation | Changelog, localized release notes, version files |
-| Testing or CI process change | `docs/development/testing.md` or related development documentation |
+| Testing or CI process change | `docs/development/testing.md` or related docs |
 
 ## Validation
 
 For documentation changes, verify as applicable:
 
-- referenced files and paths exist;
-- commands match current scripts;
-- versions and platform claims are accurate;
-- Markdown fences and tables are balanced;
-- JSON locale files parse;
-- placeholders and interpolation match across locales;
-- links are correct;
-- duplicated or conflicting instructions were not introduced.
+- referenced files, paths, commands, versions, and platform claims are accurate;
+- Markdown, JSON, placeholders, and links are valid;
+- architecture documentation matches the implementation;
+- relevant ADRs were consulted;
+- planned behavior is not presented as current;
+- GitHub information is not unnecessarily duplicated;
+- session-only knowledge was not left as required context;
+- conflicting instructions were not introduced.
 
-Code test suites are normally unnecessary for documentation-only changes unless generated documentation or configuration is involved.
+Code test suites are normally unnecessary for documentation-only changes unless
+generated documentation or configuration is involved.
 
 ## Commit boundaries
 
-Keep independently reviewable documentation stages separate when practical.
+Commit messages should remain concise and follow Conventional Commits.
 
 Examples:
 
 ```text
-docs(readme): update settings overview
-docs(architecture): document toolchain flow
-i18n(settings): add toolchain status translations
-docs(changelog): add version 2026.4.0 changes
-docs(release): add version 2026.4.0 release notes
+feat(git): add repository status service
+refactor(explorer): split file tree node responsibilities
+docs(architecture): document git integration boundaries
+docs(decisions): record tree-sitter ownership decision
 ```
 
-Combine directly related changes when splitting them would not improve review, traceability, or reversal.
+A short body of one or two sentences may be added when useful.
+
+Detailed implementation and validation context belongs in the Work Package.
+Durable technical reasoning belongs in architecture documentation or ADRs.
