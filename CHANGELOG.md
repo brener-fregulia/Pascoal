@@ -7,6 +7,37 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
 
 ## [Unreleased]
 
+## [Git panel — Unreleased]
+
+Implemented but not yet enabled - hidden behind `import.meta.env.DEV`
+until Git support ships to end users. This section intentionally does
+not use the `[Unreleased]` heading above, so a version bump can't
+accidentally sweep it into a numbered release: `scripts/extract-changelog.cjs`
+(and any straight rename of the `[Unreleased]` heading) treats this
+`## [...]` line as its own section boundary. Keep it here, under this
+same heading, until the feature is confirmed for release - then fold
+it into that release's version section and delete this heading.
+
+### Added
+- Git panel (Source Control), reachable from the sidebar: view,
+  stage/unstage/discard changes, commit, and initialize a repository.
+  Diffs open as their own read-only tab in the editor, side by side,
+  instead of inline in the panel.
+- Link a project folder to an existing GitHub repository, plus Push,
+  Pull, and Sync. An indicator next to the branch name shows how many
+  commits you're ahead or behind, kept current by a background check
+  every few minutes.
+- When committing with nothing staged, Pascoal offers to stage
+  everything for you - configurable in Settings to always ask, always
+  stage, or never.
+
+### Fixed
+- `git status` parsing now uses a more reliable format, fixing file
+  names with accented characters and renamed files being handled
+  incorrectly.
+
+## [2026.4.0]
+
 ### Added
 - Edit menu in the titlebar's native menu bar: Undo, Redo, Cut, Copy,
   Paste, Find, Replace, Find in Files, and the new Toggle Line Comment
@@ -48,26 +79,6 @@ This project uses `YEAR.FEAT.PATCH` versioning instead of Semantic Versioning.
   folder. Added a restrictive Content-Security-Policy, and opening
   URLs or revealing files in the OS file manager now goes through a
   vetted plugin instead of raw process spawns.
-
----
-
-**Implemented but not yet enabled** - hidden behind development mode
-until Git support ships:
-
-- Git panel (Source Control), reachable from the sidebar: view,
-  stage/unstage/discard changes, commit, and initialize a repository.
-  Diffs open as their own read-only tab in the editor, side by side,
-  instead of inline in the panel.
-- Link a project folder to an existing GitHub repository, plus Push,
-  Pull, and Sync. An indicator next to the branch name shows how many
-  commits you're ahead or behind, kept current by a background check
-  every few minutes.
-- When committing with nothing staged, Pascoal offers to stage
-  everything for you - configurable in Settings to always ask, always
-  stage, or never.
-- `git status` parsing now uses a more reliable format, fixing file
-  names with accented characters and renamed files being handled
-  incorrectly.
 
 ## [2026.3.0]
 
@@ -139,7 +150,8 @@ until Git support ships:
 - Automatic updates via a signed updater.
 - CodeMirror-based Pascal editor with a build/run console.
 
-[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.3.0...HEAD
+[unreleased]: https://github.com/brener-fregulia/Pascoal/compare/v2026.4.0...HEAD
+[2026.4.0]: https://github.com/brener-fregulia/Pascoal/compare/v2026.3.0...v2026.4.0
 [2026.3.0]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.1...v2026.3.0
 [2026.2.1]: https://github.com/brener-fregulia/Pascoal/compare/v2026.2.0...v2026.2.1
 [2026.2.0]: https://github.com/brener-fregulia/Pascoal/compare/v2026.1.1...v2026.2.0

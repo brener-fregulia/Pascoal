@@ -1,7 +1,7 @@
 {
   "name": "pascoal",
   "productName": "Pascoal",
-  "version": "2026.3.0",
+  "version": "2026.4.0",
   "description": "A modern Pascal playground and IDE",
   "scripts": {
     "dev:ide": "cd src && npx vite",
