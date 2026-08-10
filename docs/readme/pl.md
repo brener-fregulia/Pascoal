@@ -27,12 +27,12 @@ Pobierz najnowszy instalator dla swojej platformy ze [strony Releases](https://g
 - **Prawdziwa kompilacja** za pomocą Free Pascal Compiler (FPC)
 - **Interaktywna konsola** z oddzielnymi sekcjami dla kompilacji i wyjścia programu — `readln` działa
 - **Edycja w wielu kartach** — otwieraj wiele plików jednocześnie
-- **Eksplorator plików** — otwieraj foldery i przeglądaj pliki Pascala
+- **Eksplorator plików** — otwieraj foldery, przeglądaj pliki Pascala oraz twórz, zmieniaj nazwę, usuwaj, wytnij/kopiuj/wklej pliki i foldery z paska narzędzi, menu kontekstowego lub skrótów klawiszowych
 - **Znajdź i zamień** — pływający widget w stylu VSCode z podświetlaniem wyników oraz wyszukiwaniem we wszystkich plikach otwartego folderu
 - **Kreator instalacji FPC** — wykrywa brak Free Pascala i oferuje jego automatyczną instalację przez winget, apt, pacman, dnf lub zypper
 - **Automatyczne aktualizacje** — sprawdza dostępność nowych wersji i instaluje je automatycznie, z opcją ręcznego sprawdzenia aktualizacji
 - **Nowości** — krótka notatka w aplikacji po każdej aktualizacji, z pełną, przetłumaczoną historią wersji dostępną w aplikacji (Pomoc → Historia Wersji) i linkiem do pełnego, technicznego [changeloga](../../CHANGELOG.md)
-- **Natywne menu systemowe** — menu Plik i Pomoc zintegrowane z paskiem tytułu oraz bezpośrednie odnośniki do zgłaszania błędów i propozycji funkcji na GitHubie
+- **Natywne menu systemowe** — menu Plik, Edycja i Pomoc zintegrowane z paskiem tytułu, z pełnym menu Edycja (cofnij/ponów, wytnij/kopiuj/wklej, znajdź/zamień, znajdź w plikach, przełącz komentarz wiersza) oraz bezpośrednie odnośniki do zgłaszania błędów i propozycji funkcji na GitHubie
 - **Panel Ustawień** — skonfiguruj motyw, język, tożsamość git (globalną lub dla danego projektu), i sprawdź status instalacji Free Pascal oraz git, wszystko w jednym miejscu
 - **Trzy motywy** — Dark, Light i Charcoal z automatycznym wykrywaniem motywu systemowego
 - **Natywne kontrolki okna** dostosowane do platformy (traffic lights w macOS, styl Windows/Linux)

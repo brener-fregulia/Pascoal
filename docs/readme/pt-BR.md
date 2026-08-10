@@ -27,12 +27,12 @@ Baixe o instalador mais recente para a sua plataforma na [página de Releases](h
 - **Compilação real** via Free Pascal Compiler (FPC)
 - **Console interativo** com áreas separadas para build e saída do programa — `readln` funciona
 - **Edição em múltiplas abas** — abra vários arquivos simultaneamente
-- **Explorador de arquivos** — abra uma pasta e navegue pelos seus arquivos Pascal
+- **Explorador de arquivos** — abra uma pasta, navegue pelos seus arquivos Pascal, e crie, renomeie, exclua, recorte/copie/cole arquivos e pastas pela barra de ferramentas, menu de contexto ou atalhos de teclado
 - **Buscar e substituir** — widget flutuante no estilo VSCode com destaque de ocorrências, além de busca entre arquivos em uma pasta aberta
 - **Instalador guiado do FPC** — detecta quando o Free Pascal não está instalado e oferece instalação automática via winget, apt, pacman, dnf ou zypper
 - **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de "verificar atualizações"
 - **Novidades** — uma nota curta no app após cada atualização, com histórico completo e traduzido navegável dentro do app (Ajuda → Histórico de Versões) e um link pro [changelog](../../CHANGELOG.md) técnico completo
-- **Menu nativo do sistema** — menus Arquivo e Ajuda integrados à barra de título, com links diretos para reportar bugs ou solicitar funcionalidades no GitHub
+- **Menu nativo do sistema** — menus Arquivo, Editar e Ajuda integrados à barra de título, com um menu Editar completo (desfazer/refazer, recortar/copiar/colar, localizar/substituir, localizar nos arquivos, alternar comentário de linha) e links diretos para reportar bugs ou solicitar funcionalidades no GitHub
 - **Painel de Configurações** — configure tema, idioma, identidade do git (global ou por projeto), e confira o status de instalação do Free Pascal e do git, tudo em um só lugar
 - **Três temas** — Escuro, Claro e Charcoal, com detecção do sistema
 - **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
