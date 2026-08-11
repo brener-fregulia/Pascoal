@@ -1,6 +1,6 @@
 # Pascoal
 
-> Uma IDE moderna de Pascal para desktop — escreva, compile e execute programas em Pascal.
+> Uma IDE moderna de Pascal para desktop - escreva, compile e execute programas Pascal.
 
 [English](../../README.md) · [Español (Latinoamérica)](es-419.md) · [Polski](pl.md)
 
@@ -8,148 +8,104 @@
 
 ## O que é o Pascoal?
 
-Pascoal é uma IDE desktop para Pascal desenvolvida com Tauri e Rust, criada para levar a programação em Pascal a um público moderno. Interface limpa, compilação real via Free Pascal (FPC), console interativo para programas, explorador de arquivos e busca entre arquivos — tudo em um pacote leve.
+Pascoal é uma IDE leve de Pascal para desktop, construída com Tauri, Rust, Svelte,
+TypeScript e CodeMirror.
 
-Ele nasceu como uma rebelião contra ferramentas ultrapassadas como o Pascalzim, com o objetivo de tornar Pascal acessível e divertido novamente — sem o peso do Electron nem a bagunça de interfaces legadas.
+O foco é oferecer uma interface moderna, compilação real com Free Pascal,
+execução interativa de programas, navegação de projetos e uma experiência de
+desenvolvimento adequada tanto para estudantes quanto para desenvolvedores
+Pascal.
 
 ## Download
 
-Baixe o instalador mais recente para a sua plataforma na [página de Releases](https://github.com/brener-fregulia/Pascoal/releases/latest):
+Baixe a versão mais recente na
+[página de Releases](https://github.com/brener-fregulia/Pascoal/releases/latest).
 
-- **Windows** — `Pascoal_x.x.x_x64-setup.exe`
-- **Linux** — `.deb` (Debian/Ubuntu), `.rpm` (Fedora/openSUSE) ou `.AppImage` (qualquer distro)
+- **Windows** - `Pascoal_x.x.x_x64-setup.exe`
+- **Linux** - `.deb`, `.rpm` ou `.AppImage`
 
-> **Aviso do SmartScreen no Windows:** o instalador do Pascoal ainda não é assinado digitalmente, então o Windows pode exibir "O Windows protegeu o computador" na primeira execução. Isso é normal para aplicativos novos e não assinados — clique em **Mais informações** → **Executar assim mesmo** para prosseguir. O aviso desaparece com o tempo, conforme mais pessoas baixam e executam o Pascoal.
+> **Windows SmartScreen:** o Pascoal ainda não possui assinatura de código, então
+> o Windows pode exibir um aviso do SmartScreen na primeira execução.
 
 ## Funcionalidades
 
-- **Editor moderno** com CodeMirror 6, com destaque de sintaxe estrutural para Pascal via uma gramática Tree-sitter de verdade (não regex) e temas reativos
-- **Compilação real** via Free Pascal Compiler (FPC)
-- **Console interativo** com áreas separadas para build e saída do programa — `readln` funciona
-- **Edição em múltiplas abas** — abra vários arquivos simultaneamente
-- **Explorador de arquivos** — abra uma pasta, navegue pelos seus arquivos Pascal, e crie, renomeie, exclua, recorte/copie/cole arquivos e pastas pela barra de ferramentas, menu de contexto ou atalhos de teclado
-- **Buscar e substituir** — widget flutuante no estilo VSCode com destaque de ocorrências, além de busca entre arquivos em uma pasta aberta
-- **Instalador guiado do FPC** — detecta quando o Free Pascal não está instalado e oferece instalação automática via winget, apt, pacman, dnf ou zypper
-- **Atualização automática** — verifica novas versões e as instala automaticamente, com uma opção manual de "verificar atualizações"
-- **Novidades** — uma nota curta no app após cada atualização, com histórico completo e traduzido navegável dentro do app (Ajuda → Histórico de Versões) e um link pro [changelog](../../CHANGELOG.md) técnico completo
-- **Menu nativo do sistema** — menus Arquivo, Editar e Ajuda integrados à barra de título, com um menu Editar completo (desfazer/refazer, recortar/copiar/colar, localizar/substituir, localizar nos arquivos, alternar comentário de linha) e links diretos para reportar bugs ou solicitar funcionalidades no GitHub
-- **Painel de Configurações** — configure tema, idioma, identidade do git (global ou por projeto), e confira o status de instalação do Free Pascal e do git, tudo em um só lugar
-- **Três temas** — Escuro, Claro e Charcoal, com detecção do sistema
-- **Controles nativos de janela** adaptados por plataforma (traffic lights no macOS, estilo Windows/Linux)
-- **Salvamento automático antes de executar** — configurável
-- **Interface internacionalizada** — English, Português (BR), Español (Latinoamérica) e Polski, com persistência da seleção de idioma
-- **Leve** — cerca de 170 MB de RAM no Windows (WebView2), 270 MB no Linux (WebKitGTK) e instaladores de aproximadamente 5 MB
+- Editor CodeMirror 6 com realce estrutural de Pascal baseado em Tree-sitter
+- Integração com o Free Pascal Compiler (FPC)
+- Console interativo de programas com suporte a `readln`
+- Edição em múltiplas abas
+- Explorador de arquivos com operações de arquivos e pastas
+- Localizar/substituir e busca entre arquivos
+- Instalação guiada do FPC
+- Atualizações automáticas do aplicativo
+- Notas de versão e histórico de versões dentro do aplicativo
+- Menus Arquivo, Editar e Ajuda no estilo nativo
+- Configurações de aparência, idioma, identidade Git e status do toolchain
+- Temas Dark, Light e Charcoal
+- Interface em English, Português (BR), Español (Latinoamérica) e Polski
+- Suporte a Windows e Linux
 
 ## Requisitos
 
-- [Rust](https://rustup.rs/) (stable)
-- [Node.js](https://nodejs.org/) >= 22
-- [Free Pascal Compiler (FPC)](https://www.freepascal.org/download.html) — não é necessário instalá-lo previamente; o Pascoal detecta sua ausência e oferece a instalação
+Para desenvolvimento:
+
+- [Rust](https://rustup.rs/) stable
+- [Node.js](https://nodejs.org/) 22 ou mais recente
 - [Pré-requisitos do Tauri](https://tauri.app/start/prerequisites/) para a sua plataforma
 
-## Primeiros passos
+O FPC não precisa estar instalado previamente para uso normal; o Pascoal pode
+detectar a ausência do compilador e orientar sua instalação.
+
+## Como começar
 
 ```bash
-# Clonar o repositório
 git clone https://github.com/brener-fregulia/Pascoal.git
 cd Pascoal
-
-# Instalar dependências
 npm install
-
-# Executar em modo de desenvolvimento
 cargo tauri dev
+```
 
-# Gerar build de produção
+Build de produção:
+
+```bash
 cargo tauri build
 ```
 
-### Apenas frontend (desenvolvimento de UI sem Tauri)
+Desenvolvimento somente do frontend:
 
 ```bash
 npm run dev:ide
 ```
 
-### Dicas de desenvolvimento
-
-Para acelerar os rebuilds do Rust durante o desenvolvimento, instale o [sccache](https://github.com/mozilla/sccache):
+## Testes
 
 ```bash
-cargo install sccache
+npm test
+npm run test:frontend
+npm run test:rust
+npm run test:pascal
 ```
 
-Depois, defina-o como wrapper do compilador Rust em `src-tauri/.cargo/config.toml`:
+Consulte [Testes](../development/testing.md) para a política completa de testes.
 
-```toml
-[build]
-rustc-wrapper = "sccache"
-```
+## Desenvolvimento
 
-Isso também é usado no CI para acelerar builds nos runners do GitHub Actions.
+O Pascoal usa contratos explícitos de arquitetura e um fluxo de
+Spec-Driven Development.
 
-### Executando os testes
+- [Arquitetura](../architecture/README.md)
+- [Decisões arquiteturais](../decisions/README.md)
+- [Spec-Driven Development](../development/sdd.md)
+- [Fluxo de desenvolvimento](../development/workflow.md)
+- [Testes](../development/testing.md)
+- [Processo de release](../development/release-process.md)
+- [Política de documentação](../development/documentation-policy.md)
+- [Changelog](../../CHANGELOG.md)
+- [Projeto Pascoal Development](https://github.com/users/brener-fregulia/projects/3)
 
-```bash
-npm test              # frontend + Rust + Pascal
-npm run test:frontend # apenas Vitest
-npm run test:rust     # apenas cargo test
-npm run test:pascal   # testes de integração em Pascal (requer FPC)
-```
+As regras do repositório específicas para agents são definidas em
+[AGENTS.md](../../AGENTS.md).
 
-## Estrutura do projeto
-
-```text
-src/                       # Frontend Svelte + Vite, organizado por domínio
-  app/                       # Shell (Titlebar, ActivityBar, Statusbar), diálogos (About, FpcMissing,
-                              # UpdateAvailable, WhatsNew), tela de boas-vindas
-  editor/                    # Integração com CodeMirror, estado de abas/sessão, Editor/EditorArea/FindWidget
-  language/pascal/           # Lado frontend do highlighting via Tree-sitter (client + decorações)
-  project/                   # Explorador de arquivos e busca entre arquivos
-  settings/                  # Painel de Configurações (view + páginas de Temas/Idioma/Git/Toolchain) e
-                              # sua store de persistência
-  toolchain/                 # Orquestração de compilar/rodar, console de build, UI de instalação do FPC
-  integrations/
-    tauri/                    # Ponto único de contato com a ponte de IPC do Tauri
-    git/                       # Painel e store do Git
-    updater/                   # Store de auto-atualização
-  shared/                    # Componentes cross-domínio (IconButton, PanelHeader, Tab, TabBar) e tema
-  icons/                     # Componentes de ícones SVG
-  i18n/                      # Arquivos de locale, store de traduções, release-notes/ (blurbs de changelog, lazy-loaded)
-  styles/                    # CSS global
-src-tauri/
-  src/
-    lib.rs                    # Só configuração do app e registro de comandos
-    commands/                 # Adaptadores finos dos comandos Tauri
-    application/              # Casos de uso (analyze_document, run_program, manage_files,
-                                # manage_settings, manage_workspace, install_toolchain,
-                                # check_toolchain)
-    language/pascal/          # Highlighting via Tree-sitter e sua query vendorizada
-    project/                  # Explorer, abrir/salvar arquivo, busca entre arquivos
-    toolchain/
-      compiler/                 # Compilação via FPC
-      installer.rs               # Detecção de gerenciador de pacotes e instalação guiada
-      runner.rs                  # Execução de processos (pipes/PTY)
-    infrastructure/            # filesystem, git, environment, platform, settings - primitivas de SO
-                                # e o store do arquivo de settings
-    state/                     # Estado compartilhado do app (ProcessState)
-    tests/                     # Testes unitários em Rust
-  tests/
-    pascal_runner.rs           # Testes de integração Pascal (compila/roda fixtures reais, requer FPC)
-  tauri.conf.json
-  Cargo.toml
-tests/
-  frontend/                  # Testes com Vitest
-  pascal/                    # Fixtures de teste de integração Pascal (.pas + specs.json)
-docs/
-  readme/                    # Traduções do README
-scripts/
-  set-version.cjs            # Script de bump de versão (também limpa o cache de build do Rust,
-                              # avisa se faltar entrada no CHANGELOG.md pra versão nova)
-  extract-changelog.cjs      # Extrai uma seção do CHANGELOG.md pro fluxo de release
-CHANGELOG.md                 # Formato Keep a Changelog, vira o corpo da release no GitHub
-```
-
-## Stack de tecnologias
+## Stack tecnológica
 
 | | |
 |---|---|
@@ -159,30 +115,17 @@ CHANGELOG.md                 # Formato Keep a Changelog, vira o corpo da release
 | Compilador | Free Pascal (FPC) |
 | Editor | CodeMirror 6 |
 | Console | xterm.js |
-| Controle de versão | Git (via CLI) |
+| Controle de versão | Git |
 | Testes | Vitest + cargo test |
-
-## Roadmap
-
-- [x] Arquivos recentes (tela de boas-vindas)
-- [x] Abrir pasta / projeto
-- [x] Buscar e substituir, busca entre arquivos
-- [x] CI/CD com GitHub Actions
-- [x] Instalador guiado do FPC (instalação automática via winget/apt/pacman/dnf/zypper)
-- [x] Verificador de versão / atualizador
-- [x] Gramática Pascal com Tree-sitter (destaque de sintaxe estrutural)
-- [x] Changelog / notas de versão no app
-- [x] Painel de Configurações (temas, idioma, identidade do git, status do toolchain)
-- [ ] Painel de Git / interface de controle de versão (implementada, mas não habilitada ainda)
-- [ ] Terminal PTY (PowerShell, bash, fish)
-- [ ] Janela de terminal destacada para executar programas em Pascal
-- [ ] Guias de indentação e outline de código via Tree-sitter
-- [ ] Modo Playground
-- [ ] Modo Challenge com casos de teste
 
 ## Contribuindo
 
-Contribuições são bem-vindas. Sinta-se à vontade para abrir issues ou pull requests. Relatos de bugs e solicitações de funcionalidades usam [GitHub Issue Forms](../../.github/ISSUE_TEMPLATE/) estruturados — disponíveis diretamente pelo menu Ajuda do app.
+Contribuições são bem-vindas. Relatos de bugs e solicitações de funcionalidades
+podem ser abertos nas
+[Issues do GitHub](https://github.com/brener-fregulia/Pascoal/issues).
+
+O trabalho de desenvolvimento deve seguir a documentação do repositório e os
+contratos de arquitetura vinculados acima.
 
 ## Licença
 
