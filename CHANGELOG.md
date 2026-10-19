@@ -36,6 +36,18 @@ it into that release's version section and delete this heading.
   names with accented characters and renamed files being handled
   incorrectly.
 
+## [2026.4.1]
+
+### Fixed
+- Startup no longer stalls on a blank window: the interface fonts are
+  bundled with the app instead of being fetched from Google Fonts on
+  every launch, which blocked the first paint until the network
+  answered or timed out.
+- The window no longer freezes while Pascoal works in the background.
+  Detecting Free Pascal, reading the toolchain status, listing or
+  searching a folder, highlighting code, and every git operation now
+  run off the UI thread instead of inside it.
+
 ## [2026.4.0]
 
 ### Added

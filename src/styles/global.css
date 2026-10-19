@@ -1,4 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+/* Fonts are bundled with the app instead of fetched from Google Fonts at
+   runtime: a remote @import is render-blocking, so every launch stalled the
+   first paint until the network answered (or timed out). Each file carries
+   every subset with its unicode-range, so Polish latin-ext text keeps
+   working. */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
 @import '@xterm/xterm/css/xterm.css';
 
 *,

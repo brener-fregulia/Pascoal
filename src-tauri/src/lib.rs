@@ -24,7 +24,11 @@ pub struct AppInfo {
 
 // ── Commands ──────────────────────────────────────────────────────────────────
 
-#[tauri::command]
+// `(async)` dispatches the command to the async runtime's thread pool
+// instead of running it inline on the webview's IPC (UI) thread -
+// `detect_fpc` spawns `fpc -iV`, and blocking here froze the window
+// during startup.
+#[tauri::command(async)]
 fn get_app_info(app: tauri::AppHandle) -> AppInfo {
     let (fpc_installed, fpc_version) = detect_fpc();
     AppInfo {

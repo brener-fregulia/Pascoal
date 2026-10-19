@@ -50,6 +50,20 @@ A command may delegate:
 Commands should not become a second implementation layer for filesystem,
 process, Git, language, or toolchain logic.
 
+### Dispatch
+
+A command declared as a plain `#[tauri::command]` runs inline on the webview's
+IPC handler, which is the UI thread: anything it does - spawning a process,
+walking a folder, parsing a document - freezes the window until it returns.
+
+Commands that do real work are therefore declared `#[tauri::command(async)]`.
+The function itself stays synchronous and directly unit-testable, while Tauri
+dispatches it to the async runtime's thread pool. `process_commands::send_input`
+is the deliberate exception: it is a cheap PTY write kept inline so concurrent
+keystrokes cannot be reordered.
+
+`tests/command_dispatch_tests.rs` enforces this.
+
 ## `application/` contract
 
 `application/` owns use-case coordination.

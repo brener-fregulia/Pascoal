@@ -1,3 +1,4 @@
+mod command_dispatch_tests;
 mod commands_tests;
 mod compile_tests;
 mod explorer_tests;
