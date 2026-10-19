@@ -5,5 +5,6 @@
     "2026.2.1": "Możesz teraz przeglądać pełną historię wersji w Pomoc > Historia Wersji, a powiadomienia o aktualizacji pokazują te same przyjazne notatki co 'Co nowego'.",
     "2026.3.0": "Pojawił się panel Ustawień - wybierz motyw i język, skonfiguruj tożsamość git bez terminala i sprawdź instalację Free Pascal oraz git, wszystko w jednym miejscu.",
     "2026.4.0": "Możesz teraz tworzyć, zmieniać nazwę, usuwać oraz wycinać/kopiować/wklejać pliki i foldery bezpośrednio w Eksploratorze, a nowe menu Edycja dodaje Znajdź w Plikach, Przełącz Komentarz Wiersza i więcej do paska menu.",
-    "2026.4.1": "Pascoal uruchamia się teraz szybciej i nie zacina się: czcionki interfejsu są dołączone do aplikacji zamiast pobierane przy każdym starcie, a zadania w tle nie blokują już okna."
+    "2026.4.1": "Pascoal uruchamia się teraz szybciej i nie zacina się: czcionki interfejsu są dołączone do aplikacji zamiast pobierane przy każdym starcie, a zadania w tle nie blokują już okna.",
+    "2026.4.2": "Operacje git nie otwierają już migającego okna konsoli w systemie Windows."
 }

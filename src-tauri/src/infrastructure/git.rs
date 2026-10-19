@@ -17,7 +17,7 @@ pub struct GitStatusResult {
 }
 
 fn run_git(folder: &str, args: &[&str]) -> Result<String, String> {
-    let output = Command::new("git")
+    let output = crate::infrastructure::platform::no_window(Command::new("git"))
         .args(args)
         .current_dir(folder)
         .output()
@@ -279,7 +279,9 @@ pub fn set_global_identity(name: &str, email: &str) -> Result<(), String> {
 /// Detects whether git is installed and, if so, its reported version
 /// (e.g. "2.43.0").
 pub fn detect_git_version() -> (bool, Option<String>) {
-    let output = Command::new("git").arg("--version").output();
+    let output = crate::infrastructure::platform::no_window(Command::new("git"))
+        .arg("--version")
+        .output();
 
     match output {
         Ok(o) if o.status.success() => {

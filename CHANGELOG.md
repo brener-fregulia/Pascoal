@@ -36,6 +36,13 @@ it into that release's version section and delete this heading.
   names with accented characters and renamed files being handled
   incorrectly.
 
+## [2026.4.2]
+
+### Fixed
+- Git operations no longer flash a console window on Windows. Opening a
+  workspace with Git status enabled, or the Toolchain settings, used to
+  pop several terminal windows open and closed in rapid succession.
+
 ## [2026.4.1]
 
 ### Fixed

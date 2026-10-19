@@ -156,3 +156,29 @@ fn commit_succeeds_after_setting_local_identity() {
     let result = commit(&dir.to_string_lossy(), "Initial commit");
     assert!(result.is_ok(), "commit failed: {:?}", result);
 }
+
+// Every `git` invocation goes through `run_git`, which every git_* command
+// funnels through. Spawning it as a bare `Command::new("git")` (no
+// `no_window()`) flashes a console window on Windows for every single one -
+// status, stage, commit, push, pull, the background fetch... Reading the
+// source instead of spawning a real console is the only way to assert
+// "no window appeared" platform-independently.
+#[test]
+fn git_is_never_spawned_without_suppressing_its_console_window() {
+    let source = fs::read_to_string(
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/infrastructure/git.rs"),
+    )
+    .unwrap();
+
+    for (i, line) in source.lines().enumerate() {
+        if line.contains("Command::new(\"git\")") {
+            assert!(
+                line.contains("no_window("),
+                "infrastructure/git.rs:{} spawns `git` without `no_window()`, \
+                 which flashes a console window on Windows: {}",
+                i + 1,
+                line.trim()
+            );
+        }
+    }
+}
