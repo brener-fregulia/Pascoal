@@ -51,6 +51,41 @@ describe('Tab', () => {
         await fireEvent.click(getByLabelText('Close main.pas'))
         expect(onClose).toHaveBeenCalledTimes(1)
     })
+
+    it('calls onClose on middle-click when closable', async () => {
+        const onClose = vi.fn()
+        const { getByRole } = render(Tab, {
+            props: { label: 'main.pas', closable: true, onClose },
+        })
+        await fireEvent(
+            getByRole('tab'),
+            new MouseEvent('auxclick', { button: 1, bubbles: true, cancelable: true }),
+        )
+        expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not call onClose on middle-click when not closable', async () => {
+        const onClose = vi.fn()
+        const { getByRole } = render(Tab, { props: { label: 'main.pas', onClose } })
+        await fireEvent(
+            getByRole('tab'),
+            new MouseEvent('auxclick', { button: 1, bubbles: true, cancelable: true }),
+        )
+        expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('ignores auxclick from other buttons', async () => {
+        const onClose = vi.fn()
+        const { getByRole } = render(Tab, {
+            props: { label: 'main.pas', closable: true, onClose },
+        })
+        await fireEvent(
+            getByRole('tab'),
+            new MouseEvent('auxclick', { button: 2, bubbles: true, cancelable: true }),
+        )
+        expect(onClose).not.toHaveBeenCalled()
+    })
+
     it('does not show the read-only badge by default', () => {
         const { queryByTitle } = render(Tab, { props: { label: 'main.pas' } })
         expect(queryByTitle('Read-only')).not.toBeInTheDocument()

@@ -30,6 +30,19 @@ describe('App', () => {
         expect(container.querySelector('#statusbar')).toBeInTheDocument()
     })
 
+    it('cancels the default action of middle-click anywhere in the window', async () => {
+        const { container } = render(App)
+        await waitFor(() => expect(container.querySelector('#statusbar')).toBeInTheDocument())
+        for (const type of ['mousedown', 'mouseup', 'auxclick']) {
+            const ev = new MouseEvent(type, { button: 1, bubbles: true, cancelable: true })
+            container.querySelector('#statusbar')!.dispatchEvent(ev)
+            expect(ev.defaultPrevented).toBe(true)
+        }
+        const left = new MouseEvent('mousedown', { button: 0, bubbles: true, cancelable: true })
+        container.querySelector('#statusbar')!.dispatchEvent(left)
+        expect(left.defaultPrevented).toBe(false)
+    })
+
     it('shows Welcome by default with no open tabs', () => {
         const { container } = render(App)
         expect(container.querySelector('#welcome')).toBeInTheDocument()

@@ -9,9 +9,25 @@
   export let onClose: (() => void) | null = null
   export let readOnly: boolean = false
   export let readOnlyLabel: string = 'Read-only'
+
+  // Middle-click closes a closable tab. Its default action (autoscroll,
+  // primary-selection paste) is cancelled app-wide in App.svelte.
+  function handleAuxClick(e: MouseEvent) {
+    if (e.button !== 1) return
+    e.preventDefault()
+    if (closable) onClose?.()
+  }
 </script>
 
-<div class="tab" class:active role="tab" tabindex="0" on:click on:keydown>
+<div
+  class="tab"
+  class:active
+  role="tab"
+  tabindex="0"
+  on:click
+  on:keydown
+  on:auxclick={handleAuxClick}
+>
   <slot name="icon" />
 
   <span class="tab-label">

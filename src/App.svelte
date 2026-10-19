@@ -42,7 +42,17 @@
     }
   }
 
+  // Middle-click pastes the primary selection into the focused editor on
+  // Linux. Only tabs use it (to close), so cancel its default everywhere;
+  // Tab handles the close itself on auxclick.
+  function suppressMiddleClickDefault(e: MouseEvent) {
+    if (e.button === 1) e.preventDefault()
+  }
+
   onMount(async () => {
+    for (const type of ['mousedown', 'mouseup', 'auxclick'] as const) {
+      window.addEventListener(type, suppressMiddleClickDefault)
+    }
     themeStore.init()
     gitStore.watchFolder()
     await appStore.init()
