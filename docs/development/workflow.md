@@ -16,13 +16,14 @@ without adding unnecessary team ceremony.
 
 - The repository is the source of technical truth.
 - GitHub is the operational source of truth for approved work and progress.
-- Implement one approved Work Package or reduced-SDD responsibility at a time.
+- Milestones define release scope; Issues (Work Package, Spike, Bug, Refactor)
+  are self-contained units of work; Project #3 tracks status and type.
+- Implement one approved Issue or reduced-SDD responsibility at a time.
 - Relevant automated tests are part of implementation completeness.
 - Owner manual validation is the gate before `Done`.
-- Keep `main` stable; planned Feature, Fix, and independent Refactor work uses a
-  dedicated branch.
-- Work Packages normally share the branch of their parent item.
-- Commits stay concise; detailed execution history belongs in the Work Package.
+- Keep `main` stable; the owner chooses whether planned work uses a dedicated
+  branch or small owner-validated commits directly on `main`.
+- Commits stay concise; detailed execution history belongs in the Issue.
 - The repository owner retains control of Git and publication.
 
 ## Operational flow
@@ -30,9 +31,9 @@ without adding unnecessary team ceremony.
 ```text
 Approved specification
         ↓
-Work Package: Ready
+Issue: Ready
         ↓
-Branch from main
+Branch (if chosen by owner)
         ↓
 In Progress
   implementation
@@ -45,21 +46,21 @@ Validation
 Done
 ```
 
-A failed automated check or owner validation returns the Work Package to
+A failed automated check or owner validation returns the Issue to
 `In Progress`.
 
 ## 1. Start or resume work
 
 Before editing:
 
-1. identify the approved Feature, Fix, or Refactor;
-2. identify the current Work Package;
-3. inspect its scope, acceptance criteria, and status;
+1. identify the approved Issue and its Milestone;
+2. confirm its type in Project #3;
+3. inspect its scope, acceptance criteria, dependencies, and status;
 4. inspect relevant architecture and ADRs;
 5. inspect the current implementation and nearby tests;
 6. verify that unresolved questions do not block implementation.
 
-A Work Package should enter `Ready` only when another agent session could begin
+An Issue should enter `Ready` only when another agent session could begin
 from persistent repository and GitHub context without depending on conversation
 history.
 
@@ -70,7 +71,11 @@ Reduced-SDD work may skip formal GitHub decomposition when allowed by
 
 `main` is the stable integration branch.
 
-Planned work uses a branch created from `main`:
+The repository owner decides how planned work is integrated. Two models are
+supported:
+
+- a branch created from `main` (`feature/` for Work Packages, `fix/` for Bugs,
+  `refactor/` for Refactors):
 
 ```text
 feature/<name>
@@ -86,14 +91,11 @@ fix/runner-rebuild
 refactor/file-tree
 ```
 
-A Feature's Work Packages normally use the same `feature/<name>` branch.
-Likewise, Work Packages belonging to a Fix or independent Refactor share their
-parent branch.
+- small, owner-validated commits directly on `main`, when the repository owner
+  explicitly chooses that path for an initiative or for small reduced-SDD work.
 
-Do not create a branch per Work Package by default.
-
-Small reduced-SDD documentation or maintenance work may be performed directly on
-`main` when the repository owner explicitly chooses that simpler path.
+Do not create a branch per Issue by default. The choice is recorded by the owner
+in the Issue or Milestone; an agent must not assume it.
 
 Branch creation, switching, merging, pushing, pulling, and publication remain
 repository-owner operations unless explicitly authorized for the current task by
@@ -106,7 +108,7 @@ experimentation, external contribution, or GitHub review tooling provides value.
 
 `In Progress` is the implementation stage.
 
-For the current Work Package:
+For the current Issue:
 
 - inspect the current state before editing;
 - preserve established architecture and naming;
@@ -123,7 +125,7 @@ versions, changelog entries, or release work.
 Testing must not encode guessed behavior. If requirements or acceptance criteria
 are ambiguous, resolve the ambiguity instead of choosing behavior through a test.
 
-A Work Package is ready to leave `In Progress` when:
+An Issue is ready to leave `In Progress` when:
 
 - its approved scope is implemented;
 - required focused automated tests exist;
@@ -151,14 +153,14 @@ Before handoff, the agent reports:
 
 Do not claim owner validation was completed.
 
-If manual validation finds a problem, return the Work Package to `In Progress`,
+If manual validation finds a problem, return the Issue to `In Progress`,
 correct the behavior and relevant tests, then validate again.
 
-## 5. Done and Work Package outcome
+## 5. Done and Issue outcome
 
-`Done` means the repository owner accepted the Work Package.
+`Done` means the repository owner accepted the Issue.
 
-After validation, keep the Work Package outcome concise and useful:
+After validation, keep the Issue outcome concise and useful:
 
 ```text
 Outcome
@@ -177,8 +179,8 @@ Related changes
 
 Do not reproduce the code diff or conversation transcript.
 
-A parent Feature, Fix, or Refactor is complete only when its required Work
-Packages and acceptance criteria are complete.
+An Issue is complete only when its acceptance criteria are met and the
+owner has accepted it. Issues it depends on must be complete first.
 
 ## 6. Architecture and documentation
 
@@ -189,7 +191,7 @@ If work reveals a durable architectural decision with meaningful alternatives,
 follow the ADR process before silently establishing the choice through code.
 
 Update permanent documentation only when the validated change affects information
-that remains useful beyond the Work Package.
+that remains useful beyond the Issue.
 
 Documentation ownership is defined in
 `docs/development/documentation-policy.md`.
@@ -232,7 +234,7 @@ coverage backfill or a focused regression suite.
 Do not split work only to satisfy a process rule. Do not combine independent
 responsibilities only to shorten history.
 
-The Work Package, not the commit message, stores detailed implementation and
+The Issue, not the commit message, stores detailed implementation and
 validation context.
 
 Agents suggest commit messages but do not execute commits unless explicitly
@@ -240,10 +242,11 @@ authorized.
 
 ## 9. Release relationship
 
-Features, Fixes, and Refactors intended for a release belong to the corresponding
-GitHub Milestone.
+Issues intended for a release belong to the corresponding GitHub Milestone,
+which defines release scope.
 
-A release may contain multiple Features, Fixes, and Refactors.
+A release may contain multiple Work Packages, Bugs, and Refactors. Spikes
+normally produce findings or decisions rather than shipped behavior.
 
 Release preparation follows:
 

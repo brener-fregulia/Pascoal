@@ -21,8 +21,8 @@ Repository:
 GitHub:
 
 - Milestones: release scope;
-- Issues: Epics, Features, Fixes, Refactors, and Work Packages;
-- Projects: workflow state and progress.
+- Issues: self-contained Work Packages, Spikes, Bugs, and Refactors;
+- Projects: workflow status and issue type (Pascoal Development, Project #3).
 
 A session must never be the only place containing information required to
 continue, validate, or release work.
@@ -63,7 +63,7 @@ The responsible agent must:
 4. identify affected responsibilities, constraints, and non-goals;
 5. ask questions needed to remove material ambiguity;
 6. identify validation expectations;
-7. determine whether decomposition is required.
+7. determine whether decomposition into several Issues is required.
 
 Do not invent requirements to fill gaps.
 
@@ -81,82 +81,49 @@ Use only sections that provide useful information:
 - Acceptance Criteria
 - Architecture impact
 - Related ADRs
-- Work Package decomposition
+- Issue decomposition
 
 Before owner approval, the specification is a proposal.
 
 ## Work hierarchy
 
 ```text
-Release / Milestone
-│
-├── Epic                         optional
-│   └── Feature
-│       └── Work Package
-├── Feature
-│   └── Work Package
-├── Fix
-│   └── Work Package
-└── Refactor
-    └── Work Package
+Milestone (release scope)
+└── Issue: Work Package | Spike | Bug | Refactor
 ```
 
-### Release
+There is no Epic or Feature level. An Issue is not required to belong to a
+parent item.
 
-A Release is a deliverable Pascoal version represented by a GitHub Milestone.
+### Milestone
 
-Versions follow `YEAR.RELEASE.PATCH`. A release may contain multiple Features,
-Fixes, and Refactors.
+A Milestone represents a deliverable Pascoal version and defines its release
+scope. Versions follow `YEAR.RELEASE.PATCH`. Scope and dates remain
+owner-controlled.
 
-### Epic
+### Issue
 
-Optional parent used only when one idea produces multiple related Features that
-benefit from shared context.
+An Issue is the unit of approved work. It must be self-contained: it carries
+enough context to be implemented and validated without relying on the session
+that created it. Its type is recorded in Project #3, which also tracks its
+status.
 
-### Feature
+| Type | Use |
+|---|---|
+| Work Package | Planned functional capability or improvement. |
+| Spike | Time-boxed investigation that produces a decision or findings, not product behavior. |
+| Bug | Correction of existing behavior. |
+| Refactor | Structural work that preserves intended observable behavior unless its approved specification states otherwise. |
 
-One coherent functional capability or improvement. Its Issue is the primary
-approved specification and may span multiple agent sessions.
+Split work into several Issues only when the parts are independently useful,
+orderable, and validatable. Express ordering through the Dependencies section of
+each Issue.
 
-### Fix
+Issues do not need to map one-to-one to commits.
 
-Correction of existing behavior. Complex fixes may contain multiple Work
-Packages.
+## Issue structure
 
-### Refactor
-
-Structural work that preserves intended observable behavior unless its approved
-specification states otherwise. It may be independent or a Work Package inside a
-Feature.
-
-### Work Package
-
-The smallest planned execution unit. It must contain enough context to be
-implemented and validated without relying on the session that created it.
-
-Work Packages do not need to map one-to-one to commits.
-
-## Feature issue
-
-Recommended structure:
-
-```text
-Context
-Goal
-Scope / Out of scope
-RF / RNF / RN
-Acceptance Criteria
-Architecture impact / Related ADRs
-Work Packages
-Release impact
-```
-
-Implementation details that belong to one Work Package should stay out of the
-parent Feature.
-
-## Work Package issue
-
-Recommended structure:
+Recommended structure for a Work Package; adapt it for a Spike, Bug, or Refactor:
 
 ```text
 Objective
@@ -164,6 +131,7 @@ Scope / Out of scope
 Related requirements
 Relevant architecture / ADRs
 Acceptance criteria
+Dependencies
 Implementation notes
 Automated validation
 Manual validation
@@ -178,16 +146,15 @@ Outcome
 | Ready | Approved context is sufficient to start without relying on a previous session. |
 | In Progress | Implementation, focused automated tests, and relevant automated validation are active. |
 | Validation | Implementation and automated validation are complete; owner manual validation is pending. |
-| Done | The owner accepted the Work Package after validation. |
+| Done | The owner accepted the Issue after validation. |
 
 Known required automated validation must pass before `Validation`.
 
-Problems found during manual validation return the Work Package to
-`In Progress`.
+Problems found during manual validation return the Issue to `In Progress`.
 
 ## Outcome record
 
-Before `Done`, record only what future work or release preparation may need:
+Before `Done`, record in the Issue only what future work or release preparation may need:
 
 ```text
 Outcome
@@ -208,8 +175,9 @@ Do not reproduce the code diff.
 
 ## Branches and commits
 
-Features, Fixes, and independent Refactors may own development branches. Work
-Packages normally share the parent branch and do not create branches by default.
+Branch usage is an owner decision recorded in the Issue or Milestone. The owner
+may choose small, owner-validated commits directly on `main` for an initiative.
+That choice does not authorize an agent to stage, commit, push, tag, or publish.
 
 Detailed branch rules belong in `docs/development/workflow.md`.
 
@@ -221,14 +189,14 @@ refactor(explorer): split file tree node responsibilities
 ```
 
 A short body may be added when useful. Detailed implementation and validation
-context belongs in the Work Package.
+context belongs in the Issue.
 
 ## Architectural decisions during implementation
 
 If implementation reveals a durable architectural decision with meaningful
 alternatives:
 
-1. record the question in the Work Package;
+1. record the question in the Issue;
 2. inspect existing ADRs;
 3. stop the affected architectural choice;
 4. propose the decision and obtain owner approval;
@@ -239,8 +207,7 @@ Agents must not establish architectural policy silently through code.
 
 ## Session handoff
 
-Before ending a session with unfinished work, update the current Work Package
-with:
+Before ending a session with unfinished work, update the current Issue with:
 
 - current status;
 - completed and remaining work;
