@@ -111,7 +111,8 @@
   }
 
   .tab:hover .tab-close,
-  .tab.active .tab-close {
+  .tab.active .tab-close,
+  .tab-close:focus-visible {
     opacity: 1;
   }
 
