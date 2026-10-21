@@ -89,6 +89,37 @@ describe('FileTreeNode', () => {
         expect(getByText('inner.pas')).toBeInTheDocument()
     })
 
+    it('exposes the expanded state of a directory row via aria-expanded', () => {
+        const props = {
+            node: dirNode(),
+            depth: 0,
+            onToggle: vi.fn(),
+            onFileClick: vi.fn(),
+        }
+        const collapsed = render(FileTreeNode, {
+            props: { ...props, expandedPaths: new Set<string>() },
+        })
+        expect(collapsed.getByRole('button')).toHaveAttribute('aria-expanded', 'false')
+        cleanup()
+        const expanded = render(FileTreeNode, {
+            props: { ...props, expandedPaths: new Set(['/tmp/src']) },
+        })
+        expect(expanded.getByRole('button')).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('does not set aria-expanded on file rows', () => {
+        const { getByRole } = render(FileTreeNode, {
+            props: {
+                node: fileNode(),
+                depth: 0,
+                expandedPaths: new Set<string>(),
+                onToggle: vi.fn(),
+                onFileClick: vi.fn(),
+            },
+        })
+        expect(getByRole('button')).not.toHaveAttribute('aria-expanded')
+    })
+
     it('calls onToggle with the node path when a directory row is clicked', async () => {
         const onToggle = vi.fn()
         const { getByText } = render(FileTreeNode, {

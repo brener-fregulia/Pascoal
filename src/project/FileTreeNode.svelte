@@ -89,6 +89,7 @@
       class:cut={isCut}
       style="padding-left: {8 + depth * 14}px"
       title={node.relativePath}
+      aria-expanded={isExpanded}
       onclick={() => onToggle(node.path)}
       onkeydown={handleRowKeydown}
       oncontextmenu={handleContextMenu}
@@ -192,6 +193,18 @@
 
   .tree-row.selected:hover {
     background: rgba(128, 128, 128, 0.22);
+  }
+
+  /* Inset so the ring is not clipped by the scrolling tree container. */
+  .tree-row:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -1px;
+  }
+
+  /* Keep icons at their set size when a long name or narrow panel squeezes
+     the row, so icons and names stay aligned across depths. */
+  .tree-row :global(svg) {
+    flex-shrink: 0;
   }
 
   .tree-row.cut {
