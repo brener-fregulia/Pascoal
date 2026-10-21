@@ -82,11 +82,11 @@ describe.each(['dark', 'slate'])('%s theme palette', (theme) => {
 })
 
 describe('Dark and Slate stay separate', () => {
-  it('follows VS Code Dark+ for Dark', () => {
+  it('keeps Dark+ grays with a rose accent for Dark', () => {
     const dark = tokens('[data-theme="dark"]')
     expect(dark.bg).toBe('#1E1E1E')
     expect(dark.sidebar).toBe('#252526')
-    expect(dark.accent).toBe('#3794FF')
+    expect(dark.accent).toBe('#B5485F')
   })
 
   it('keeps :root in sync with Dark for the first paint', () => {

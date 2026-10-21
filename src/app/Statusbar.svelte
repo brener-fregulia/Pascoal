@@ -99,7 +99,7 @@
 
 <style>
   #statusbar {
-    background: var(--accent);
+    background: var(--statusbar-bg, var(--accent));
     display: flex;
     align-items: center;
     padding: 0 12px;
