@@ -14,6 +14,7 @@ interface ConsoleState {
   docked: boolean
   buildStatus: BuildStatus
   buildOutput: string
+  exitCode: number | null
 }
 
 function state(): ConsoleState {
@@ -105,6 +106,29 @@ describe('consoleStore', () => {
       consoleStore.setBuildStatus('success')
       consoleStore.setBuildStatus('idle')
       expect(state().buildStatus).toBe('idle')
+    })
+  })
+
+  describe('exit code', () => {
+    it('is null initially', () => {
+      expect(state().exitCode).toBeNull()
+    })
+
+    it('setExitCode records the code of the finished run', () => {
+      consoleStore.setExitCode(1)
+      expect(state().exitCode).toBe(1)
+    })
+
+    it('resetBuild clears the previous run result', () => {
+      consoleStore.setExitCode(1)
+      consoleStore.resetBuild()
+      expect(state().exitCode).toBeNull()
+    })
+
+    it('reset clears the run result', () => {
+      consoleStore.setExitCode(1)
+      consoleStore.reset()
+      expect(state().exitCode).toBeNull()
     })
   })
 

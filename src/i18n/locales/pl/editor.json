@@ -11,6 +11,7 @@
     "program": "Program",
     "status_idle": "Jeszcze nic nie skompilowano",
     "status_compiling": "Kompilowanie...",
+    "status_run_failed": "Uruchomienie nie powiodło się",
     "status_running": "Uruchomiony",
     "status_success": "Kompilacja zakończona pomyślnie",
     "status_error": "Kompilacja nie powiodła się",

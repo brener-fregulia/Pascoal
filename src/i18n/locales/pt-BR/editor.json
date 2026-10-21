@@ -11,6 +11,7 @@
     "program": "Programa",
     "status_idle": "Nenhum build ainda",
     "status_compiling": "Compilando...",
+    "status_run_failed": "Execução falhou",
     "status_running": "Executando",
     "status_success": "Build concluído",
     "status_error": "Build falhou",

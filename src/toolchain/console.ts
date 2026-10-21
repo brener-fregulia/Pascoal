@@ -11,6 +11,8 @@ interface ConsoleState {
   docked: boolean
   buildStatus: BuildStatus
   buildOutput: string
+  // Exit code of the last finished run; null while none has finished.
+  exitCode: number | null
 }
 
 function createConsoleStore() {
@@ -21,6 +23,7 @@ function createConsoleStore() {
     docked: true,
     buildStatus: 'idle',
     buildOutput: '',
+    exitCode: null,
   })
 
   function setRunning(running: boolean) {
@@ -31,12 +34,21 @@ function createConsoleStore() {
     update((s) => ({ ...s, buildStatus }))
   }
 
+  function setExitCode(exitCode: number | null) {
+    update((s) => ({ ...s, exitCode }))
+  }
+
   function appendBuildOutput(text: string) {
     update((s) => ({ ...s, buildOutput: s.buildOutput + text }))
   }
 
   function resetBuild() {
-    update((s) => ({ ...s, buildStatus: 'compiling', buildOutput: '' }))
+    update((s) => ({
+      ...s,
+      buildStatus: 'compiling',
+      buildOutput: '',
+      exitCode: null,
+    }))
   }
 
   function show() {
@@ -67,6 +79,7 @@ function createConsoleStore() {
       docked: true,
       buildStatus: 'idle',
       buildOutput: '',
+      exitCode: null,
     }))
   }
 
@@ -74,6 +87,7 @@ function createConsoleStore() {
     subscribe,
     setRunning,
     setBuildStatus,
+    setExitCode,
     appendBuildOutput,
     resetBuild,
     show,

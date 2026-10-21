@@ -23,7 +23,11 @@
     : $consoleStore.buildStatus === 'compiling' ||
         $consoleStore.buildStatus === 'error'
       ? $consoleStore.buildStatus
-      : null
+      : $consoleStore.buildStatus === 'success' &&
+          $consoleStore.exitCode !== null &&
+          $consoleStore.exitCode !== 0
+        ? 'run_failed'
+        : null
   $: runLabel = runState ? $i18n(`console.status_${runState}`) : ''
 
   let showLocalePicker = false
@@ -187,7 +191,8 @@
     background: var(--success);
   }
 
-  .run-status.error .run-dot {
+  .run-status.error .run-dot,
+  .run-status.run_failed .run-dot {
     background: var(--error);
   }
 

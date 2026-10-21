@@ -97,6 +97,7 @@
                 ? `\r\n\x1b[32m${$i18n('console.exit_success')}\x1b[0m\r\n`
                 : `\r\n\x1b[31m${$i18n('console.exit_failure', { code })}\x1b[0m\r\n`
             term?.write(msg)
+            consoleStore.setExitCode(code)
           }
           consoleStore.setRunning(false)
           isRunning = false

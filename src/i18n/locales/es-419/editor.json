@@ -11,6 +11,7 @@
     "program": "Programa",
     "status_idle": "Aún no hay compilaciones",
     "status_compiling": "Compilando...",
+    "status_run_failed": "La ejecución falló",
     "status_running": "Ejecutando",
     "status_success": "Compilación completada",
     "status_error": "La compilación falló",

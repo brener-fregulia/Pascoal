@@ -75,6 +75,29 @@ describe('Statusbar', () => {
             expect(queryByRole('status')).toBeNull()
         })
 
+        it('shows run failed when a successful build exits with a non-zero code', () => {
+            consoleStore.setBuildStatus('success')
+            consoleStore.setExitCode(1)
+            const { getByRole } = render(Statusbar)
+            expect(getByRole('status')).toHaveTextContent('Run failed')
+        })
+
+        it('shows nothing when the run exits with code 0', () => {
+            consoleStore.setBuildStatus('success')
+            consoleStore.setExitCode(0)
+            const { queryByRole } = render(Statusbar)
+            expect(queryByRole('status')).toBeNull()
+        })
+
+        it('clears run failed when a new compilation starts', async () => {
+            consoleStore.setBuildStatus('success')
+            consoleStore.setExitCode(1)
+            const { getByRole } = render(Statusbar)
+            consoleStore.resetBuild()
+            await Promise.resolve()
+            expect(getByRole('status')).toHaveTextContent('Compiling...')
+        })
+
         it('opens the console when the indicator is clicked', async () => {
             consoleStore.setBuildStatus('error')
             const { getByRole } = render(Statusbar)
