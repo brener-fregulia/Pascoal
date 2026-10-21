@@ -23,32 +23,50 @@
 
 /* ── Themes ────────────────────────────────────────────────── */
 
+/* Dark follows VS Code Dark+: neutral grays in three elevation steps
+   (editor, sidebar, panel) with a restrained blue accent. :root mirrors
+   it so the first paint before data-theme is set matches. */
 :root {
-  --bg: #0D0D0D;
-  --sidebar: #111118;
-  --panel: #16161F;
-  --border: #2A2A3A;
-  --accent: #E94560;
-  --accent2: #A8DADC;
-  --text: #F0F0F0;
-  --text-dim: #7A7A9A;
-  --success: #4CAF82;
-  --error: #E94560;
+  --bg: #1E1E1E;
+  --sidebar: #252526;
+  --panel: #2D2D30;
+  --border: #3C3C3C;
+  --accent: #3794FF;
+  --accent2: #4EC9B0;
+  --text: #D4D4D4;
+  --text-dim: #9D9D9D;
+  --success: #89D185;
+  --error: #F14C4C;
   --font-mono: 'JetBrains Mono', monospace;
   --font-ui: 'Inter', sans-serif;
 }
 
 [data-theme="dark"] {
-  --bg: #0D0D0D;
-  --sidebar: #111118;
-  --panel: #16161F;
-  --border: #2A2A3A;
-  --accent: #E94560;
-  --accent2: #A8DADC;
-  --text: #F0F0F0;
-  --text-dim: #7A7A9A;
-  --success: #4CAF82;
-  --error: #E94560;
+  --bg: #1E1E1E;
+  --sidebar: #252526;
+  --panel: #2D2D30;
+  --border: #3C3C3C;
+  --accent: #3794FF;
+  --accent2: #4EC9B0;
+  --text: #D4D4D4;
+  --text-dim: #9D9D9D;
+  --success: #89D185;
+  --error: #F14C4C;
+}
+
+/* Slate is a slate/navy palette: the same elevation steps as Dark, tinted
+   blue, with low-contrast borders and a soft blue accent. */
+[data-theme="slate"] {
+  --bg: #171B22;
+  --sidebar: #1B2028;
+  --panel: #212630;
+  --border: #2B313B;
+  --accent: #6F9CEB;
+  --accent2: #9CC4E8;
+  --text: #D2D7E0;
+  --text-dim: #8290A0;
+  --success: #4FBF7E;
+  --error: #E06C75;
 }
 
 [data-theme="light"] {
@@ -75,6 +93,22 @@
   --text-dim: #6A6055;
   --success: #7A9A50;
   --error: #CC3322;
+}
+
+/* Dracula follows the official Dracula palette (draculatheme.com):
+   purple-gray surfaces with a purple accent. The secondary text is lifted
+   above the official comment color so labels stay readable on panels. */
+[data-theme="dracula"] {
+  --bg: #282A36;
+  --sidebar: #21222C;
+  --panel: #343746;
+  --border: #44475A;
+  --accent: #BD93F9;
+  --accent2: #8BE9FD;
+  --text: #F8F8F2;
+  --text-dim: #9AA3C8;
+  --success: #50FA7B;
+  --error: #FF5555;
 }
 
 /* ── Base ──────────────────────────────────────────────────── */
@@ -162,4 +196,67 @@ body {
 
 .cm-ts-variable {
   color: var(--text) !important;
+}
+
+/* Per-theme syntax overrides. The shared rules above stay as they are for
+   Light and Charcoal; Dark uses the VS Code Dark+ token colors and Slate
+   swaps the accent-driven keyword color for lavender and softens the
+   fixed hues. */
+
+[data-theme="dark"] .cm-ts-keyword {
+  color: #569CD6 !important;
+}
+
+[data-theme="dark"] .cm-ts-string {
+  color: #CE9178 !important;
+}
+
+[data-theme="dark"] .cm-ts-number {
+  color: #B5CEA8 !important;
+}
+
+[data-theme="dark"] .cm-ts-constant {
+  color: #4FC1FF !important;
+}
+
+[data-theme="dark"] .cm-ts-function {
+  color: #DCDCAA !important;
+}
+
+[data-theme="dark"] .cm-ts-comment {
+  color: #6A9955 !important;
+}
+
+[data-theme="slate"] .cm-ts-keyword {
+  color: #B49CEB !important;
+}
+
+[data-theme="slate"] .cm-ts-number,
+[data-theme="slate"] .cm-ts-constant {
+  color: #E0B072 !important;
+}
+
+[data-theme="slate"] .cm-ts-function {
+  color: #82AAFF !important;
+}
+
+[data-theme="dracula"] .cm-ts-keyword {
+  color: #FF79C6 !important;
+}
+
+[data-theme="dracula"] .cm-ts-string {
+  color: #F1FA8C !important;
+}
+
+[data-theme="dracula"] .cm-ts-number,
+[data-theme="dracula"] .cm-ts-constant {
+  color: #BD93F9 !important;
+}
+
+[data-theme="dracula"] .cm-ts-function {
+  color: #50FA7B !important;
+}
+
+[data-theme="dracula"] .cm-ts-comment {
+  color: #6272A4 !important;
 }

@@ -129,16 +129,16 @@
     const style = getComputedStyle(document.documentElement)
     const get = (v: string) => style.getPropertyValue(v).trim()
     return {
-      background: get('--bg') || '#0D0D0D',
-      foreground: get('--text') || '#F0F0F0',
-      cursor: get('--accent') || '#E94560',
+      background: get('--bg') || '#1E1E1E',
+      foreground: get('--text') || '#D4D4D4',
+      cursor: get('--accent') || '#3794FF',
       black: '#000000',
-      red: get('--error') || '#E94560',
-      green: get('--success') || '#4CAF82',
-      cyan: get('--accent2') || '#A8DADC',
-      white: get('--text') || '#F0F0F0',
-      brightBlack: get('--text-dim') || '#7A7A9A',
-      brightWhite: get('--text') || '#F0F0F0',
+      red: get('--error') || '#F14C4C',
+      green: get('--success') || '#89D185',
+      cyan: get('--accent2') || '#4EC9B0',
+      white: get('--text') || '#D4D4D4',
+      brightBlack: get('--text-dim') || '#9D9D9D',
+      brightWhite: get('--text') || '#D4D4D4',
     }
   }
 

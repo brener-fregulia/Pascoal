@@ -9,8 +9,7 @@
   alt="Pascoal"
   {height}
   class="logo"
-  class:dark={$themeStore.current === 'dark' ||
-    $themeStore.current === 'charcoal'}
+  class:dark={$themeStore.current !== 'light'}
   draggable="false"
 />
 
@@ -23,7 +22,7 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Dark / Charcoal: shift to ash gray (#B0B0B0) */
+  /* Dark / Charcoal / Slate / Dracula: shift to ash gray (#B0B0B0) */
   .logo.dark {
     filter: brightness(0) saturate(0) invert(1) brightness(0.69);
   }

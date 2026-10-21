@@ -12,6 +12,8 @@
     "theme_dark": "Dark",
     "theme_light": "Light",
     "theme_charcoal": "Charcoal",
+    "theme_slate": "Slate",
+    "theme_dracula": "Dracula",
     "git_scope_user": "User",
     "git_name": "Name",
     "git_email": "Email",

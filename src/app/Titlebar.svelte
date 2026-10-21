@@ -238,7 +238,7 @@
     color: var(--text);
   }
   .wc-btn.wc-close:hover {
-    background: var(--accent);
+    background: var(--error);
     color: #fff;
   }
 </style>

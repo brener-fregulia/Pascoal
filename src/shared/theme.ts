@@ -1,9 +1,9 @@
 import { get, writable } from 'svelte/store'
 import { settingsStore } from '../settings/settingsStore'
 
-export type Theme = 'dark' | 'light' | 'charcoal'
+export type Theme = 'dark' | 'light' | 'charcoal' | 'slate' | 'dracula'
 
-const THEMES: Theme[] = ['dark', 'light', 'charcoal']
+const THEMES: Theme[] = ['dark', 'light', 'charcoal', 'slate', 'dracula']
 const LEGACY_STORAGE_KEY = 'pascoal-theme'
 
 function detectSystem(): Theme {

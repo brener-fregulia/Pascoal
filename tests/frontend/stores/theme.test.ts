@@ -33,6 +33,12 @@ describe('themeStore', () => {
     expect(localStorage.getItem('pascoal-theme')).toBeNull()
   })
 
+  it('restores a saved slate theme', () => {
+    settingsStore.updateSetting('theme', 'slate')
+    themeStore.init()
+    expect(current()).toBe('slate')
+  })
+
   it('ignores an invalid legacy value', () => {
     localStorage.setItem('pascoal-theme', 'invalid-theme')
     themeStore.init()

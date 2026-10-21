@@ -2,11 +2,13 @@
   import { i18n } from '../i18n'
   import { themeStore, type Theme } from '../shared/theme'
 
-  const THEMES: Theme[] = ['dark', 'light', 'charcoal']
+  const THEMES: Theme[] = ['dark', 'light', 'charcoal', 'slate', 'dracula']
   const labelKeys: Record<Theme, string> = {
     dark: 'settings.theme_dark',
     light: 'settings.theme_light',
     charcoal: 'settings.theme_charcoal',
+    slate: 'settings.theme_slate',
+    dracula: 'settings.theme_dracula',
   }
 </script>
 

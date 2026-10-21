@@ -110,6 +110,10 @@
     position: relative;
   }
 
+  :global([data-theme='dracula']) #statusbar {
+    color: #282a36;
+  }
+
   :global([data-theme='charcoal']) #statusbar {
     color: #e8d8c0;
   }

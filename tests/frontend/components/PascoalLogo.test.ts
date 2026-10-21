@@ -33,6 +33,12 @@ describe('PascoalLogo', () => {
         expect(getByAltText('Pascoal')).toHaveClass('dark')
     })
 
+    it('applies the dark filter class for the slate theme too', () => {
+        themeStore.apply('slate')
+        const { getByAltText } = render(PascoalLogo)
+        expect(getByAltText('Pascoal')).toHaveClass('dark')
+    })
+
     it('does not apply the dark filter class for the light theme', () => {
         themeStore.apply('light')
         const { getByAltText } = render(PascoalLogo)
