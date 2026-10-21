@@ -1,23 +1,39 @@
 import { describe, it, expect } from 'vitest'
-import { readFileSync } from 'fs'
+import { readFileSync, readdirSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, '../../..')
 const globalCss = readFileSync(path.join(ROOT, 'src/styles/global.css'), 'utf-8')
+const THEMES_DIR = path.join(ROOT, 'src/styles/themes')
+const themeCss = readdirSync(THEMES_DIR)
+  .filter((file) => file.endsWith('.css'))
+  .map((file) => readFileSync(path.join(THEMES_DIR, file), 'utf-8'))
+  .join('\n')
 
-// Parse the `--name: value;` declarations of the first block whose selector
-// is exactly `selector`.
+const COLOR_TOKENS = [
+  'bg', 'sidebar', 'panel', 'border', 'accent', 'accent2',
+  'text', 'text-dim', 'success', 'error',
+]
+
+// Merge the `--name: value;` declarations of every theme block whose
+// selector list contains `selector`.
 function tokens(selector: string): Record<string, string> {
-  const escaped = selector.replace(/[[\]()"=]/g, '\\$&')
-  const block = globalCss.match(new RegExp(`(^|\\n)${escaped}\\s*\\{([^}]*)\\}`))
-  if (!block) throw new Error(`no block for ${selector}`)
   const result: Record<string, string> = {}
-  for (const [, name, value] of block[2].matchAll(/--([\w-]+):\s*([^;]+);/g)) {
-    result[name] = value.trim()
+  const css = themeCss.replace(/\/\*[\s\S]*?\*\//g, '')
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    if (!selectors.split(',').some((s) => s.trim() === selector)) continue
+    for (const [, name, value] of body.matchAll(/--([\w-]+):\s*([^;]+);/g)) {
+      result[name] = value.trim()
+    }
   }
+  if (Object.keys(result).length === 0) throw new Error(`no block for ${selector}`)
   return result
+}
+
+function colors(palette: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(COLOR_TOKENS.map((name) => [name, palette[name]]))
 }
 
 function luminance(hex: string): number {
@@ -31,11 +47,6 @@ function contrast(a: string, b: string): number {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
-
-const COLOR_TOKENS = [
-  'bg', 'sidebar', 'panel', 'border', 'accent', 'accent2',
-  'text', 'text-dim', 'success', 'error',
-]
 
 describe.each(['dark', 'slate'])('%s theme palette', (theme) => {
   const palette = tokens(`[data-theme="${theme}"]`)
@@ -65,32 +76,8 @@ describe.each(['dark', 'slate'])('%s theme palette', (theme) => {
     expect(palette.error).not.toBe(palette.accent)
   })
 
-  it('overrides keyword syntax color for its own theme', () => {
-    expect(globalCss).toMatch(
-      new RegExp(`\\[data-theme="${theme}"\\] \\.cm-ts-keyword\\s*\\{`),
-    )
-  })
-})
-
-describe('dracula theme palette', () => {
-  const palette = tokens('[data-theme="dracula"]')
-
-  it('defines every color token as a 6-digit hex', () => {
-    for (const name of COLOR_TOKENS) {
-      expect(palette[name], name).toMatch(/^#[0-9A-Fa-f]{6}$/)
-    }
-  })
-
-  it('uses the official Dracula editor background and accent', () => {
-    expect(palette.bg).toBe('#282A36')
-    expect(palette.accent).toBe('#BD93F9')
-  })
-
-  it('keeps text readable on every surface', () => {
-    for (const surface of [palette.bg, palette.sidebar, palette.panel]) {
-      expect(contrast(palette.text, surface)).toBeGreaterThanOrEqual(7)
-      expect(contrast(palette['text-dim'], surface)).toBeGreaterThanOrEqual(4.5)
-    }
+  it('sets its own keyword syntax color', () => {
+    expect(palette['syntax-keyword']).toMatch(/^#[0-9A-Fa-f]{6}$/)
   })
 })
 
@@ -103,31 +90,34 @@ describe('Dark and Slate stay separate', () => {
   })
 
   it('keeps :root in sync with Dark for the first paint', () => {
-    const root = tokens(':root')
-    const dark = tokens('[data-theme="dark"]')
-    for (const name of COLOR_TOKENS) {
-      expect(root[name], name).toBe(dark[name])
-    }
+    expect(colors(tokens(':root'))).toEqual(colors(tokens('[data-theme="dark"]')))
+  })
+
+  it('keeps optional tokens off :root so they cannot leak into other themes', () => {
+    expect(Object.keys(tokens(':root')).sort()).toEqual([...COLOR_TOKENS].sort())
   })
 
   it('gives Slate its own slate/navy palette', () => {
-    expect(tokens('[data-theme="slate"]')).not.toEqual(
-      tokens('[data-theme="dark"]'),
+    expect(colors(tokens('[data-theme="slate"]'))).not.toEqual(
+      colors(tokens('[data-theme="dark"]')),
     )
   })
 })
 
 describe('other themes stay intact', () => {
-  it('has no syntax overrides for Light or Charcoal', () => {
-    expect(globalCss).not.toMatch(/\[data-theme="(light|charcoal)"\] \.cm-ts-/)
-    // Shared rules that Light and Charcoal still rely on stay unchanged.
-    expect(globalCss).toMatch(/\n\.cm-ts-keyword\s*\{\s*color: var\(--accent\) !important;/)
-    expect(globalCss).toMatch(/\n\.cm-ts-number\s*\{\s*color: #E5A84A !important;/)
-    expect(globalCss).toMatch(/\n\.cm-ts-function\s*\{\s*color: #61AFEF !important;/)
+  it('has no syntax tokens for Light or Charcoal', () => {
+    for (const theme of ['light', 'charcoal']) {
+      const names = Object.keys(tokens(`[data-theme="${theme}"]`))
+      expect(names.filter((name) => name.startsWith('syntax-'))).toEqual([])
+    }
+    // Shared defaults that Light and Charcoal still rely on stay unchanged.
+    expect(globalCss).toContain('color: var(--syntax-keyword, var(--accent)) !important;')
+    expect(globalCss).toContain('color: var(--syntax-number, #E5A84A) !important;')
+    expect(globalCss).toContain('color: var(--syntax-function, #61AFEF) !important;')
   })
 
   it('keeps the Light palette', () => {
-    expect(tokens('[data-theme="light"]')).toEqual({
+    expect(colors(tokens('[data-theme="light"]'))).toEqual({
       bg: '#FFFFFF',
       sidebar: '#F0F0F5',
       panel: '#F7F7FA',
@@ -142,7 +132,7 @@ describe('other themes stay intact', () => {
   })
 
   it('keeps the Charcoal palette', () => {
-    expect(tokens('[data-theme="charcoal"]')).toEqual({
+    expect(colors(tokens('[data-theme="charcoal"]'))).toEqual({
       bg: '#141414',
       sidebar: '#1C1C1A',
       panel: '#1F1F1C',

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { themeStore } from './theme'
+  import { themeStore, themeDefinition } from './theme'
   import logoSrc from '../assets/pascoal-logo.svg'
   export let height: number = 32
 </script>
@@ -9,7 +9,7 @@
   alt="Pascoal"
   {height}
   class="logo"
-  class:dark={$themeStore.current !== 'light'}
+  class:dark={themeDefinition($themeStore.current).appearance === 'dark'}
   draggable="false"
 />
 
@@ -22,7 +22,7 @@
     -webkit-app-region: no-drag;
   }
 
-  /* Dark / Charcoal / Slate / Dracula: shift to ash gray (#B0B0B0) */
+  /* Dark appearance themes: shift to ash gray (#B0B0B0) */
   .logo.dark {
     filter: brightness(0) saturate(0) invert(1) brightness(0.69);
   }

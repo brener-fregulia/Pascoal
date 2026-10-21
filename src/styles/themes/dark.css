@@ -1,0 +1,28 @@
+/* Dark follows VS Code Dark+: neutral grays in three elevation steps
+   (editor, sidebar, panel) with a restrained blue accent.
+
+   Only the base tokens, which every theme redefines, also go on :root.
+   Optional tokens such as --syntax-* stay scoped to data-theme: on :root
+   they would leak into every theme that leaves them unset. */
+:root,
+[data-theme="dark"] {
+  --bg: #1E1E1E;
+  --sidebar: #252526;
+  --panel: #2D2D30;
+  --border: #3C3C3C;
+  --accent: #3794FF;
+  --accent2: #4EC9B0;
+  --text: #D4D4D4;
+  --text-dim: #9D9D9D;
+  --success: #89D185;
+  --error: #F14C4C;
+}
+
+[data-theme="dark"] {
+  --syntax-keyword: #569CD6;
+  --syntax-string: #CE9178;
+  --syntax-number: #B5CEA8;
+  --syntax-constant: #4FC1FF;
+  --syntax-function: #DCDCAA;
+  --syntax-comment: #6A9955;
+}

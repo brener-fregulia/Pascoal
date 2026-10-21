@@ -1,0 +1,19 @@
+/* Slate is a slate/navy palette: the same elevation steps as Dark, tinted
+   blue, with low-contrast borders, a soft blue accent and lavender
+   keywords. */
+[data-theme="slate"] {
+  --bg: #171B22;
+  --sidebar: #1B2028;
+  --panel: #212630;
+  --border: #2B313B;
+  --accent: #6F9CEB;
+  --accent2: #9CC4E8;
+  --text: #D2D7E0;
+  --text-dim: #8290A0;
+  --success: #4FBF7E;
+  --error: #E06C75;
+  --syntax-keyword: #B49CEB;
+  --syntax-number: #E0B072;
+  --syntax-constant: #E0B072;
+  --syntax-function: #82AAFF;
+}

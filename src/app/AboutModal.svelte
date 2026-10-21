@@ -161,10 +161,7 @@
     filter: none !important;
   }
 
-  :global([data-theme='dark']) .about-logo :global(.logo),
-  :global([data-theme='charcoal']) .about-logo :global(.logo),
-  :global([data-theme='slate']) .about-logo :global(.logo),
-  :global([data-theme='dracula']) .about-logo :global(.logo) {
+  :global([data-appearance='dark']) .about-logo :global(.logo) {
     filter: brightness(0) saturate(0) invert(1) brightness(0.75) !important;
   }
 

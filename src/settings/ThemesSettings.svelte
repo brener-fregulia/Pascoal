@@ -1,15 +1,6 @@
 <script lang="ts">
   import { i18n } from '../i18n'
-  import { themeStore, type Theme } from '../shared/theme'
-
-  const THEMES: Theme[] = ['dark', 'light', 'charcoal', 'slate', 'dracula']
-  const labelKeys: Record<Theme, string> = {
-    dark: 'settings.theme_dark',
-    light: 'settings.theme_light',
-    charcoal: 'settings.theme_charcoal',
-    slate: 'settings.theme_slate',
-    dracula: 'settings.theme_dracula',
-  }
+  import { themeStore, THEMES } from '../shared/theme'
 </script>
 
 <section>
@@ -18,11 +9,11 @@
     {#each THEMES as theme}
       <button
         class="theme-option"
-        class:active={$themeStore.current === theme}
-        on:click={() => themeStore.apply(theme)}
+        class:active={$themeStore.current === theme.id}
+        on:click={() => themeStore.apply(theme.id)}
       >
         <span class="swatch-frame">
-          <span class="swatch" data-theme={theme}>
+          <span class="swatch" data-theme={theme.id}>
             <span class="swatch-sidebar"></span>
             <span class="swatch-main">
               <span class="swatch-tabbar">
@@ -37,7 +28,11 @@
             </span>
           </span>
         </span>
-        <span class="theme-label">{$i18n(labelKeys[theme])}</span>
+        <!-- Palette candidates carry an untranslated label; official themes
+             use their settings.theme_<id> translation. -->
+        <span class="theme-label"
+          >{theme.label ?? $i18n(`settings.theme_${theme.id}`)}</span
+        >
       </button>
     {/each}
   </div>
@@ -59,6 +54,7 @@
 
   #theme-options {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
   }
 

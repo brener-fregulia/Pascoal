@@ -393,7 +393,9 @@
     border-radius: 2px;
   }
 
-  :global([data-theme='light']) #codemirror-editor :global(.cm-pascal-match) {
+  :global([data-appearance='light'])
+    #codemirror-editor
+    :global(.cm-pascal-match) {
     background-color: rgba(255, 152, 0, 0.4);
   }
 
@@ -403,7 +405,7 @@
     border-radius: 2px;
   }
 
-  :global([data-theme='light'])
+  :global([data-appearance='light'])
     #codemirror-editor
     :global(.cm-pascal-match-selected) {
     background-color: rgba(255, 111, 0, 0.55);

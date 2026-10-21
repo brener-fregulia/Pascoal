@@ -1,6 +1,6 @@
 <script lang="ts">
   import { appStore } from './app'
-  import { themeStore } from '../shared/theme'
+  import { themeStore, themeDefinition } from '../shared/theme'
   import { fpcInstallStore } from '../toolchain/fpcInstall'
   import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'
   import LocaleFlag from '../icons/LocaleFlag.svelte'
@@ -11,6 +11,7 @@
     : $i18n('statusbar.fpc_not_found')
   $: versionLabel = info ? `${info.name} v${info.version}` : 'Pascoal'
   $: themeLabel =
+    themeDefinition($themeStore.current).label ??
     $themeStore.current.charAt(0).toUpperCase() + $themeStore.current.slice(1)
   $: currentLocale = LOCALE_OPTIONS.find((o) => o.value === $localeStore)!
 
@@ -105,17 +106,9 @@
     gap: 8px;
     font-family: var(--font-mono);
     font-size: 11px;
-    color: #fff;
+    color: var(--statusbar-text, #fff);
     user-select: none;
     position: relative;
-  }
-
-  :global([data-theme='dracula']) #statusbar {
-    color: #282a36;
-  }
-
-  :global([data-theme='charcoal']) #statusbar {
-    color: #e8d8c0;
   }
 
   .sep {

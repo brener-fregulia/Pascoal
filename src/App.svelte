@@ -13,7 +13,7 @@
   import VersionHistoryModal from './app/VersionHistoryModal.svelte'
   import { appStore } from './app/app'
   import { whatsNewStore } from './app/whatsNew'
-  import { themeStore } from './shared/theme'
+  import { themeStore, themeDefinition } from './shared/theme'
   import { tabStore } from './editor/tabs'
   import { explorerStore } from './project/explorerStore'
   import { searchFocusTick } from './project/searchStore'
@@ -152,7 +152,12 @@
   })
 
   $effect(() => {
-    document.documentElement.setAttribute('data-theme', $themeStore.current)
+    const root = document.documentElement
+    root.setAttribute('data-theme', $themeStore.current)
+    root.setAttribute(
+      'data-appearance',
+      themeDefinition($themeStore.current).appearance,
+    )
   })
 
   $effect(() => {

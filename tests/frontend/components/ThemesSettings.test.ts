@@ -7,13 +7,12 @@ import { themeStore } from '../../../src/shared/theme'
 afterEach(() => cleanup())
 
 describe('ThemesSettings', () => {
-    it('renders all five theme options', () => {
+    it('renders all four theme options', () => {
         const { getByText } = render(ThemesSettings)
         expect(getByText('Dark')).toBeInTheDocument()
         expect(getByText('Light')).toBeInTheDocument()
         expect(getByText('Charcoal')).toBeInTheDocument()
         expect(getByText('Slate')).toBeInTheDocument()
-        expect(getByText('Dracula')).toBeInTheDocument()
     })
 
     it('applies Slate when its option is clicked', async () => {

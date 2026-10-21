@@ -1,0 +1,13 @@
+[data-theme="charcoal"] {
+  --bg: #141414;
+  --sidebar: #1C1C1A;
+  --panel: #1F1F1C;
+  --border: #2C2820;
+  --accent: #CC3322;
+  --accent2: #C8901A;
+  --text: #E8D8C0;
+  --text-dim: #6A6055;
+  --success: #7A9A50;
+  --error: #CC3322;
+  --statusbar-text: #E8D8C0;
+}
