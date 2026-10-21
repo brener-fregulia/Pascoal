@@ -3,6 +3,8 @@ import { render, cleanup, fireEvent } from '@testing-library/svelte'
 import Statusbar from '../../../src/app/Statusbar.svelte'
 import { themeStore } from '../../../src/shared/theme'
 import { fpcInstallStore } from '../../../src/toolchain/fpcInstall'
+import { consoleStore } from '../../../src/toolchain/console'
+import { get } from 'svelte/store'
 
 afterEach(() => cleanup())
 
@@ -10,6 +12,7 @@ describe('Statusbar', () => {
     beforeEach(() => {
         themeStore.apply('dark')
         fpcInstallStore.hide()
+        consoleStore.reset()
     })
 
     it('shows the FPC-not-found label when appStore has no info yet', () => {
@@ -39,5 +42,44 @@ describe('Statusbar', () => {
         await fireEvent.click(getByTitle('Language / Idioma'))
         await fireEvent.keyDown(window, { key: 'Escape' })
         expect(queryByRole('listbox')).not.toBeInTheDocument()
+    })
+
+    describe('run status', () => {
+        it('shows nothing when idle', () => {
+            const { queryByRole } = render(Statusbar)
+            expect(queryByRole('status')).toBeNull()
+        })
+
+        it('shows compiling while the build is in progress', () => {
+            consoleStore.resetBuild()
+            const { getByRole } = render(Statusbar)
+            expect(getByRole('status')).toHaveTextContent('Compiling...')
+        })
+
+        it('shows running only once the program is running', () => {
+            consoleStore.setBuildStatus('success')
+            const { queryByRole, rerender } = render(Statusbar)
+            expect(queryByRole('status')).toBeNull()
+            consoleStore.setRunning(true)
+            return rerender({}).then(() => {
+                expect(queryByRole('status')).toHaveTextContent('Running')
+            })
+        })
+
+        it('shows build failed after an error and hides when a finished run succeeded', async () => {
+            consoleStore.setBuildStatus('error')
+            const { getByRole, queryByRole } = render(Statusbar)
+            expect(getByRole('status')).toHaveTextContent('Build failed')
+            consoleStore.setBuildStatus('success')
+            await Promise.resolve()
+            expect(queryByRole('status')).toBeNull()
+        })
+
+        it('opens the console when the indicator is clicked', async () => {
+            consoleStore.setBuildStatus('error')
+            const { getByRole } = render(Statusbar)
+            await fireEvent.click(getByRole('button', { name: /Compiling|Build failed/ }))
+            expect(get(consoleStore).visible).toBe(true)
+        })
     })
 })

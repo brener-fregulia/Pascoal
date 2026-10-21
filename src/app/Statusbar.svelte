@@ -2,6 +2,7 @@
   import { appStore } from './app'
   import { themeStore, themeDefinition } from '../shared/theme'
   import { fpcInstallStore } from '../toolchain/fpcInstall'
+  import { consoleStore } from '../toolchain/console'
   import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'
   import LocaleFlag from '../icons/LocaleFlag.svelte'
 
@@ -14,6 +15,16 @@
     themeDefinition($themeStore.current).label ??
     $themeStore.current.charAt(0).toUpperCase() + $themeStore.current.slice(1)
   $: currentLocale = LOCALE_OPTIONS.find((o) => o.value === $localeStore)!
+
+  // Only states the console store actually knows: a successful build is
+  // reported only while the program is running, never as a finished run.
+  $: runState = $consoleStore.running
+    ? 'running'
+    : $consoleStore.buildStatus === 'compiling' ||
+        $consoleStore.buildStatus === 'error'
+      ? $consoleStore.buildStatus
+      : null
+  $: runLabel = runState ? $i18n(`console.status_${runState}`) : ''
 
   let showLocalePicker = false
 
@@ -56,6 +67,20 @@
   {/if}
   <span class="sep">|</span>
   <span>{versionLabel}</span>
+
+  {#if runState}
+    <span class="sep">|</span>
+    <span class="run-wrapper" role="status">
+      <button
+        class="status-btn run-status {runState}"
+        title={$i18n('console.title')}
+        on:click={() => consoleStore.show()}
+      >
+        <span class="run-dot" aria-hidden="true"></span>
+        {runLabel}
+      </button>
+    </span>
+  {/if}
 
   <div class="spacer"></div>
 
@@ -142,6 +167,28 @@
   .locale-option:focus-visible {
     outline: 1px solid var(--accent2);
     outline-offset: -2px;
+  }
+
+  .run-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .run-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .run-status.running .run-dot {
+    background: var(--success);
+  }
+
+  .run-status.error .run-dot {
+    background: var(--error);
   }
 
   .locale-code {
