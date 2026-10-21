@@ -25,7 +25,7 @@
   }
 </script>
 
-<header id="titlebar" class:mac={isMac}>
+<header id="titlebar" class:mac={isMac} data-tauri-drag-region>
   {#if isMac}
     <div class="mac-group">
       <button
@@ -84,7 +84,7 @@
   <!-- Menu bar -->
   <Menu />
 
-  <div class="drag-region"></div>
+  <div class="drag-region" data-tauri-drag-region></div>
 
   {#if !isMac}
     <div class="win-group" style="-webkit-app-region: no-drag">

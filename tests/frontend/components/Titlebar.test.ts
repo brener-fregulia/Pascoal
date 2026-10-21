@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup } from '@testing-library/svelte'
+import { readFileSync } from 'node:fs'
 
 const { mockAppState } = vi.hoisted(() => ({
     mockAppState: {
@@ -71,6 +72,29 @@ describe('Titlebar', () => {
             mockAppState.info = { platform: 'macos' }
             const { container } = render(Titlebar)
             expect(container.querySelector('#titlebar')).toHaveClass('mac')
+        })
+    })
+
+    describe('window dragging', () => {
+        it('marks the titlebar and its empty area as Tauri drag regions', () => {
+            const { container } = render(Titlebar)
+            expect(container.querySelector('#titlebar')).toHaveAttribute('data-tauri-drag-region')
+            expect(container.querySelector('.drag-region')).toHaveAttribute('data-tauri-drag-region')
+        })
+
+        it('does not mark menus or window controls as drag regions', () => {
+            const { container } = render(Titlebar)
+            expect(container.querySelector('.menubar')).not.toHaveAttribute('data-tauri-drag-region')
+            for (const btn of container.querySelectorAll('button')) {
+                expect(btn).not.toHaveAttribute('data-tauri-drag-region')
+            }
+        })
+
+        it('grants the start-dragging permission required by data-tauri-drag-region', () => {
+            const capability = JSON.parse(
+                readFileSync('../src-tauri/capabilities/default.json', 'utf-8'),
+            )
+            expect(capability.permissions).toContain('core:window:allow-start-dragging')
         })
     })
 })
