@@ -78,6 +78,12 @@
     background: rgba(255, 255, 255, 0.03);
   }
 
+  .tab:focus-visible,
+  .tab-close:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -2px;
+  }
+
   .tab.active {
     color: var(--text);
     background: var(--bg);

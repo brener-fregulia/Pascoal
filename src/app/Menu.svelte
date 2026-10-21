@@ -233,6 +233,12 @@
     color: var(--text);
   }
 
+  .menu-trigger:focus-visible,
+  .menu-item:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -2px;
+  }
+
   .menu-backdrop {
     position: fixed;
     inset: 0;

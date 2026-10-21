@@ -237,6 +237,10 @@
     background: rgba(255, 255, 255, 0.08);
     color: var(--text);
   }
+  .wc-btn:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -2px;
+  }
   .wc-btn.wc-close:hover {
     background: var(--error);
     color: #fff;

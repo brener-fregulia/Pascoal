@@ -31,6 +31,12 @@
       background 0.15s;
   }
 
+  /* Inset so the ring is not clipped by bars with overflow. */
+  .icon-btn:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -2px;
+  }
+
   /* ── activity bar ── */
   .activity {
     width: 36px;

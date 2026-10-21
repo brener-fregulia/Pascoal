@@ -138,6 +138,12 @@
     opacity: 1;
   }
 
+  .status-btn:focus-visible,
+  .locale-option:focus-visible {
+    outline: 1px solid var(--accent2);
+    outline-offset: -2px;
+  }
+
   .locale-code {
     font-size: 10px;
     font-weight: 700;
