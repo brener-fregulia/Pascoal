@@ -7,6 +7,7 @@ mod state;
 mod toolchain;
 
 use infrastructure::environment::{detect_fpc, get_documents_dir};
+use infrastructure::window_state::has_saved_window;
 use state::{ProcessState, WorkspaceState};
 use tauri::Manager;
 
@@ -46,6 +47,9 @@ fn get_app_info(app: tauri::AppHandle) -> AppInfo {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Registered on the builder, not in setup(): the plugin only tracks
+        // windows created after it, and `main` is created before setup runs.
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .manage(ProcessState::new())
         .manage(WorkspaceState::new())
         .setup(|app| {
@@ -61,16 +65,19 @@ pub fn run() {
                 .plugin(tauri_plugin_updater::Builder::new().build())?;
             app.handle().plugin(tauri_plugin_process::init())?;
             app.handle().plugin(tauri_plugin_opener::init())?;
-            app.handle()
-                .plugin(tauri_plugin_window_state::Builder::default().build())?;
 
-            // First-ever launch (no settings.json saved yet) starts
-            // maximized. Every launch after that is left entirely to the
-            // window-state plugin above - we don't touch it again.
+            // A window with no saved state yet starts maximized. Once the
+            // plugin (registered on the builder, so it tracks `main`) has
+            // saved one, every later launch is left to it.
             let is_first_launch = app
                 .path()
                 .app_config_dir()
-                .map(|dir| !dir.join("settings.json").exists())
+                .map(|dir| {
+                    !has_saved_window(
+                        &dir.join(tauri_plugin_window_state::DEFAULT_FILENAME),
+                        "main",
+                    )
+                })
                 .unwrap_or(true);
 
             if is_first_launch {

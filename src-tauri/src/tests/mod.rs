@@ -12,4 +12,5 @@ mod manage_workspace_tests;
 mod process_state_tests;
 mod search_tests;
 mod settings_tests;
+mod window_state_tests;
 mod workspace_guard_tests;
