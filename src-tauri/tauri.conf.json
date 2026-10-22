@@ -16,6 +16,8 @@
         "title": "Pascoal",
         "width": 1600,
         "height": 900,
+        "minWidth": 760,
+        "minHeight": 480,
         "resizable": true,
         "decorations": false,
         "fullscreen": false
