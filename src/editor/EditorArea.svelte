@@ -5,6 +5,7 @@
   import SearchPanel from '../project/SearchPanel.svelte'
   import GitPanel from '../integrations/git/GitPanel.svelte'
   import MainContent from './MainContent.svelte'
+  import { loadSidePanelWidth, saveSidePanelWidth } from './sidePanelWidth'
 
   export let activePanel: string | null
 
@@ -17,9 +18,14 @@
   const MIN_SIDEBAR_PX = 220
   const EDITOR_RESERVED_PX = 480
   const DEFAULT_SIDEBAR_PX = 220
+  const RESIZE_KEYS = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
 
   let windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1280
   let isDraggingResizer = false
+  let sidebarPx = loadSidePanelWidth(DEFAULT_SIDEBAR_PX)
+  let sidebarSizePct = 0
+  let userResizing = false
+  let userResized = false
 
   onMount(() => {
     function handleResize() {
@@ -35,23 +41,46 @@
     100 - (EDITOR_RESERVED_PX / groupWidth) * 100,
     minSizePct,
   )
-  $: defaultSizePct = (DEFAULT_SIDEBAR_PX / groupWidth) * 100
+  $: defaultSizePct = (sidebarPx / groupWidth) * 100
+
+  // Only drags and keyboard resizes change the preferred width; clamping
+  // caused by a narrower window must not overwrite it.
+  function beginUserResize() {
+    userResizing = true
+    userResized = false
+  }
+
+  function handleSidebarResize(size: number) {
+    sidebarSizePct = size
+    if (userResizing) userResized = true
+  }
+
+  function endUserResize() {
+    userResizing = false
+    // A collapsed panel keeps the last expanded width for its next opening.
+    if (!userResized || sidebarSizePct <= 0) return
+    sidebarPx = Math.round((sidebarSizePct / 100) * groupWidth)
+    saveSidePanelWidth(sidebarPx)
+  }
+
+  function handleDraggingChange(dragging: boolean) {
+    isDraggingResizer = dragging
+    if (dragging) beginUserResize()
+    else endUserResize()
+  }
 </script>
 
 <div id="editor-area">
   <div id="editor-content">
     {#if hasSidePanel}
-      <PaneGroup
-        direction="horizontal"
-        autoSaveId="pascoal-side-panel"
-        class="pane-group"
-      >
+      <PaneGroup direction="horizontal" class="pane-group">
         <Pane
           defaultSize={defaultSizePct}
           minSize={minSizePct}
           maxSize={maxSizePct}
           collapsible={true}
           collapsedSize={0}
+          onResize={handleSidebarResize}
         >
           <div id="side-panel">
             {#if activePanel === 'explorer'}
@@ -65,7 +94,11 @@
         </Pane>
         <PaneResizer
           class={`pane-resizer ${isDraggingResizer ? 'dragging' : ''}`}
-          onDraggingChange={(dragging) => (isDraggingResizer = dragging)}
+          onDraggingChange={handleDraggingChange}
+          onkeydown={(e: KeyboardEvent) =>
+            RESIZE_KEYS.includes(e.key) && beginUserResize()}
+          onkeyup={(e: KeyboardEvent) =>
+            RESIZE_KEYS.includes(e.key) && endUserResize()}
         />
         <Pane>
           <MainContent />

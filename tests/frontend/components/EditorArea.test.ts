@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, cleanup } from '@testing-library/svelte'
+import { render, cleanup, fireEvent } from '@testing-library/svelte'
+import { tick } from 'svelte'
 import { EditorState } from '@codemirror/state'
 
 const { mockTabState, mockConsoleState } = vi.hoisted(() => ({
@@ -64,8 +65,12 @@ vi.mock('../../../src/project/explorerStore', () => ({
 
 import EditorArea from '../../../src/editor/EditorArea.svelte'
 
+const initialWindowWidth = window.innerWidth
+
 afterEach(() => {
     cleanup()
+    window.innerWidth = initialWindowWidth
+    localStorage.clear()
     mockTabState.tabs = []
     mockTabState.activeTabId = null
     mockTabState.activeView = 'welcome'
@@ -138,5 +143,111 @@ describe('EditorArea', () => {
             props: { activePanel: null },
         })
         expect(container.querySelector('#main-content')).toBeInTheDocument()
+    })
+})
+
+describe('EditorArea side panel width', () => {
+    // 1048 px window - 48 px ActivityBar = 1000 px group, so 1% = 10 px.
+    const GROUP_1000 = 1048
+
+    async function settle() {
+        for (let i = 0; i < 3; i++) {
+            await tick()
+            await new Promise((resolve) => setTimeout(resolve, 0))
+        }
+    }
+
+    async function resizeWindow(width: number) {
+        window.innerWidth = width
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+    }
+
+    async function renderWithSidePanel(activePanel: string | null = 'explorer') {
+        const result = render(EditorArea, { props: { activePanel } })
+        await settle()
+        return result
+    }
+
+    function resizer(container: HTMLElement) {
+        return container.querySelector('[data-pane-resizer]') as HTMLElement
+    }
+
+    function sidebarPct(container: HTMLElement) {
+        return Number(resizer(container).getAttribute('aria-valuenow'))
+    }
+
+    async function pressResizeKey(container: HTMLElement, key: string) {
+        await fireEvent.keyDown(resizer(container), { key })
+        await fireEvent.keyUp(resizer(container), { key })
+        await settle()
+    }
+
+    it('opens at the default 220 px width on first use', async () => {
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        expect(sidebarPct(container)).toBe(22)
+    })
+
+    it('restores the saved width on startup', async () => {
+        localStorage.setItem('pascoal-side-panel-width', '300')
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        expect(sidebarPct(container)).toBe(30)
+    })
+
+    it('saves the width chosen with the keyboard in pixels', async () => {
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        await pressResizeKey(container, 'ArrowRight')
+        expect(sidebarPct(container)).toBe(32)
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBe('320')
+    })
+
+    it('keeps the chosen pixel width when the window is resized', async () => {
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        await pressResizeKey(container, 'ArrowRight')
+
+        // 1548 px window -> 1500 px group; 320 px = 21.33%
+        await resizeWindow(1548)
+        expect(sidebarPct(container)).toBe(21)
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBe('320')
+    })
+
+    it('clamps to the editor reserve in narrow windows without losing the preference', async () => {
+        localStorage.setItem('pascoal-side-panel-width', '600')
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        // 1000 px - 480 px editor reserve = 520 px max
+        expect(sidebarPct(container)).toBe(52)
+
+        // 2048 px window -> 2000 px group; 600 px = 30%
+        await resizeWindow(2048)
+        expect(sidebarPct(container)).toBe(30)
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBe('600')
+    })
+
+    it('reopens a collapsed panel at the preferred width', async () => {
+        localStorage.setItem('pascoal-side-panel-width', '300')
+        window.innerWidth = GROUP_1000
+        const { container, rerender } = await renderWithSidePanel()
+        await pressResizeKey(container, 'Home')
+        expect(sidebarPct(container)).toBe(0)
+
+        await rerender({ activePanel: null })
+        await settle()
+        await rerender({ activePanel: 'search' })
+        await settle()
+        expect(sidebarPct(container)).toBe(30)
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBe('300')
+    })
+
+    it('does not use the window-size dependent PaneForge autosave', async () => {
+        window.innerWidth = GROUP_1000
+        const { container } = await renderWithSidePanel()
+        await pressResizeKey(container, 'ArrowRight')
+        await new Promise((resolve) => setTimeout(resolve, 150))
+        expect(localStorage.getItem('paneforge:pascoal-side-panel')).toBeNull()
     })
 })
