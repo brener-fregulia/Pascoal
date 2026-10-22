@@ -28,13 +28,6 @@
       stroke-width="0.7"
       fill="none"
     />
-  {:else if locale === 'es-419'}
-    <rect width="20" height="4.67" fill="#CE1126" />
-    <rect y="4.67" width="20" height="4.67" fill="#FCD116" />
-    <rect y="9.33" width="20" height="4.67" fill="#CE1126" />
-  {:else if locale === 'pl'}
-    <rect width="20" height="7" fill="#fff" />
-    <rect y="7" width="20" height="7" fill="#DC143C" />
   {/if}
 </svg>
 

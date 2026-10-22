@@ -12,19 +12,24 @@ describe('LanguageSettings', () => {
         const { getByText } = render(LanguageSettings)
         expect(getByText('English')).toBeInTheDocument()
         expect(getByText('Português (Brasil)')).toBeInTheDocument()
-        expect(getByText('Español (Latinoamérica)')).toBeInTheDocument()
-        expect(getByText('Polski')).toBeInTheDocument()
+    })
+
+    it('offers only English and Português (Brasil)', () => {
+        const { getAllByRole, queryByText } = render(LanguageSettings)
+        expect(getAllByRole('button')).toHaveLength(2)
+        expect(queryByText('Español (Latinoamérica)')).toBeNull()
+        expect(queryByText('Polski')).toBeNull()
     })
 
     it('marks the current locale as active', () => {
-        localeStore.set('pl')
+        localeStore.set('pt-BR')
         const { getByText } = render(LanguageSettings)
-        expect(getByText('Polski').closest('button')).toHaveClass('active')
+        expect(getByText('Português (Brasil)').closest('button')).toHaveClass('active')
     })
 
     it('changes locale when an option is clicked', async () => {
         const { getByText } = render(LanguageSettings)
-        await fireEvent.click(getByText('Polski'))
-        expect(get(localeStore)).toBe('pl')
+        await fireEvent.click(getByText('Português (Brasil)'))
+        expect(get(localeStore)).toBe('pt-BR')
     })
 })

@@ -2,7 +2,7 @@
 
 > A modern Pascal IDE for desktop - write, compile, and run Pascal programs.
 
-[Português (BR)](docs/readme/pt-BR.md) · [Español (Latinoamérica)](docs/readme/es-419.md) · [Polski](docs/readme/pl.md)
+[Português (BR)](docs/readme/pt-BR.md)
 
 ---
 
@@ -40,7 +40,7 @@ Download the latest release from the
 - Native-style File, Edit, and Help menus
 - Settings for appearance, language, Git identity, and toolchain status
 - Dark, Light, and Charcoal themes
-- English, Português (BR), Español (Latinoamérica), and Polski UI
+- English and Português (BR) UI
 - Windows and Linux support
 
 ## Requirements

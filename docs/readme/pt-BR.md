@@ -2,7 +2,7 @@
 
 > Uma IDE moderna de Pascal para desktop - escreva, compile e execute programas Pascal.
 
-[English](../../README.md) · [Español (Latinoamérica)](es-419.md) · [Polski](pl.md)
+[English](../../README.md)
 
 ---
 
@@ -41,7 +41,7 @@ Baixe a versão mais recente na
 - Menus Arquivo, Editar e Ajuda no estilo nativo
 - Configurações de aparência, idioma, identidade Git e status do toolchain
 - Temas Dark, Light e Charcoal
-- Interface em English, Português (BR), Español (Latinoamérica) e Polski
+- Interface em English e Português (BR)
 - Suporte a Windows e Linux
 
 ## Requisitos

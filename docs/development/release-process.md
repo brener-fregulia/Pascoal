@@ -294,8 +294,6 @@ Currently supported files are:
 
 ```text
 en.json
-es-419.json
-pl.json
 pt-BR.json
 ```
 

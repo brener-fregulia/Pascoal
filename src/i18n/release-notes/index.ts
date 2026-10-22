@@ -10,10 +10,6 @@ function loadLocaleFile(locale: Locale): Promise<Record<string, string>> {
       return import('./locales/en.json').then((m) => m.default)
     case 'pt-BR':
       return import('./locales/pt-BR.json').then((m) => m.default)
-    case 'es-419':
-      return import('./locales/es-419.json').then((m) => m.default)
-    case 'pl':
-      return import('./locales/pl.json').then((m) => m.default)
   }
 }
 

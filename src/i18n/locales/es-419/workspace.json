@@ -1,9 +1,0 @@
-{
-  "workspace": {
-    "section_recent_workspaces": "Espacios de trabajo recientes",
-    "no_recent_workspaces": "No hay espacios de trabajo recientes.",
-    "open_recent": "Abrir espacio de trabajo reciente",
-    "remove_recent": "Quitar de recientes",
-    "switch_confirm": "Tienes cambios sin guardar. Cambiar de espacio de trabajo modificará la carpeta de proyecto abierta. ¿Continuar?"
-  }
-}

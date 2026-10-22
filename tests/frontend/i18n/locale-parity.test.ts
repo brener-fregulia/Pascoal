@@ -4,7 +4,7 @@ import { locales, type Locale } from '../../../src/i18n'
 type Tree = Record<string, unknown>
 
 const REFERENCE: Locale = 'en'
-const OTHERS: Locale[] = ['pt-BR', 'es-419', 'pl']
+const OTHERS: Locale[] = ['pt-BR']
 
 function extractPlaceholders(value: string): string[] {
   const tokens = value.match(/\{(\w+)\}/g) ?? []

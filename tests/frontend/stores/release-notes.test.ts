@@ -5,7 +5,7 @@ import {
 } from '../../../src/i18n/release-notes'
 import en from '../../../src/i18n/release-notes/locales/en.json'
 
-const LOCALES = ['en', 'pt-BR', 'es-419', 'pl'] as const
+const LOCALES = ['en', 'pt-BR'] as const
 const KNOWN_VERSIONS = Object.keys(en)
 
 describe('loadReleaseNote', () => {

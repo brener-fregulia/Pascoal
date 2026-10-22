@@ -11,8 +11,6 @@ body:
       options:
         - README (English)
         - README (Portugues)
-        - README (Espanol)
-        - README (Polski)
         - CONTRIBUTING / setup instructions
         - In-app text / UI strings
         - Other

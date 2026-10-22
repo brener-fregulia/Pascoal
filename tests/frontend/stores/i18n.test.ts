@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { get } from 'svelte/store'
 import {
   localeStore,
@@ -25,18 +25,59 @@ describe('localeStore', () => {
   })
 
   it('restores locale from localStorage', () => {
-    localStorage.setItem('pascoal-locale', 'pl')
-    localeStore.set('pl')
-    expect(get(localeStore)).toBe('pl')
+    localStorage.setItem('pascoal-locale', 'pt-BR')
+    localeStore.set('pt-BR')
+    expect(get(localeStore)).toBe('pt-BR')
   })
 
-  it('LOCALE_OPTIONS contains all expected locales', () => {
-    const values = LOCALE_OPTIONS.map((o) => o.value)
-    expect(values).toContain('en')
-    expect(values).toContain('pt-BR')
-    expect(values).toContain('es-419')
-    expect(values).toContain('pl')
+  it('LOCALE_OPTIONS contains exactly the supported locales', () => {
+    expect(LOCALE_OPTIONS.map((o) => o.value)).toEqual(['en', 'pt-BR'])
   })
+})
+
+describe('locale detection on startup', () => {
+  async function freshStore() {
+    vi.resetModules()
+    return (await import('../../../src/i18n')).localeStore
+  }
+
+  function setSystemLanguages(languages: string[]) {
+    vi.spyOn(navigator, 'languages', 'get').mockReturnValue(languages)
+  }
+
+  beforeEach(() => localStorage.clear())
+  afterEach(() => vi.restoreAllMocks())
+
+  it.each(['es-419', 'pl'])(
+    'migrates a saved retired locale (%s) to en, ignoring the system language',
+    async (retired) => {
+      localStorage.setItem('pascoal-locale', retired)
+      setSystemLanguages(['pt-BR'])
+      const store = await freshStore()
+      expect(get(store)).toBe('en')
+      expect(localStorage.getItem('pascoal-locale')).toBe('en')
+    },
+  )
+
+  it.each(['en', 'pt-BR'] as const)('keeps a saved %s preference', async (saved) => {
+    localStorage.setItem('pascoal-locale', saved)
+    setSystemLanguages(saved === 'en' ? ['pt-BR'] : ['en-US'])
+    const store = await freshStore()
+    expect(get(store)).toBe(saved)
+  })
+
+  it('selects pt-BR for a Portuguese system language', async () => {
+    setSystemLanguages(['pt-PT'])
+    expect(get(await freshStore())).toBe('pt-BR')
+  })
+
+  it.each([['en-GB'], ['es-MX'], ['pl-PL']])(
+    'falls back to en for system language %s',
+    async (lang) => {
+      setSystemLanguages([lang])
+      expect(get(await freshStore())).toBe('en')
+    },
+  )
 })
 
 describe('t() non-reactive translation function', () => {
@@ -63,19 +104,9 @@ describe('t() non-reactive translation function', () => {
     expect(t('editor.run')).toBe('Executar')
   })
 
-  it('returns es-419 string when locale is es-419', () => {
-    localeStore.set('es-419')
-    expect(t('editor.run')).toBe('Ejecutar')
-  })
-
-  it('returns pl string when locale is pl', () => {
-    localeStore.set('pl')
-    expect(t('editor.run')).toBe('Uruchom')
-  })
-
-  it('falls back to English when key is missing in locale', () => {
-    localeStore.set('pl')
-    expect(t('console.title')).toBe('Konsola')
+  it('returns the key itself when it exists in no locale', () => {
+    localeStore.set('pt-BR')
+    expect(t('does.not.exist')).toBe('does.not.exist')
   })
 })
 
