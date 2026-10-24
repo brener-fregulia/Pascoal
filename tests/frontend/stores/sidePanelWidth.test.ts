@@ -16,6 +16,11 @@ describe('sidePanelWidth', () => {
     expect(loadSidePanelWidth(220)).toBe(302)
   })
 
+  it('rounds a fractional saved width to whole pixels', () => {
+    localStorage.setItem('pascoal-side-panel-width', '301.6')
+    expect(loadSidePanelWidth(220)).toBe(302)
+  })
+
   it.each(['abc', '0', '-50', 'Infinity'])(
     'returns the fallback for an invalid saved value (%s)',
     (value) => {

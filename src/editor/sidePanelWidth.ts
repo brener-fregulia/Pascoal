@@ -5,7 +5,7 @@ const STORAGE_KEY = 'pascoal-side-panel-width'
 
 export function loadSidePanelWidth(fallback: number): number {
   try {
-    const width = Number(localStorage.getItem(STORAGE_KEY))
+    const width = Math.round(Number(localStorage.getItem(STORAGE_KEY)))
     return Number.isFinite(width) && width > 0 ? width : fallback
   } catch {
     return fallback
