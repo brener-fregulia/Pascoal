@@ -28,4 +28,15 @@ describe('sidePanelWidth', () => {
       expect(loadSidePanelWidth(220)).toBe(220)
     },
   )
+
+  it('ignores invalid widths without overwriting the saved value', () => {
+    saveSidePanelWidth(320)
+
+    for (const width of [0, -50, NaN, Infinity]) {
+      saveSidePanelWidth(width)
+    }
+
+    expect(loadSidePanelWidth(220)).toBe(320)
+  })
+
 })

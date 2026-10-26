@@ -13,9 +13,13 @@ export function loadSidePanelWidth(fallback: number): number {
 }
 
 export function saveSidePanelWidth(width: number) {
+  const rounded = Math.round(width)
+  if (!Number.isFinite(rounded) || rounded <= 0) return
+
   try {
-    localStorage.setItem(STORAGE_KEY, String(Math.round(width)))
+    localStorage.setItem(STORAGE_KEY, String(rounded))
   } catch {
     /* ignore */
   }
 }
+
