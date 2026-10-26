@@ -127,9 +127,10 @@ sizing.
 
 The editor has priority over optional panels. When the window cannot fit the
 sidebar, the right panel, and the editor's reserved width, the right panel is
-hidden temporarily and the status bar control is disabled. The saved `open` and
-width preferences are left unchanged, and the panel can reappear once there is
-enough space.
+hidden temporarily. The status bar control prevents opening a closed panel
+when space is insufficient, but remains enabled to close an already-requested
+panel. The saved `open` and width preferences are left unchanged, and the
+panel can reappear once there is enough space.
 
 ### Current limits
 
