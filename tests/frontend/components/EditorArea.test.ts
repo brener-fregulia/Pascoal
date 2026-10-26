@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 import { tick } from 'svelte'
+import { get } from 'svelte/store'
 import { EditorState } from '@codemirror/state'
 
 const { mockTabState, mockConsoleState } = vi.hoisted(() => ({
@@ -64,6 +65,7 @@ vi.mock('../../../src/project/explorerStore', () => ({
 }))
 
 import EditorArea from '../../../src/editor/EditorArea.svelte'
+import { rightPanelStore } from '../../../src/app/rightPanel'
 
 const initialWindowWidth = window.innerWidth
 
@@ -79,6 +81,7 @@ afterEach(() => {
     mockConsoleState.position = 'bottom'
     mockExplorerState.folder = null
     mockExplorerState.tree = []
+    rightPanelStore.reset()
     vi.clearAllMocks()
 })
 
@@ -249,5 +252,103 @@ describe('EditorArea side panel width', () => {
         await pressResizeKey(container, 'ArrowRight')
         await new Promise((resolve) => setTimeout(resolve, 150))
         expect(localStorage.getItem('paneforge:pascoal-side-panel')).toBeNull()
+    })
+})
+
+describe('EditorArea right panel', () => {
+    // 1248 px window - 48 px ActivityBar = 1200 px group.
+    const WIDE = 1248
+
+    async function settle() {
+        for (let i = 0; i < 3; i++) {
+            await tick()
+            await new Promise((resolve) => setTimeout(resolve, 0))
+        }
+    }
+
+    async function renderArea(activePanel: string | null = null) {
+        const result = render(EditorArea, { props: { activePanel } })
+        await settle()
+        return result
+    }
+
+    async function setOpen(open: boolean) {
+        if (get(rightPanelStore).open !== open) rightPanelStore.toggle()
+        await settle()
+    }
+
+    it('is hidden by default', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        expect(container.querySelector('#right-panel')).toBeNull()
+    })
+
+    it('shows the empty state when opened and hides when closed', async () => {
+        window.innerWidth = WIDE
+        const { container, getByText } = await renderArea()
+        await setOpen(true)
+        expect(container.querySelector('#right-panel')).toBeInTheDocument()
+        expect(getByText(/Nothing to show yet/)).toBeInTheDocument()
+        await setOpen(false)
+        expect(container.querySelector('#right-panel')).toBeNull()
+    })
+
+    it('keeps the editor mounted and beside the panel', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        const main = container.querySelector('#main-content')
+        await setOpen(true)
+        expect(container.querySelector('#main-content')).toBe(main)
+        const panes = [...container.querySelectorAll('[data-pane]')]
+        expect(panes.at(-1)).toContainElement(
+            container.querySelector('#right-panel') as HTMLElement,
+        )
+        expect(panes.at(-2)).toContainElement(main as HTMLElement)
+    })
+
+    it('works together with the left sidebar', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea('explorer')
+        await setOpen(true)
+        expect(container.querySelector('#side-panel')).toBeInTheDocument()
+        expect(container.querySelector('#right-panel')).toBeInTheDocument()
+        expect(container.querySelector('#main-content')).toBeInTheDocument()
+        expect(container.querySelectorAll('[data-pane-resizer]')).toHaveLength(2)
+    })
+
+    it('does not touch the saved left width', async () => {
+        localStorage.setItem('pascoal-side-panel-width', '300')
+        window.innerWidth = WIDE
+        await renderArea('explorer')
+        await setOpen(true)
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBe('300')
+    })
+
+    it('does not appear over the editor when there is no room, and returns later', async () => {
+        // 760 px window -> 712 px group: sidebar (220) + panel (200) + editor (480) do not fit.
+        window.innerWidth = 760
+        const { container } = await renderArea('explorer')
+        await setOpen(true)
+        expect(container.querySelector('#right-panel')).toBeNull()
+        expect(container.querySelector('#side-panel')).toBeInTheDocument()
+
+        window.dispatchEvent(new Event('resize'))
+        window.innerWidth = WIDE
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+        expect(container.querySelector('#right-panel')).toBeInTheDocument()
+    })
+
+    it('fits at the minimum window width when the left sidebar is closed', async () => {
+        window.innerWidth = 760
+        const { container } = await renderArea(null)
+        await setOpen(true)
+        expect(container.querySelector('#right-panel')).toBeInTheDocument()
+    })
+
+    it('reports availability to the shell', async () => {
+        window.innerWidth = 760
+        await renderArea('explorer')
+        expect(get(rightPanelStore).available).toBe(false)
     })
 })

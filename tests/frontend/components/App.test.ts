@@ -43,6 +43,19 @@ describe('App', () => {
         expect(left.defaultPrevented).toBe(false)
     })
 
+    it('keeps the right panel hidden until the statusbar toggle is used', async () => {
+        const { container, getByRole } = render(App)
+        expect(container.querySelector('#right-panel')).toBeNull()
+        const toggle = getByRole('button', { name: 'Toggle right panel' })
+        await fireEvent.click(toggle)
+        await waitFor(() =>
+            expect(container.querySelector('#right-panel')).toBeInTheDocument(),
+        )
+        expect(container.querySelector('#welcome')).toBeInTheDocument()
+        await fireEvent.click(toggle)
+        await waitFor(() => expect(container.querySelector('#right-panel')).toBeNull())
+    })
+
     it('shows Welcome by default with no open tabs', () => {
         const { container } = render(App)
         expect(container.querySelector('#welcome')).toBeInTheDocument()

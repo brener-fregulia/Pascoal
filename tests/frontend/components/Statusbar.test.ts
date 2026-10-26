@@ -4,6 +4,7 @@ import Statusbar from '../../../src/app/Statusbar.svelte'
 import { themeStore } from '../../../src/shared/theme'
 import { fpcInstallStore } from '../../../src/toolchain/fpcInstall'
 import { consoleStore } from '../../../src/toolchain/console'
+import { rightPanelStore } from '../../../src/app/rightPanel'
 import { get } from 'svelte/store'
 
 afterEach(() => cleanup())
@@ -13,6 +14,7 @@ describe('Statusbar', () => {
         themeStore.apply('dark')
         fpcInstallStore.hide()
         consoleStore.reset()
+        rightPanelStore.reset()
     })
 
     it('shows the FPC-not-found label when appStore has no info yet', () => {
@@ -29,6 +31,23 @@ describe('Statusbar', () => {
         const { getByText } = render(Statusbar)
         await fireEvent.click(getByText('FPC not found'))
         expect(fpcInstallStore).toBeDefined()
+    })
+
+    it('toggles the right panel with an accessible button', async () => {
+        const { getByRole } = render(Statusbar)
+        const button = getByRole('button', { name: 'Toggle right panel' })
+        expect(button).toHaveAttribute('aria-pressed', 'false')
+        await fireEvent.click(button)
+        expect(button).toHaveAttribute('aria-pressed', 'true')
+        expect(get(rightPanelStore).open).toBe(true)
+        await fireEvent.click(button)
+        expect(get(rightPanelStore).open).toBe(false)
+    })
+
+    it('disables opening the right panel when there is no room', () => {
+        rightPanelStore.setAvailable(false)
+        const { getByRole } = render(Statusbar)
+        expect(getByRole('button', { name: 'Toggle right panel' })).toBeDisabled()
     })
 
     it('opens the locale picker when the language button is clicked', async () => {

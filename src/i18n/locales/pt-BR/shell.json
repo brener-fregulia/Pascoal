@@ -37,6 +37,12 @@
     "playground": "Playground",
     "settings": "Configurações"
   },
+  "right_panel": {
+    "title": "Painel lateral",
+    "empty": "Nada para mostrar ainda. Informações contextuais aparecerão aqui quando um recurso as fornecer.",
+    "toggle": "Alternar painel direito",
+    "no_space": "Espaço insuficiente para o painel direito"
+  },
   "statusbar": {
     "fpc_not_found": "FPC não encontrado",
     "fpc_install_hint": "Clique para instalar"

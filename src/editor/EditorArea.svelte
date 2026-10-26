@@ -5,6 +5,8 @@
   import SearchPanel from '../project/SearchPanel.svelte'
   import GitPanel from '../integrations/git/GitPanel.svelte'
   import MainContent from './MainContent.svelte'
+  import RightPanel from '../app/RightPanel.svelte'
+  import { rightPanelStore } from '../app/rightPanel'
   import { loadSidePanelWidth, saveSidePanelWidth } from './sidePanelWidth'
 
   export let activePanel: string | null
@@ -18,6 +20,8 @@
   const MIN_SIDEBAR_PX = 220
   const EDITOR_RESERVED_PX = 480
   const DEFAULT_SIDEBAR_PX = 220
+  const MIN_RIGHT_PX = 200
+  const DEFAULT_RIGHT_PX = 260
   const RESIZE_KEYS = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
 
   let windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1280
@@ -37,11 +41,62 @@
 
   $: groupWidth = Math.max(windowWidth - ACTIVITY_BAR_WIDTH, 1)
   $: minSizePct = (MIN_SIDEBAR_PX / groupWidth) * 100
+  // The right panel is only shown when it fits next to the left sidebar
+  // without taking the editor below its reserve. Otherwise it stays hidden
+  // and the user's choice is kept, so it returns once there is room.
+  $: fitsRightPanel =
+    groupWidth >=
+    (hasSidePanel ? MIN_SIDEBAR_PX : 0) + MIN_RIGHT_PX + EDITOR_RESERVED_PX
+  $: showRightPanel = $rightPanelStore.open && fitsRightPanel
+  $: rightPanelStore.setAvailable(fitsRightPanel)
   $: maxSizePct = Math.max(
-    100 - (EDITOR_RESERVED_PX / groupWidth) * 100,
+    100 -
+      ((EDITOR_RESERVED_PX + (showRightPanel ? MIN_RIGHT_PX : 0)) /
+        groupWidth) *
+        100,
     minSizePct,
   )
   $: defaultSizePct = (sidebarPx / groupWidth) * 100
+
+  let rightPx = DEFAULT_RIGHT_PX
+  let rightSizePct = 0
+  let isDraggingRightResizer = false
+  let rightUserResizing = false
+  let rightUserResized = false
+
+  $: rightMinPct = (MIN_RIGHT_PX / groupWidth) * 100
+  $: rightMaxPct = Math.max(
+    100 -
+      (((hasSidePanel ? MIN_SIDEBAR_PX : 0) + EDITOR_RESERVED_PX) /
+        groupWidth) *
+        100,
+    rightMinPct,
+  )
+  $: rightDefaultPct = (rightPx / groupWidth) * 100
+
+  // Same rule as the sidebar: only drags and keyboard resizes change the
+  // preferred width, never clamping caused by a narrower window.
+  function beginRightUserResize() {
+    rightUserResizing = true
+    rightUserResized = false
+  }
+
+  function handleRightResize(size: number) {
+    rightSizePct = size
+    if (rightUserResizing) rightUserResized = true
+  }
+
+  function endRightUserResize() {
+    rightUserResizing = false
+    if (!rightUserResized || rightSizePct <= 0) return
+    rightPx = Math.round((rightSizePct / 100) * groupWidth)
+  }
+
+  function handleRightDraggingChange(dragging: boolean) {
+    isDraggingRightResizer = dragging
+    if (dragging) beginRightUserResize()
+    else endRightUserResize()
+  }
 
   // Only drags and keyboard resizes change the preferred width; clamping
   // caused by a narrower window must not overwrite it.
@@ -72,9 +127,10 @@
 
 <div id="editor-area">
   <div id="editor-content">
-    {#if hasSidePanel}
-      <PaneGroup direction="horizontal" class="pane-group">
+    <PaneGroup direction="horizontal" class="pane-group">
+      {#if hasSidePanel}
         <Pane
+          order={1}
           defaultSize={defaultSizePct}
           minSize={minSizePct}
           maxSize={maxSizePct}
@@ -100,13 +156,30 @@
           onkeyup={(e: KeyboardEvent) =>
             RESIZE_KEYS.includes(e.key) && endUserResize()}
         />
-        <Pane>
-          <MainContent />
+      {/if}
+      <Pane order={2}>
+        <MainContent />
+      </Pane>
+      {#if showRightPanel}
+        <PaneResizer
+          class={`pane-resizer ${isDraggingRightResizer ? 'dragging' : ''}`}
+          onDraggingChange={handleRightDraggingChange}
+          onkeydown={(e: KeyboardEvent) =>
+            RESIZE_KEYS.includes(e.key) && beginRightUserResize()}
+          onkeyup={(e: KeyboardEvent) =>
+            RESIZE_KEYS.includes(e.key) && endRightUserResize()}
+        />
+        <Pane
+          order={3}
+          defaultSize={rightDefaultPct}
+          minSize={rightMinPct}
+          maxSize={rightMaxPct}
+          onResize={handleRightResize}
+        >
+          <RightPanel />
         </Pane>
-      </PaneGroup>
-    {:else}
-      <MainContent />
-    {/if}
+      {/if}
+    </PaneGroup>
   </div>
 </div>
 

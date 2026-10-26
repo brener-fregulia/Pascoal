@@ -37,6 +37,12 @@
     "playground": "Playground",
     "settings": "Settings"
   },
+  "right_panel": {
+    "title": "Side panel",
+    "empty": "Nothing to show yet. Contextual information will appear here when a feature provides it.",
+    "toggle": "Toggle right panel",
+    "no_space": "Not enough space for the right panel"
+  },
   "statusbar": {
     "fpc_not_found": "FPC not found",
     "fpc_install_hint": "Click to install"

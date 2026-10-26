@@ -5,6 +5,8 @@
   import { consoleStore } from '../toolchain/console'
   import { i18n, localeStore, LOCALE_OPTIONS, type Locale } from '../i18n'
   import LocaleFlag from '../icons/LocaleFlag.svelte'
+  import PanelRight from '../icons/PanelRight.svelte'
+  import { rightPanelStore } from './rightPanel'
 
   $: info = $appStore.info
   $: fpcLabel = info?.fpcInstalled
@@ -92,6 +94,23 @@
 
   <span class="sep">|</span>
 
+  <button
+    class="status-btn"
+    class:active={$rightPanelStore.open}
+    aria-label={$i18n('right_panel.toggle')}
+    aria-pressed={$rightPanelStore.open}
+    aria-controls="right-panel"
+    title={$rightPanelStore.available || $rightPanelStore.open
+      ? $i18n('right_panel.toggle')
+      : $i18n('right_panel.no_space')}
+    disabled={!$rightPanelStore.available && !$rightPanelStore.open}
+    on:click={() => rightPanelStore.toggle()}
+  >
+    <PanelRight size={14} />
+  </button>
+
+  <span class="sep">|</span>
+
   <div class="locale-wrapper">
     <button
       class="status-btn"
@@ -163,8 +182,14 @@
     height: 100%;
   }
 
-  .status-btn:hover {
+  .status-btn:hover,
+  .status-btn.active {
     opacity: 1;
+  }
+
+  .status-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
   .status-btn:focus-visible,
