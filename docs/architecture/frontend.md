@@ -86,6 +86,57 @@ domain boundaries.
 Domain behavior should remain in its domain store, component, or integration
 module instead of accumulating in `App.svelte`.
 
+## Panel layout contract
+
+`EditorArea.svelte` owns the internal layout of the editor region. A single
+PaneForge group coordinates the optional left sidebar, the central editor
+(`MainContent.svelte`), and the optional contextual right panel.
+
+`MainContent.svelte` stays mounted while either side panel is opened or closed,
+so editor state, focus, and scroll are preserved. Side panels never replace the
+editor.
+
+### Right panel responsibilities
+
+- `app/rightPanel.ts` owns the shared right-panel state and its persistence.
+- `app/RightPanel.svelte` is the visual container and renders an informative
+  empty state.
+- `app/Statusbar.svelte` provides the explicit open/close control.
+- `EditorArea.svelte` owns the right panel's placement, effective size, and
+  resize handling.
+
+Layout infrastructure belongs to the shell. A future feature supplies the
+content shown in the panel and must not take over global layout, visibility, or
+sizing.
+
+### State and persistence
+
+- `open` is the user's explicit choice and is persisted under
+  `pascoal-right-panel-open`.
+- `available` reports whether the current window has room for the panel. It
+  depends on the layout and is never persisted.
+- The preferred width is persisted under `pascoal-right-panel-width` as whole
+  pixels, because PaneForge works in percentages of the current window.
+- Only intentional resizing by mouse or keyboard updates the preferred width.
+  Clamping caused by the window size does not overwrite it.
+- Invalid stored values and unavailable storage fall back to the defaults
+  without interrupting the application.
+- The left sidebar keeps its own independent width preference.
+
+### Small windows
+
+The editor has priority over optional panels. When the window cannot fit the
+sidebar, the right panel, and the editor's reserved width, the right panel is
+hidden temporarily and the status bar control is disabled. The saved `open` and
+width preferences are left unchanged, and the panel can reappear once there is
+enough space.
+
+### Current limits
+
+- The panel only shows an empty state; there is no Outline or Debugger content.
+- There is no dedicated keyboard shortcut for the panel.
+- The panel is not shown in the Settings view.
+
 ## Shared contract
 
 `src/shared/` is for UI or state genuinely reused across domains.
