@@ -6,7 +6,11 @@
   import GitPanel from '../integrations/git/GitPanel.svelte'
   import MainContent from './MainContent.svelte'
   import RightPanel from '../app/RightPanel.svelte'
-  import { rightPanelStore } from '../app/rightPanel'
+  import {
+    rightPanelStore,
+    loadRightPanelWidth,
+    saveRightPanelWidth,
+  } from '../app/rightPanel'
   import { loadSidePanelWidth, saveSidePanelWidth } from './sidePanelWidth'
 
   export let activePanel: string | null
@@ -58,7 +62,7 @@
   )
   $: defaultSizePct = (sidebarPx / groupWidth) * 100
 
-  let rightPx = DEFAULT_RIGHT_PX
+  let rightPx = loadRightPanelWidth(DEFAULT_RIGHT_PX)
   let rightSizePct = 0
   let isDraggingRightResizer = false
   let rightUserResizing = false
@@ -90,6 +94,7 @@
     rightUserResizing = false
     if (!rightUserResized || rightSizePct <= 0) return
     rightPx = Math.round((rightSizePct / 100) * groupWidth)
+    saveRightPanelWidth(rightPx)
   }
 
   function handleRightDraggingChange(dragging: boolean) {

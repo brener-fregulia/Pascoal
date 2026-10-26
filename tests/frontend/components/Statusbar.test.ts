@@ -7,7 +7,10 @@ import { consoleStore } from '../../../src/toolchain/console'
 import { rightPanelStore } from '../../../src/app/rightPanel'
 import { get } from 'svelte/store'
 
-afterEach(() => cleanup())
+afterEach(() => {
+    cleanup()
+    localStorage.clear()
+})
 
 describe('Statusbar', () => {
     beforeEach(() => {

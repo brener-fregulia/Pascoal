@@ -352,3 +352,136 @@ describe('EditorArea right panel', () => {
         expect(get(rightPanelStore).available).toBe(false)
     })
 })
+
+describe('EditorArea right panel persistence', () => {
+    // 1248 px window - 48 px ActivityBar = 1200 px group, so 1% = 12 px.
+    const WIDE = 1248
+
+    async function settle() {
+        for (let i = 0; i < 3; i++) {
+            await tick()
+            await new Promise((resolve) => setTimeout(resolve, 0))
+        }
+    }
+
+    async function renderArea(activePanel: string | null = null) {
+        const result = render(EditorArea, { props: { activePanel } })
+        await settle()
+        return result
+    }
+
+    async function open() {
+        rightPanelStore.toggle()
+        await settle()
+    }
+
+    function rightPct(container: HTMLElement) {
+        const panes = container.querySelectorAll<HTMLElement>('[data-pane]')
+        return Number(panes[panes.length - 1].style.flexGrow)
+    }
+
+    async function pressKey(container: HTMLElement, key: string) {
+        const handles = container.querySelectorAll('[data-pane-resizer]')
+        const handle = handles[handles.length - 1] as HTMLElement
+        await fireEvent.keyDown(handle, { key })
+        await fireEvent.keyUp(handle, { key })
+        await settle()
+    }
+
+    it('opens at 260 px by default without saving anything', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        await open()
+        expect(rightPct(container)).toBeCloseTo((260 / 1200) * 100, 0)
+        expect(localStorage.getItem('pascoal-right-panel-width')).toBeNull()
+    })
+
+    it('restores the saved width', async () => {
+        localStorage.setItem('pascoal-right-panel-width', '360')
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        await open()
+        expect(rightPct(container)).toBeCloseTo(30, 0)
+    })
+
+    it('ignores an invalid saved width', async () => {
+        localStorage.setItem('pascoal-right-panel-width', '-5')
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        await open()
+        expect(rightPct(container)).toBeCloseTo((260 / 1200) * 100, 0)
+    })
+
+    it('saves a keyboard resize in pixels and keeps it after hiding and reopening', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        await open()
+        await pressKey(container, 'ArrowLeft')
+        const saved = localStorage.getItem('pascoal-right-panel-width')
+        expect(Number(saved)).toBeGreaterThan(260)
+
+        await open()
+        await open()
+        expect(Number(localStorage.getItem('pascoal-right-panel-width'))).toBe(Number(saved))
+        expect(rightPct(container)).toBeCloseTo((Number(saved) / 1200) * 100, 0)
+    })
+
+    it('keeps the preferred width when the window shrinks and recovers it', async () => {
+        localStorage.setItem('pascoal-right-panel-width', '400')
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        await open()
+
+        // 760 px window, sidebar closed -> 712 px group; 712 - 480 = 232 px max.
+        window.innerWidth = 760
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+        expect(rightPct(container)).toBeLessThan((400 / 712) * 100)
+        expect(localStorage.getItem('pascoal-right-panel-width')).toBe('400')
+
+        window.innerWidth = WIDE
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+        expect(rightPct(container)).toBeCloseTo((400 / 1200) * 100, 0)
+        expect(localStorage.getItem('pascoal-right-panel-width')).toBe('400')
+    })
+
+    it('keeps the open preference while there is no room and shows the panel again later', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea('explorer')
+        await open()
+        window.innerWidth = 760
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+        expect(container.querySelector('#right-panel')).toBeNull()
+        expect(localStorage.getItem('pascoal-right-panel-open')).toBe('true')
+
+        window.innerWidth = WIDE
+        window.dispatchEvent(new Event('resize'))
+        await settle()
+        expect(container.querySelector('#right-panel')).toBeInTheDocument()
+    })
+
+    it('does not write the sidebar width when resizing the right panel', async () => {
+        window.innerWidth = WIDE
+        const { container } = await renderArea('explorer')
+        await open()
+        await pressKey(container, 'ArrowLeft')
+        expect(localStorage.getItem('pascoal-side-panel-width')).toBeNull()
+    })
+
+    it('keeps existing tabs and the editor mounted when toggling', async () => {
+        mockTabState.tabs = [
+            { id: 'tab-1', state: EditorState.create({ doc: 'program Test;' }) },
+        ]
+        mockTabState.activeTabId = 'tab-1'
+        mockTabState.activeView = 'editor'
+        window.innerWidth = WIDE
+        const { container } = await renderArea()
+        const wrapper = container.querySelector('#editor-wrapper')
+        await open()
+        expect(container.querySelector('#editor-wrapper')).toBe(wrapper)
+        expect(wrapper).toHaveClass('visible')
+        expect(mockTabState.tabs).toHaveLength(1)
+    })
+})
