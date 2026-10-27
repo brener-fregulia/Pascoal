@@ -43,7 +43,8 @@ of being implemented directly in the editor component.
 
 ### Editor views/components
 
-`EditorArea.svelte` composes the side panel and main editor area.
+`EditorArea.svelte` composes the optional left sidebar, the central editor
+area, and the optional contextual right panel.
 
 `MainContent.svelte` composes editor tabs, Welcome, diff views, and the console.
 
