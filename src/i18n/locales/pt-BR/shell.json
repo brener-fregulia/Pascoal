@@ -43,6 +43,11 @@
     "toggle": "Alternar painel direito",
     "no_space": "Espaço insuficiente para o painel direito"
   },
+  "command_palette": {
+    "title": "Paleta de Comandos",
+    "placeholder": "Digite o nome de um comando",
+    "no_results": "Nenhum comando encontrado"
+  },
   "statusbar": {
     "fpc_not_found": "FPC não encontrado",
     "fpc_install_hint": "Clique para instalar"

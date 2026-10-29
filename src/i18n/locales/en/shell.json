@@ -43,6 +43,11 @@
     "toggle": "Toggle right panel",
     "no_space": "Not enough space for the right panel"
   },
+  "command_palette": {
+    "title": "Command Palette",
+    "placeholder": "Type a command name",
+    "no_results": "No matching commands"
+  },
   "statusbar": {
     "fpc_not_found": "FPC not found",
     "fpc_install_hint": "Click to install"

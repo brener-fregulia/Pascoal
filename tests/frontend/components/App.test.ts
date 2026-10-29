@@ -5,6 +5,8 @@ import App from '../../../src/App.svelte'
 import { recentWorkspacesStore } from '../../../src/project/recentWorkspaces'
 import { settingsStore } from '../../../src/settings/settingsStore'
 import { explorerStore } from '../../../src/project/explorerStore'
+import { tabStore } from '../../../src/editor/tabs'
+import { fpcInstallStore } from '../../../src/toolchain/fpcInstall'
 
 beforeEach(() => {
     localStorage.clear()
@@ -104,6 +106,11 @@ vi.mock('@tauri-apps/api/event', () => ({
             return Promise.resolve(() => { })
         },
     ),
+    // Delivers the event to the registered handler, like the Tauri event
+    // system does for frontend-to-frontend events.
+    emit: vi.fn(async (eventName: string, payload?: unknown) => {
+        await mockListenHandlers[eventName]?.({ payload })
+    }),
 }))
 
 function defaultInvokeImpl(
@@ -321,5 +328,157 @@ describe('App - menu-find-in-files listener', () => {
         await waitFor(() => {
             expect(container.querySelector('.search-panel')).toBeInTheDocument()
         })
+    })
+})
+
+describe('App - command palette', () => {
+    beforeEach(() => {
+        mockInvoke.mockReset()
+        mockInvoke.mockImplementation(defaultInvokeImpl())
+        clearListenHandlers()
+        explorerStore.reset()
+        tabStore.reset()
+        fpcInstallStore.hide()
+            ; (window as any).__TAURI__ = { core: { invoke: mockInvoke } }
+        settingsStore.updateSetting('reopenLastWorkspace', false)
+    })
+
+    afterEach(() => {
+        cleanup()
+        explorerStore.reset()
+        tabStore.reset()
+        fpcInstallStore.hide()
+        settingsStore.updateSetting('reopenLastWorkspace', true)
+            ; (window as any).__TAURI__ = undefined
+    })
+
+    async function renderReady() {
+        const utils = render(App)
+        // The last listener App.svelte registers on mount.
+        await waitFor(() =>
+            expect(mockListenHandlers['menu-version-history']).toBeDefined(),
+        )
+        return utils
+    }
+
+    async function openPalette() {
+        await fireEvent.keyDown(document.activeElement ?? document.body, {
+            key: 'P',
+            ctrlKey: true,
+            shiftKey: true,
+        })
+    }
+
+    function palettes() {
+        return document.querySelectorAll('[role="dialog"][aria-label="Command Palette"]')
+    }
+
+    it('opens on Ctrl+Shift+P with the input focused and only once', async () => {
+        const { getByRole } = await renderReady()
+        await openPalette()
+        expect(document.activeElement).toBe(getByRole('combobox'))
+        await openPalette()
+        await fireEvent.keyDown(window, { key: 'P', ctrlKey: true, shiftKey: true })
+        expect(palettes()).toHaveLength(1)
+    })
+
+    it('closes on Escape and gives focus back', async () => {
+        const { getByRole } = await renderReady()
+        const toggle = getByRole('button', { name: 'Toggle right panel' })
+        toggle.focus()
+        await openPalette()
+        await fireEvent.keyDown(getByRole('combobox'), { key: 'Escape' })
+        expect(palettes()).toHaveLength(0)
+        expect(document.activeElement).toBe(toggle)
+    })
+
+    it('does not open over a store-controlled modal', async () => {
+        await renderReady()
+        fpcInstallStore.show()
+        await openPalette()
+        expect(palettes()).toHaveLength(0)
+    })
+
+    it('does not open over a modal controlled by App state', async () => {
+        const { findByRole } = await renderReady()
+        await mockListenHandlers['menu-about']({ payload: undefined })
+        await findByRole('dialog', { name: 'About Pascoal' })
+        await openPalette()
+        expect(palettes()).toHaveLength(0)
+    })
+
+    it('opens a folder through the existing menu handler, showing the Explorer', async () => {
+        mockInvoke.mockImplementation(
+            defaultInvokeImpl({
+                open_workspace: async () => ({
+                    folder: { name: 'MyProject', path: '/tmp/MyProject' },
+                    tree: [],
+                }),
+            }),
+        )
+        const { getByRole, container } = await renderReady()
+        await openPalette()
+        await fireEvent.click(getByRole('option', { name: 'Open Folder...' }))
+
+        expect(palettes()).toHaveLength(0)
+        await waitFor(() => expect(mockInvoke).toHaveBeenCalledWith('open_workspace', undefined))
+        await waitFor(() => {
+            expect(container.querySelector('.file-tree')).toBeInTheDocument()
+        })
+    })
+
+    it('opens Find in Files through the existing handler with Enter', async () => {
+        const { getByRole, container } = await renderReady()
+        await openPalette()
+        const input = getByRole('combobox')
+        await fireEvent.input(input, { target: { value: 'find' } })
+        await fireEvent.keyDown(input, { key: 'Enter' })
+
+        await waitFor(() => {
+            expect(container.querySelector('.search-panel')).toBeInTheDocument()
+        })
+    })
+
+    it('creates a file through the existing handler', async () => {
+        const { getByRole } = await renderReady()
+        await openPalette()
+        await fireEvent.click(getByRole('option', { name: 'New File' }))
+        await waitFor(() => expect(get(tabStore).tabs).toHaveLength(1))
+        expect(get(tabStore).activeTabId).toBe(get(tabStore).tabs[0].id)
+    })
+
+    it('keeps editor shortcuts from running while typing in the palette', async () => {
+        const { getByRole, container } = await renderReady()
+        await mockListenHandlers['menu-new-file']({ payload: undefined })
+        await waitFor(() => expect(container.querySelector('.cm-editor')).toBeInTheDocument())
+        mockInvoke.mockClear()
+
+        await openPalette()
+        const input = getByRole('combobox')
+        await fireEvent.keyDown(input, { key: 's', ctrlKey: true })
+        await fireEvent.keyDown(input, { key: 'S', ctrlKey: true, shiftKey: true })
+        await fireEvent.keyDown(input, { key: 'F5' })
+        await fireEvent.keyDown(input, { key: 'f', ctrlKey: true })
+        await fireEvent.keyDown(input, { key: 'F', ctrlKey: true, shiftKey: true })
+        await new Promise((resolve) => setTimeout(resolve, 0))
+
+        expect(palettes()).toHaveLength(1)
+        expect(mockInvoke).not.toHaveBeenCalled()
+        expect(container.querySelector('.find-widget')).toBeNull()
+        expect(container.querySelector('.search-panel')).toBeNull()
+    })
+
+    it('closes with Escape without closing the editor find widget', async () => {
+        const { getByRole, container } = await renderReady()
+        await mockListenHandlers['menu-new-file']({ payload: undefined })
+        await waitFor(() => expect(container.querySelector('.cm-editor')).toBeInTheDocument())
+        await fireEvent.keyDown(document, { key: 'f', ctrlKey: true })
+        await waitFor(() => expect(container.querySelector('.find-widget')).toBeInTheDocument())
+
+        await openPalette()
+        await fireEvent.keyDown(getByRole('combobox'), { key: 'Escape' })
+
+        expect(palettes()).toHaveLength(0)
+        expect(container.querySelector('.find-widget')).toBeInTheDocument()
     })
 })

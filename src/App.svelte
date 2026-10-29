@@ -11,6 +11,7 @@
   import UpdateAvailableModal from './app/UpdateAvailableModal.svelte'
   import WhatsNewModal from './app/WhatsNewModal.svelte'
   import VersionHistoryModal from './app/VersionHistoryModal.svelte'
+  import CommandPalette from './app/CommandPalette.svelte'
   import { appStore } from './app/app'
   import { whatsNewStore } from './app/whatsNew'
   import { themeStore, themeDefinition } from './shared/theme'
@@ -29,13 +30,35 @@
   let activePanel = $state<string | null>(null)
   let showAbout = $state(false)
   let showVersionHistory = $state(false)
+  let showCommandPalette = $state(false)
 
   function openFindInFiles() {
     activePanel = 'search'
     searchFocusTick.update((n) => n + 1)
   }
 
+  // Modals are controlled both by local state here and by stores; the
+  // update condition mirrors the one in UpdateAvailableModal.svelte.
+  function isModalOpen(): boolean {
+    const updateStatus = get(updateStore).status
+    return (
+      showAbout ||
+      showVersionHistory ||
+      get(fpcInstallStore).visible ||
+      get(whatsNewStore).show ||
+      updateStatus === 'available' ||
+      updateStatus === 'downloading' ||
+      updateStatus === 'ready' ||
+      updateStatus === 'error'
+    )
+  }
+
   function handleKeydown(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'p') {
+      e.preventDefault()
+      if (!showCommandPalette && !isModalOpen()) showCommandPalette = true
+      return
+    }
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'f') {
       e.preventDefault()
       openFindInFiles()
@@ -187,6 +210,9 @@
 <UpdateAvailableModal />
 <WhatsNewModal onViewHistory={() => (showVersionHistory = true)} />
 <VersionHistoryModal bind:open={showVersionHistory} />
+{#if showCommandPalette}
+  <CommandPalette onClose={() => (showCommandPalette = false)} />
+{/if}
 
 <style>
   #layout {
