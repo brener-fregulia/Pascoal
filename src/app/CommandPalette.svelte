@@ -6,9 +6,13 @@
     executeCommand,
     filterCommands,
     type Command,
+    type CommandContext,
   } from './commands'
 
-  let { onClose }: { onClose: () => void } = $props()
+  let {
+    onClose,
+    getContext,
+  }: { onClose: () => void; getContext: () => CommandContext } = $props()
 
   const uid = $props.id()
   const listboxId = `${uid}-listbox`
@@ -17,7 +21,7 @@
   let inputEl: HTMLInputElement
   let query = $state('')
   let activeIndex = $state(0)
-  let available = $state<Command[]>(availableCommands())
+  let available = $state<Command[]>(listAvailable())
   let previousFocus: HTMLElement | null = null
 
   let results = $derived(filterCommands(available, query, $i18n))
@@ -27,6 +31,11 @@
   let activeDescendant = $derived(
     selectedIndex >= 0 ? optionId(results[selectedIndex]) : undefined,
   )
+
+  // The App context is read on demand: it is not reactive here.
+  function listAvailable(): Command[] {
+    return availableCommands(getContext())
+  }
 
   function optionId(command: Command): string {
     return `${uid}-option-${command.id}`
@@ -53,7 +62,7 @@
   // (editor, search input, file dialog).
   function execute(command: Command) {
     close()
-    void executeCommand(command)
+    void executeCommand(command, getContext())
   }
 
   function move(delta: number) {
@@ -90,7 +99,7 @@
   }
 
   function handleInput() {
-    available = availableCommands()
+    available = listAvailable()
     activeIndex = 0
   }
 </script>

@@ -7,6 +7,7 @@ import { settingsStore } from '../../../src/settings/settingsStore'
 import { explorerStore } from '../../../src/project/explorerStore'
 import { tabStore } from '../../../src/editor/tabs'
 import { fpcInstallStore } from '../../../src/toolchain/fpcInstall'
+import { EditorView } from '@codemirror/view'
 
 beforeEach(() => {
     localStorage.clear()
@@ -459,6 +460,7 @@ describe('App - command palette', () => {
         await fireEvent.keyDown(input, { key: 'S', ctrlKey: true, shiftKey: true })
         await fireEvent.keyDown(input, { key: 'F5' })
         await fireEvent.keyDown(input, { key: 'f', ctrlKey: true })
+        await fireEvent.keyDown(input, { key: 'h', ctrlKey: true })
         await fireEvent.keyDown(input, { key: 'F', ctrlKey: true, shiftKey: true })
         await new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -480,5 +482,177 @@ describe('App - command palette', () => {
 
         expect(palettes()).toHaveLength(0)
         expect(container.querySelector('.find-widget')).toBeInTheDocument()
+    })
+
+    // ── Editor commands ─────────────────────────────────────────────────
+
+    const SOURCE = 'program Test;\nbegin\n  WriteLn(1);\nend.\n'
+
+    async function renderWithFile(filePath: string | null = '/tmp/test.pas') {
+        const utils = await renderReady()
+        const tab = filePath
+            ? await tabStore.openFile(filePath, SOURCE)
+            : await tabStore.newTab(SOURCE)
+        tabStore.activate(tab.id)
+        await waitFor(() =>
+            expect(mockListenHandlers['menu-toggle-comment']).toBeDefined(),
+        )
+        const view = EditorView.findFromDOM(
+            utils.container.querySelector('.cm-editor') as HTMLElement,
+        )!
+        await waitFor(() => expect(view.state.doc.toString()).toBe(SOURCE))
+        mockInvoke.mockClear()
+        return { ...utils, view, tab }
+    }
+
+    async function runFromPalette(id: string) {
+        await openPalette()
+        await fireEvent.click(document.querySelector(`[role="option"][id$="-option-${id}"]`)!)
+    }
+
+    function selectLines(view: EditorView, from: number, to: number) {
+        const doc = view.state.doc
+        view.dispatch({
+            selection: { anchor: doc.line(from).from, head: doc.line(to).to },
+        })
+        view.focus()
+    }
+
+    function optionLabels() {
+        return Array.from(document.querySelectorAll('[role="option"]')).map(
+            (o) => o.textContent?.trim(),
+        )
+    }
+
+    it('lists the editor commands only while the editor shows an active tab', async () => {
+        const { getByRole } = await renderWithFile()
+        await openPalette()
+        expect(optionLabels()).toEqual([
+            'New File',
+            'Open File...',
+            'Open Folder...',
+            'Save',
+            'Save As...',
+            'Find',
+            'Replace',
+            'Find in Files',
+            'Toggle Line Comment',
+        ])
+        await fireEvent.keyDown(getByRole('combobox'), { key: 'Escape' })
+
+        tabStore.showWelcome()
+        await openPalette()
+        expect(optionLabels()).not.toContain('Save')
+    })
+
+    it('hides the editor commands in the Settings view', async () => {
+        const { getByRole, container } = await renderWithFile()
+        await fireEvent.click(getByRole('button', { name: 'Settings' }))
+        await waitFor(() => expect(container.querySelector('.cm-editor')).toBeNull())
+        await openPalette()
+        expect(optionLabels()).toEqual([
+            'New File',
+            'Open File...',
+            'Open Folder...',
+            'Find in Files',
+        ])
+    })
+
+    it('saves the active file through the existing Ctrl+S handler', async () => {
+        const { view, tab } = await renderWithFile()
+        tabStore.markDirty(tab.id)
+        selectLines(view, 2, 3)
+        const selection = view.state.selection
+
+        await runFromPalette('file.save')
+
+        await waitFor(() =>
+            expect(mockInvoke).toHaveBeenCalledWith('save_file', {
+                content: SOURCE,
+                filePath: '/tmp/test.pas',
+            }),
+        )
+        await waitFor(() => expect(tabStore.getActive()?.isDirty).toBe(false))
+        expect(palettes()).toHaveLength(0)
+        expect(view.state.selection.eq(selection)).toBe(true)
+    })
+
+    it('falls back to Save As for an untitled file, like the menu', async () => {
+        const { tab } = await renderWithFile(null)
+        await runFromPalette('file.save')
+        await waitFor(() =>
+            expect(mockInvoke).toHaveBeenCalledWith('save_file_as', {
+                content: SOURCE,
+                suggestedName: tab.fileName,
+                folderPath: null,
+            }),
+        )
+        expect(mockInvoke).not.toHaveBeenCalledWith('save_file', expect.anything())
+    })
+
+    it('saves as through the existing handler and updates the tab path', async () => {
+        mockInvoke.mockImplementation(
+            defaultInvokeImpl({ save_file_as: async () => ({ path: '/tmp/renamed.pas' }) }),
+        )
+        await renderWithFile()
+        await runFromPalette('file.saveAs')
+        await waitFor(() =>
+            expect(tabStore.getActive()?.filePath).toBe('/tmp/renamed.pas'),
+        )
+        expect(mockInvoke).toHaveBeenCalledWith('save_file_as', expect.anything())
+    })
+
+    it('opens Find with the focus in the find input after the palette closes', async () => {
+        const { container } = await renderWithFile()
+        await runFromPalette('edit.find')
+        await waitFor(() =>
+            expect(document.activeElement).toBe(
+                container.querySelector('.find-widget .find-input'),
+            ),
+        )
+        expect(palettes()).toHaveLength(0)
+        expect(container.querySelectorAll('.find-widget .find-input')).toHaveLength(1)
+    })
+
+    it('opens Replace with the replace row and the focus in the find input', async () => {
+        const { container } = await renderWithFile()
+        await runFromPalette('edit.replace')
+        await waitFor(() =>
+            expect(document.activeElement).toBe(
+                container.querySelector('.find-widget .find-input'),
+            ),
+        )
+        expect(container.querySelectorAll('.find-widget .find-input')).toHaveLength(2)
+    })
+
+    it('toggles the comment of the lines selected before opening the palette', async () => {
+        const { view } = await renderWithFile()
+        selectLines(view, 2, 3)
+
+        await runFromPalette('edit.toggleLineComment')
+
+        await waitFor(() =>
+            expect(view.state.doc.toString()).toBe(
+                'program Test;\n// begin\n//   WriteLn(1);\nend.\n',
+            ),
+        )
+        const { from, to } = view.state.selection.main
+        expect(view.state.doc.lineAt(from).number).toBe(2)
+        expect(view.state.doc.lineAt(to).number).toBe(3)
+    })
+
+    it('gives the focus and the selection back to the editor on Escape', async () => {
+        const { view, getByRole } = await renderWithFile()
+        selectLines(view, 2, 3)
+        const selection = view.state.selection
+        const focused = document.activeElement
+        expect(focused).toBe(view.contentDOM)
+
+        await openPalette()
+        expect(document.activeElement).toBe(getByRole('combobox'))
+        await fireEvent.keyDown(getByRole('combobox'), { key: 'Escape' })
+
+        expect(document.activeElement).toBe(focused)
+        expect(view.state.selection.eq(selection)).toBe(true)
     })
 })

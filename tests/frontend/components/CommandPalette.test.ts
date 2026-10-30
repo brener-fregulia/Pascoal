@@ -2,6 +2,8 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/svelte'
 import { tick } from 'svelte'
 import { localeStore } from '../../../src/i18n'
+import { tabStore } from '../../../src/editor/tabs'
+import type { CommandContext } from '../../../src/app/commands'
 
 const { mockEmit } = vi.hoisted(() => ({ mockEmit: vi.fn() }))
 
@@ -12,10 +14,12 @@ vi.mock('@tauri-apps/api/event', () => ({
 import CommandPalette from '../../../src/app/CommandPalette.svelte'
 
 let outside: HTMLButtonElement
+let context: CommandContext
 
 beforeEach(() => {
     ; (window as any).__TAURI__ = { core: { invoke: vi.fn() } }
     localeStore.set('en')
+    context = { activePanel: null }
     outside = document.createElement('button')
     outside.textContent = 'outside'
     document.body.appendChild(outside)
@@ -26,13 +30,14 @@ afterEach(() => {
     cleanup()
     outside.remove()
     vi.clearAllMocks()
+    tabStore.reset()
     localeStore.set('en')
         ; (window as any).__TAURI__ = undefined
 })
 
 function renderPalette() {
     const onClose = vi.fn()
-    const utils = render(CommandPalette, { onClose })
+    const utils = render(CommandPalette, { onClose, getContext: () => context })
     const input = utils.getByRole('combobox') as HTMLInputElement
     return { ...utils, input, onClose }
 }
@@ -184,6 +189,34 @@ describe('CommandPalette', () => {
         expect(queryAllByRole('option')).toHaveLength(0)
         expect(getByRole('status')).toBeInTheDocument()
         await fireEvent.keyDown(input, { key: 'Enter' })
+        expect(mockEmit).not.toHaveBeenCalled()
+    })
+
+    it('lists the editor commands when an editor tab is active', async () => {
+        const tab = await tabStore.newTab('program Test;\nbegin\nend.\n')
+        tabStore.activate(tab.id)
+        const { getAllByRole } = renderPalette()
+        expect(getAllByRole('option').map((o) => o.textContent?.trim())).toEqual([
+            'New File',
+            'Open File...',
+            'Open Folder...',
+            'Save',
+            'Save As...',
+            'Find',
+            'Replace',
+            'Find in Files',
+            'Toggle Line Comment',
+        ])
+    })
+
+    it('reads the App context again before running a command', async () => {
+        const tab = await tabStore.newTab('program Test;\nbegin\nend.\n')
+        tabStore.activate(tab.id)
+        const { getByRole, onClose } = renderPalette()
+        context = { activePanel: 'settings' }
+        await fireEvent.click(getByRole('option', { name: 'Save' }))
+        await tick()
+        expect(onClose).toHaveBeenCalledTimes(1)
         expect(mockEmit).not.toHaveBeenCalled()
     })
 

@@ -211,7 +211,10 @@
 <WhatsNewModal onViewHistory={() => (showVersionHistory = true)} />
 <VersionHistoryModal bind:open={showVersionHistory} />
 {#if showCommandPalette}
-  <CommandPalette onClose={() => (showCommandPalette = false)} />
+  <CommandPalette
+    onClose={() => (showCommandPalette = false)}
+    getContext={() => ({ activePanel })}
+  />
 {/if}
 
 <style>
