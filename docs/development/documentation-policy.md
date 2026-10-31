@@ -148,12 +148,12 @@ specification.
 
 Once work has approved scope, use GitHub:
 
-- Milestones for Releases;
-- Epic issues only when multiple related Features need shared context;
-- Feature issues for approved functional specifications;
-- Fix and Refactor issues for independently tracked work;
-- Work Package sub-issues for focused execution units;
-- Projects for workflow state and progress.
+- Milestones for release scope;
+- Issues for self-contained Work Packages, Spikes, Bugs, and Refactors;
+- Projects for issue type and workflow status.
+
+Issues do not require an Epic/Feature hierarchy or a parent issue. See
+`docs/development/sdd.md` for the approved work model.
 
 Do not duplicate the complete GitHub hierarchy in roadmap documents.
 Small, low-risk changes may use Reduced SDD.
@@ -163,7 +163,7 @@ Small, low-risk changes may use Reduced SDD.
 | Change | Typical documentation |
 |---|---|
 | Internal implementation with no durable effect | Work Package outcome when useful |
-| User-visible feature | GitHub Feature spec; README/feature docs when needed; changelog |
+| User-visible feature | GitHub Issue; README/feature docs when needed; changelog |
 | Bug fix | Fix/Work Package tracking when needed; changelog when release-relevant |
 | Reversible refactor | Work Package outcome when useful |
 | Architecture change | Architecture docs and ADR when a durable decision is involved |
